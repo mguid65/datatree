@@ -2,7 +2,7 @@
 
 datatree library just for fun
 
-You might look at this and say "That looks like JSON" and you would be correct, but it doesn't matter. I'm only writing this to show that I have something to show and in fact do know how to write C++.
+You might look at this and say "that looks like JSON"...
 
 ## Build
 
