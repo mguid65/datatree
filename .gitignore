@@ -6,6 +6,7 @@ conan-cache/
 
 # User spesific settings
 CMakeUserPresets.json
+conan_provider.cmake
 
 # IDE files
 .vs/

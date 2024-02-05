@@ -1,11 +1,13 @@
-//
-// Created by matthew on 2/4/24.
-//
+/**
+ * @brief Tests for datatree
+ * @author Matthew Guidry (github: mguid65)
+ * @date 2024-02-05
+ */
 
-#include <catch2/catch2.hpp>
+#include <catch2/catch_all.hpp>
+
+#include <datatree/datatree.hpp>
 
 TEST_CASE("Datatree Constructor") {
-  SECTION("Default Constructor") {
-    mguid::datatree dt;
-  }
+  SECTION("Default Constructor") { mguid::datatree dt; }
 }
