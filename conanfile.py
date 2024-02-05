@@ -22,10 +22,10 @@ class DataTreeConan(ConanFile):
         copy(self, "test/*", self.recipe_folder, self.export_sources_folder)
 
     def requirements(self):
-        pass
+        self.test_requires('catch2/3.5.2')
 
     def build_requirements(self):
-        self.test_requires('catch2/3.5.2')
+        pass
 
     def build(self):
         cmake = CMake(self)
