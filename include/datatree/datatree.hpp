@@ -9,10 +9,7 @@
 
 namespace mguid {
 
-class datatree {
-public:
-private:
-};
+class datatree {};
 
 }  // namespace mguid
 

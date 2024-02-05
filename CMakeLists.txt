@@ -10,6 +10,10 @@ project(datatree VERSION 0.0.1 LANGUAGES CXX C)
 
 set(DATATREE_SOURCES
         source/datatree/datatree.cpp
+        source/datatree/tree_node.cpp
+        source/datatree/node_types/array_node.cpp
+        source/datatree/node_types/object_node.cpp
+        source/datatree/node_types/value_node.cpp
 )
 
 # Static because I don't feel like dealing with shared shenanigans
