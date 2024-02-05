@@ -4,6 +4,7 @@ set(UNIT_TEST_SRC
         unit_test_object_node.cpp
         unit_test_array_node.cpp
         unit_test_value_node.cpp
+        unit_test_null_type.cpp
 )
 
 add_executable(unit_tests EXCLUDE_FROM_ALL)
