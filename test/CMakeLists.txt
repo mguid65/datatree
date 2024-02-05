@@ -7,7 +7,7 @@ set(UNIT_TEST_SRC
 )
 
 add_executable(unit_tests EXCLUDE_FROM_ALL)
-target_sources(unit_tests PRIVATE "${UNIT_TEST_SRC}")
+target_sources(unit_tests PRIVATE ${UNIT_TEST_SRC})
 target_link_libraries(unit_tests PRIVATE datatree Catch2::Catch2WithMain)
 
 add_test(NAME unit_tests
