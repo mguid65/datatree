@@ -9,5 +9,5 @@
 #include <datatree/node_types/value_node.hpp>
 
 TEST_CASE("Value Node Constructor") {
-  SECTION("Default Constructor") { mguid::value_node vn; }
+  SECTION("Default Constructor") { mguid::ValueNode vn; }
 }

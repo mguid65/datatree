@@ -7,5 +7,5 @@
 #include <datatree/datatree.hpp>
 
 auto main(int argc, const char* argv[]) -> int {
-  mguid::datatree dt;
+  mguid::DataTree dt;
 }

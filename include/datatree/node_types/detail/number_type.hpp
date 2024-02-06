@@ -7,18 +7,42 @@
 #ifndef DATATREE_NUMBER_TYPE_HPP
 #define DATATREE_NUMBER_TYPE_HPP
 
+#include <concepts>
 #include <cstdint>
+#include <utility>
 
 namespace mguid {
 
+using IntegerType = std::int64_t;
+using UnsignedIntegerType = std::uint64_t;
+using FloatType = double;
+
+template <typename TType>
+concept AllowedNumericType =
+    (!std::same_as<std::remove_cvref_t<TType>, bool> &&
+     (std::integral<std::remove_cvref_t<TType>> ||
+      std::floating_point<std::remove_cvref_t<TType>>));
+
+template <typename TType>
+concept SignedIntegerLike = (!std::same_as<std::remove_cvref_t<TType>, bool> &&
+                             (std::integral<std::remove_cvref_t<TType>>)) &&
+                            std::is_signed_v<std::remove_cvref_t<TType>>;
+
+template <typename TType>
+concept UnsignedIntegerLike =
+    (!std::same_as<std::remove_cvref_t<TType>, bool> &&
+     (std::integral<std::remove_cvref_t<TType>>)) &&
+    std::is_unsigned_v<std::remove_cvref_t<TType>>;
+
 /**
- * @brief
+ * @brief A class that holds numeric values
  */
-class number_type {
-  enum class tag { Float64, Int64, None } m_tag{tag::None};
+class NumberType {
+  enum class tag { Float, UInt, Int, None } m_tag{tag::None};
   union {
-    double m_f_value;
-    std::int64_t m_i_value;
+    FloatType m_f_value;
+    IntegerType m_i_value;
+    UnsignedIntegerType m_u_value;
   };
 
 public:
@@ -28,26 +52,19 @@ public:
    * Sets the tag to None
    *
    */
-  constexpr number_type() noexcept = default;
-  /**
-   * @brief Construct a number from a double
-   *
-   * Sets the tag to Float64
-   *
-   * @param val double value
-   */
-  constexpr number_type(double val) noexcept
-      : m_f_value{val}, m_tag{tag::Float64} {}
+  constexpr NumberType() noexcept = default;
+
+  constexpr NumberType(std::nullptr_t) noexcept : m_tag{tag::None} {}
 
   /**
-   * @brief Construct a number from a 64-bit integer
-   *
-   * Sets the tag to Int64
-   *
-   * @param val integer value
+   * @brief
+   * @tparam TValueType
+   * @param val
    */
-  constexpr number_type(std::int64_t val) noexcept
-      : m_i_value{val}, m_tag{tag::Int64} {}
+  template <AllowedNumericType TValueType>
+  constexpr NumberType(TValueType&& val) noexcept {
+    this->operator=(val);
+  }
 
   /**
    * @brief Does this number have a value
@@ -62,23 +79,31 @@ public:
    * @return True if it is a double, otherwise false
    */
   [[nodiscard]] constexpr bool isDouble() const noexcept {
-    return m_tag == tag::Float64;
+    return m_tag == tag::Float;
   }
 
   /**
    * @brief Is this number holding an integer value
    * @return True if it is an integer, otherwise false
    */
-  [[nodiscard]] constexpr bool isInteger() const noexcept {
-    return m_tag == tag::Int64;
+  [[nodiscard]] constexpr bool isInt() const noexcept {
+    return m_tag == tag::Int;
+  }
+
+  /**
+   * @brief Is this number holding an unsigned integer value
+   * @return True if it is an unsigned integer, otherwise false
+   */
+  [[nodiscard]] constexpr bool isUInt() const noexcept {
+    return m_tag == tag::UInt;
   }
 
   /**
    * @brief Try to get a double from this number type
    * @return the double value if it exists, otherwise nullptr
    */
-  [[nodiscard]] const double* try_get_double() const {
-    if (m_tag == tag::Float64) return &m_f_value;
+  [[nodiscard]] const FloatType* tryGetDouble() const {
+    if (m_tag == tag::Float) return &m_f_value;
     return nullptr;
   }
 
@@ -86,9 +111,40 @@ public:
    * @brief Try to get an integer from this number type
    * @return the integer value if it exists, otherwise nullptr
    */
-  [[nodiscard]] const std::int64_t* try_get_integer() const {
-    if (m_tag == tag::Int64) return &m_i_value;
+  [[nodiscard]] const IntegerType* tryGetInt() const {
+    if (m_tag == tag::Int) return &m_i_value;
     return nullptr;
+  }
+
+  /**
+   * @brief Try to get an integer from this number type
+   * @return the integer value if it exists, otherwise nullptr
+   */
+  [[nodiscard]] const UnsignedIntegerType* tryGetUInt() const {
+    if (m_tag == tag::UInt) return &m_u_value;
+    return nullptr;
+  }
+
+  /**
+   * @brief
+   * @return
+   */
+  template <AllowedNumericType TValueType>
+  NumberType& operator=(TValueType&& val) {
+    if constexpr (std::floating_point<std::remove_cvref_t<TValueType>>) {
+      m_f_value = std::forward<TValueType>(val);
+      m_tag = tag::Float;
+    } else if constexpr (SignedIntegerLike<TValueType>) {
+      m_i_value = std::forward<TValueType>(val);
+      m_tag = tag::Int;
+    } else if constexpr (UnsignedIntegerLike<TValueType>) {
+      m_u_value = std::forward<TValueType>(val);
+      m_tag = tag::UInt;
+    } else {
+      // The concept should prevent this from happening but just in case.
+      throw std::exception{};
+    }
+    return *this;
   }
 };
 

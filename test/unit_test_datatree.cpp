@@ -9,5 +9,5 @@
 #include <datatree/datatree.hpp>
 
 TEST_CASE("Datatree Constructor") {
-  SECTION("Default Constructor") { mguid::datatree dt; }
+  SECTION("Default Constructor") { mguid::DataTree dt; }
 }

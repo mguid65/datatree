@@ -1,6 +1,6 @@
-# datatree
+# DataTree
 
-datatree library just for fun
+DataTree library just for fun
 
 You might look at this and say "that looks like JSON"...
 

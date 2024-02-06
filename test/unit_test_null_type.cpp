@@ -11,27 +11,27 @@
 
 TEST_CASE("Null Type Traits") {
   SECTION("Trivially Default Constructible") {
-    REQUIRE(std::is_trivially_default_constructible_v<mguid::null_type>);
+    REQUIRE(std::is_trivially_default_constructible_v<mguid::NullType>);
   }
   SECTION("Trivially Copy Constructible") {
-    REQUIRE(std::is_trivially_copy_constructible_v<mguid::null_type>);
+    REQUIRE(std::is_trivially_copy_constructible_v<mguid::NullType>);
   }
   SECTION("Trivially Copy Assignable") {
-    REQUIRE(std::is_trivially_copy_assignable_v<mguid::null_type>);
+    REQUIRE(std::is_trivially_copy_assignable_v<mguid::NullType>);
   }
   SECTION("Trivially Destructible") {
-    REQUIRE(std::is_trivially_destructible_v<mguid::null_type>);
+    REQUIRE(std::is_trivially_destructible_v<mguid::NullType>);
   }
   SECTION("Constexpr Constructible") {
-    constexpr mguid::null_type nt;
+    constexpr mguid::NullType nt;
     ((void) nt);
   }
 }
 
 TEST_CASE("Null Type Comparisons") {
   SECTION("Comparisons") {
-    constexpr mguid::null_type nt1;
-    constexpr mguid::null_type nt2;
+    constexpr mguid::NullType nt1;
+    constexpr mguid::NullType nt2;
 
     // Comparisons are correct and noexcept
     REQUIRE((nt1 == nt2));
@@ -78,11 +78,11 @@ TEST_CASE("Null Type Comparisons") {
 }
 
 TEST_CASE("Null Type Hash") {
-  using hash_type = std::hash<mguid::null_type>;
+  using hash_type = std::hash<mguid::NullType>;
   const auto hsh = hash_type{};
 
-  mguid::null_type nt1;
-  const mguid::null_type nt2;
+  mguid::NullType nt1;
+  const mguid::NullType nt2;
 
   REQUIRE(hsh(nt1) == hsh(nt1));
   REQUIRE(hsh(nt2) == hsh(nt2));

@@ -1,5 +1,5 @@
 /**
- * @brief Definition of null_type value type
+ * @brief Definition of NullType value type
  *
  * Based on the libc++ implementation of std::monostate
  *
@@ -22,20 +22,19 @@ namespace mguid {
  * @brief Class that represents a well behaved null state similar
  * to std::monostate
  */
-struct null_type {};
+struct NullType {};
 
 /**
- * @brief Equality operator for null_type
+ * @brief Equality operator for NullType
  * @return Always returns true
  */
-inline constexpr bool operator==(null_type, null_type) noexcept { return true; }
+inline constexpr bool operator==(NullType, NullType) noexcept { return true; }
 
 /**
- * @brief Comparison operator for null_type
+ * @brief Comparison operator for NullType
  * @return Always returns equal
  */
-inline constexpr std::strong_ordering operator<=>(null_type,
-                                                  null_type) noexcept {
+inline constexpr std::strong_ordering operator<=>(NullType, NullType) noexcept {
   return std::strong_ordering::equal;
 }
 
@@ -43,15 +42,15 @@ inline constexpr std::strong_ordering operator<=>(null_type,
 
 namespace std {
 /**
- * @brief Specialization of std::hash for null_type
+ * @brief Specialization of std::hash for NullType
  */
 template <>
-struct hash<mguid::null_type> {
-  using argument_type = mguid::null_type;
+struct hash<mguid::NullType> {
+  using argument_type = mguid::NullType;
   using result_type = std::size_t;
 
   /**
-   * @brief Hash function for null_type
+   * @brief Hash function for NullType
    *
    * The value returned is the same as the value returned by the
    * std::hash<std::monostate> specialization in llvm/libc++.

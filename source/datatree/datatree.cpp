@@ -6,4 +6,4 @@
 
 #include "datatree/datatree.hpp"
 
-namespace mguid {}
+namespace mguid {} // namespace mguid

@@ -9,7 +9,7 @@
 
 namespace mguid {
 
-class array_node {};
+class ArrayNode {};
 
 }  // namespace mguid
 

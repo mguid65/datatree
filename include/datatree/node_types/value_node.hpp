@@ -9,7 +9,7 @@
 
 namespace mguid {
 
-class value_node {};
+class ValueNode {};
 
 }  // namespace mguid
 

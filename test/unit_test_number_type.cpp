@@ -10,7 +10,7 @@
 
 TEST_CASE("Number Type Constructor") {
   SECTION("Default Constructor") {
-    REQUIRE(std::is_default_constructible_v<mguid::number_type>);
-    mguid::number_type nt;
+    REQUIRE(std::is_default_constructible_v<mguid::NumberType>);
+    mguid::NumberType nt;
   }
 }
