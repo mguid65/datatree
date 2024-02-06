@@ -1,0 +1,47 @@
+name: CMake Ubuntu
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+      with:
+        version: 2.0.17
+
+    - name: Conan version
+      run: echo "${{ steps.conan.outputs.version }}"
+
+    - name: Conan Profile Detect
+      run: conan profile detect
+
+    - name: Run Conan
+      run: conan install . -b missing
+
+    - name: Configure CMake
+      run: cmake --preset conan-release
+
+    - name: Build
+      run: cmake --build --preset conan-release
+
+    - name: Run Sample
+      working-directory: ${{github.workspace}}/build
+      run: ./Release/sample
+
+    # - name: Test
+    #   working-directory: ${{github.workspace}}/build
+    #   run: ctest -C ${{env.BUILD_TYPE}}
+
