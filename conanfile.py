@@ -1,6 +1,9 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout
 from conan.tools.files import copy
+from conan.tools.build import can_run
 
 class DataTreeConan(ConanFile):
     name = 'datatree'
@@ -26,6 +29,11 @@ class DataTreeConan(ConanFile):
 
     def build_requirements(self):
         pass
+
+    def test(self):
+        if can_run(self):
+            cmd = os.path.join(self.cpp.build.bindir, "sample")
+            self.run(cmd, env="conanrun")
 
     def build(self):
         cmake = CMake(self)

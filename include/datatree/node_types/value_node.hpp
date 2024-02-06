@@ -7,6 +7,8 @@
 #ifndef DATATREE_VALUE_NODE_HPP
 #define DATATREE_VALUE_NODE_HPP
 
+#include "datatree/node_types/detail/value_types.hpp"
+
 namespace mguid {
 
 class ValueNode {};

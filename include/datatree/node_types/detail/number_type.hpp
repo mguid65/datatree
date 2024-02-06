@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <utility>
 
+#include "datatree/common.hpp"
+
 namespace mguid {
 
 using IntegerType = std::int64_t;
@@ -126,11 +128,11 @@ public:
   }
 
   /**
-   * @brief
-   * @return
+   * @brief Assign a value to this number container
+   * @return reference to this number instance
    */
   template <AllowedNumericType TValueType>
-  NumberType& operator=(TValueType&& val) {
+  constexpr NumberType& operator=(TValueType&& val) noexcept {
     if constexpr (std::floating_point<std::remove_cvref_t<TValueType>>) {
       m_f_value = std::forward<TValueType>(val);
       m_tag = tag::Float;
@@ -141,8 +143,10 @@ public:
       m_u_value = std::forward<TValueType>(val);
       m_tag = tag::UInt;
     } else {
-      // The concept should prevent this from happening but just in case.
-      throw std::exception{};
+      // The concept should prevent this from happening but just in case,
+      // we put a throw here which isn't allowed in constexpr contexts so this
+      // will fail to compile
+      unreachable();
     }
     return *this;
   }

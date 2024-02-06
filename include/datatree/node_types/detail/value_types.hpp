@@ -7,7 +7,8 @@
 #ifndef DATATREE_VALUE_TYPES_HPP
 #define DATATREE_VALUE_TYPES_HPP
 
-
+#include "datatree/node_types/detail/null_type.hpp"
+#include "datatree/node_types/detail/number_type.hpp"
 
 namespace mguid {
 
