@@ -25,6 +25,9 @@ jobs:
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
 
+    - name: Conan Profile Detect
+      run: conan profile detect
+
     - name: Run Conan
       run: conan install . -b missing
 
