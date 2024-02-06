@@ -30,7 +30,10 @@ add_executable(sample)
 target_sources(sample PRIVATE source/sample/main.cpp)
 target_link_libraries(sample PRIVATE datatree)
 
+enable_testing()
+
 add_test(NAME sample
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND sample)
 
 find_package(Catch2 COMPONENTS Catch2WithMain)

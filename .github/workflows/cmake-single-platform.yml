@@ -41,7 +41,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ./Release/sample
 
-    # - name: Test
-    #   working-directory: ${{github.workspace}}/build
-    #   run: ctest -C ${{env.BUILD_TYPE}}
-
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C
