@@ -6,7 +6,7 @@
  * src: https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h
  *
  * @author Matthew Guidry (github: mguid65)
- * @date 2/5/24
+ * @date 2024-02-05
  */
 
 #ifndef DATATREE_NULL_TYPE_HPP
