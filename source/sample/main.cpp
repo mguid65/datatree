@@ -6,6 +6,6 @@
 
 #include <datatree/datatree.hpp>
 
-auto main(int argc, const char* argv[]) -> int {
-  mguid::DataTree dt;
+auto main() -> int {
+  [[maybe_unused]] mguid::DataTree dt;
 }
