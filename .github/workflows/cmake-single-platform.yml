@@ -37,10 +37,16 @@ jobs:
     - name: Build
       run: cmake --build --preset conan-release
 
+    - name: Archive Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: ${{github.workspace}}/build/
+
     - name: Run Sample
       working-directory: ${{github.workspace}}/build
       run: ./Release/sample
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C
+      run: ctest -C --output-on-failure
