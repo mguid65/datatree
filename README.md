@@ -23,3 +23,11 @@ cmake --preset conan-debug
 cmake --build --preset conan-debug
 ./build/Debug/sample
 ```
+
+### TODO
+
+- [x] tl::expected
+- [x] Error type
+- [x] Null type
+- [ ] Number type
+- [ ] Value types

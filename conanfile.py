@@ -25,14 +25,12 @@ class DataTreeConan(ConanFile):
         copy(self, "test/*", self.recipe_folder, self.export_sources_folder)
 
     def requirements(self):
+        self.requires('expected-lite/0.6.3')
         self.test_requires('catch2/3.5.2')
-
-    def build_requirements(self):
-        pass
 
     def test(self):
         if can_run(self):
-            cmd = os.path.join(self.cpp.build.bindir, "sample")
+            cmd = os.path.join(self.cpp.build.bindir, "test",  'unit_tests')
             self.run(cmd, env="conanrun")
 
     def build(self):

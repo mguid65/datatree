@@ -9,5 +9,5 @@
 #include <datatree/node_types/array_node.hpp>
 
 TEST_CASE("Array Node Constructor") {
-  SECTION("Default Constructor") { mguid::ArrayNode an; }
+  SECTION("Default Constructor") { [[maybe_unused]] mguid::ArrayNode an; }
 }

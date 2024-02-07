@@ -7,7 +7,15 @@
 #ifndef DATATREE_COMMON_HPP
 #define DATATREE_COMMON_HPP
 
+#include <nonstd/expected.hpp>
+
 namespace mguid {
+
+/**
+ * @brief Doing this to get expected-lite things
+ */
+using nonstd::expected;
+using nonstd::make_unexpected;
 
 // Uses compiler specific extensions if possible.
 #ifdef __GNUC__ // GCC, Clang, ICC

@@ -9,5 +9,5 @@
 #include <datatree/node_types/object_node.hpp>
 
 TEST_CASE("Object Node Constructor") {
-  SECTION("Default Constructor") { mguid::ObjectNode on; }
+  SECTION("Default Constructor") { [[maybe_unused]] mguid::ObjectNode on; }
 }

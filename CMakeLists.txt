@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.16)
-
-if (NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 20)
-endif ()
-
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 project(datatree VERSION 0.0.1 LANGUAGES CXX C)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+include(utilities.cmake)
+
+enable_warnings()
 
 set(DATATREE_SOURCES
         source/datatree/datatree.cpp
@@ -16,10 +18,13 @@ set(DATATREE_SOURCES
         source/datatree/node_types/value_node.cpp
 )
 
+find_package(expected-lite REQUIRED)
+
 # Static because I don't feel like dealing with shared shenanigans
 add_library(datatree STATIC)
 target_include_directories(datatree PUBLIC include)
 target_sources(datatree PRIVATE ${DATATREE_SOURCES})
+target_link_libraries(datatree PUBLIC nonstd::expected-lite)
 
 include(CTest)
 
