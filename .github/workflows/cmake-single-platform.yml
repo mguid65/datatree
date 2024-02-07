@@ -48,5 +48,5 @@ jobs:
       run: ./Release/sample
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}/build/Release
       run: ctest -C --output-on-failure
