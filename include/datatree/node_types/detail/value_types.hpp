@@ -62,7 +62,7 @@ concept SatisfiesNullType = std::same_as<std::remove_cvref_t<TType>, NullType>;
  * @brief A variant type of allowed value node value types
  */
 using VariantValueType =
-    std::variant<NullType, BoolType, StringType, NumberType>;
+    std::variant<NullType, BoolType, NumberType, StringType>;
 
 /**
  * @brief A type satisfies this concept if it satisfies one of the value node

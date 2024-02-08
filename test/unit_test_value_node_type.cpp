@@ -13,3 +13,10 @@ TEST_CASE("Value Node Constructor") {
     REQUIRE(std::is_default_constructible_v<mguid::ValueNodeType>);
   }
 }
+
+TEST_CASE("Three Way Comparison") {
+  SECTION("Equality") {
+    REQUIRE(mguid::ValueNodeType("hello") == mguid::ValueNodeType("hello"));
+    REQUIRE(mguid::ValueNodeType("hello") != mguid::ValueNodeType(1));
+  }
+}

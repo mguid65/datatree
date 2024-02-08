@@ -514,3 +514,29 @@ TEST_CASE("Number Type Constexpr") {
   REQUIRE(nt1.getInt().has_value());
   REQUIRE(nt1.getInt().value() == mguid::IntegerType{4});
 }
+
+TEST_CASE("Number Type Comparison") {
+  SECTION("Equality") {
+    REQUIRE(mguid::NumberType() == mguid::NumberType());
+    REQUIRE(mguid::NumberType(1) == mguid::NumberType(1));
+    REQUIRE(mguid::NumberType(1u) == mguid::NumberType(1u));
+    REQUIRE(mguid::NumberType(1.0) == mguid::NumberType(1.0));
+    REQUIRE(mguid::NumberType(2) != mguid::NumberType(3));
+  }
+  SECTION("Ordering") {
+    REQUIRE(mguid::NumberType(2) < mguid::NumberType(3));
+    // Each type is compared separately so this is correct,
+    // We are not attempting to cast the Int to a Double
+    // If the types are different, then it is compared by the tag enum value
+    // None < Int < UInt < Double
+    REQUIRE(mguid::NumberType() < mguid::NumberType(1));
+    REQUIRE(mguid::NumberType() < mguid::NumberType(1u));
+    REQUIRE(mguid::NumberType() < mguid::NumberType(1.0));
+    REQUIRE(mguid::NumberType(1) < mguid::NumberType(1.0));
+
+    REQUIRE(mguid::NumberType(1) > mguid::NumberType());
+    REQUIRE(mguid::NumberType(1u) > mguid::NumberType());
+    REQUIRE(mguid::NumberType(1.0) > mguid::NumberType());
+    REQUIRE(mguid::NumberType(1.0) > mguid::NumberType(1));
+  }
+}

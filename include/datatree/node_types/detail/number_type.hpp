@@ -10,6 +10,7 @@
 #include <concepts>
 #include <cstdint>
 #include <utility>
+#include <compare>
 
 #include "datatree/common.hpp"
 #include "datatree/error/error_type.hpp"
@@ -62,7 +63,9 @@ concept UnsignedIntegerLike =
  */
 class NumberType {
 public:
-  enum class TypeTag { Double, UInt, Int, None };
+  // The ordering of these enums matter
+  // It affects the three-way comparison
+  enum class TypeTag { None, Int, UInt, Double};
 
   /**
    * @brief Default construct a number with no value
@@ -134,7 +137,7 @@ public:
    * @return the double value if it exists, otherwise error
    */
   [[nodiscard]] auto getDouble() const -> expected<DoubleType, Error> {
-    if (m_tag == TypeTag::Double) return m_f_value;
+    if (m_tag == TypeTag::Double) return m_union.m_f_value;
     return nonstd::make_unexpected(Error{.category = Error::Status::BadAccess});
   }
 
@@ -143,7 +146,7 @@ public:
    * @return the integer value if it exists, otherwise error
    */
   [[nodiscard]] auto getInt() const -> expected<IntegerType, Error> {
-    if (m_tag == TypeTag::Int) return m_i_value;
+    if (m_tag == TypeTag::Int) return m_union.m_i_value;
     return nonstd::make_unexpected(Error{.category = Error::Status::BadAccess});
   }
 
@@ -152,7 +155,7 @@ public:
    * @return the integer value if it exists, otherwise error
    */
   [[nodiscard]] auto getUInt() const -> expected<UnsignedIntegerType, Error> {
-    if (m_tag == TypeTag::UInt) return m_u_value;
+    if (m_tag == TypeTag::UInt) return m_union.m_u_value;
     return nonstd::make_unexpected(Error{.category = Error::Status::BadAccess});
   }
 
@@ -184,13 +187,13 @@ public:
   template <detail::AllowedNumericType TValueType>
   constexpr void setValue(TValueType&& val) noexcept {
     if constexpr (std::floating_point<std::remove_cvref_t<TValueType>>) {
-      m_f_value = std::forward<TValueType>(val);
+      m_union.m_f_value = std::forward<TValueType>(val);
       m_tag = TypeTag::Double;
     } else if constexpr (detail::SignedIntegerLike<TValueType>) {
-      m_i_value = std::forward<TValueType>(val);
+      m_union.m_i_value = std::forward<TValueType>(val);
       m_tag = TypeTag::Int;
     } else if constexpr (detail::UnsignedIntegerLike<TValueType>) {
-      m_u_value = std::forward<TValueType>(val);
+      m_union.m_u_value = std::forward<TValueType>(val);
       m_tag = TypeTag::UInt;
     } else {
       // The concept should prevent this from happening but just in case,
@@ -205,7 +208,55 @@ public:
    */
   constexpr void reset() noexcept {
     m_tag = TypeTag::None;
-    m_none = NullType{};
+    m_union.m_none = NullType{};
+  }
+
+  /**
+   * @brief Compare this NumberType with another NumberType
+   * @param other another NumberType
+   * @return comparison category
+   */
+  [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const -> std::partial_ordering {
+    if (m_tag == TypeTag::None && m_tag == other.m_tag) {
+      return std::strong_ordering::equal;
+    }
+    if (m_tag != other.m_tag) {
+      return static_cast<int>(m_tag) <=> static_cast<int>(other.m_tag);
+    }
+    switch(m_tag) {
+      case TypeTag::Double:
+        return m_union.m_f_value <=> other.m_union.m_f_value;
+      case TypeTag::UInt:
+        return m_union.m_u_value <=> other.m_union.m_u_value;
+      case TypeTag::Int:
+        return m_union.m_i_value <=> other.m_union.m_i_value;
+      default:
+        return std::partial_ordering::unordered;
+    }
+  }
+
+  /**
+   * @brief Equality compare this NumberType with another NumberType
+   * @param other Another NumberType to compare
+   * @return true if equal, otherwise false
+   */
+  [[nodiscard]] constexpr auto operator==(const NumberType& other) const -> bool {
+    if (m_tag == TypeTag::None && m_tag == other.m_tag) {
+      return true;
+    }
+    if (m_tag != other.m_tag) {
+      return false;
+    }
+    switch(m_tag) {
+      case TypeTag::Double:
+        return m_union.m_f_value == other.m_union.m_f_value;
+      case TypeTag::UInt:
+        return m_union.m_u_value == other.m_union.m_u_value;
+      case TypeTag::Int:
+        return m_union.m_i_value == other.m_union.m_i_value;
+      default:
+        return false;
+    }
   }
 
 private:
@@ -216,7 +267,7 @@ private:
     DoubleType m_f_value;
     IntegerType m_i_value;
     UnsignedIntegerType m_u_value;
-  };
+  } m_union;
 };
 
 }  // namespace mguid
