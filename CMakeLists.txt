@@ -19,12 +19,13 @@ set(DATATREE_SOURCES
 )
 
 find_package(expected-lite REQUIRED)
+find_package(stduuid REQUIRED)
 
 # Static because I don't feel like dealing with shared shenanigans
 add_library(datatree STATIC)
 target_include_directories(datatree PUBLIC include)
 target_sources(datatree PRIVATE ${DATATREE_SOURCES})
-target_link_libraries(datatree PUBLIC nonstd::expected-lite)
+target_link_libraries(datatree PUBLIC nonstd::expected-lite stduuid::stduuid)
 
 include(CTest)
 
@@ -45,4 +46,4 @@ find_package(Catch2 COMPONENTS Catch2WithMain)
 
 if (Catch2_FOUND)
     add_subdirectory(test)
-endif()
+endif ()

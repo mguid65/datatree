@@ -27,6 +27,7 @@ class DataTreeConan(ConanFile):
 
     def requirements(self):
         self.requires('expected-lite/0.6.3')
+        self.requires('stduuid/1.2.3')
         self.test_requires('catch2/3.5.2')
 
     def test(self):

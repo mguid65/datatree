@@ -6,8 +6,8 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/value_node.hpp>
+#include <datatree/node_types/value_node_type.hpp>
 
 TEST_CASE("Value Node Constructor") {
-  SECTION("Default Constructor") { [[maybe_unused]] mguid::ValueNode vn; }
+  SECTION("Default Constructor") { [[maybe_unused]] mguid::ValueNodeType vn; }
 }

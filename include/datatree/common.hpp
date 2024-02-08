@@ -8,8 +8,15 @@
 #define DATATREE_COMMON_HPP
 
 #include <nonstd/expected.hpp>
+#include <uuid.h>
 
 namespace mguid {
+
+/**
+ * @brief Doing this to get stduuid things
+ */
+using uuids::uuid;
+using uuids::to_string;
 
 /**
  * @brief Doing this to get expected-lite things

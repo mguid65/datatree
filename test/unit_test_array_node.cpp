@@ -6,8 +6,8 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/array_node.hpp>
+#include <datatree/node_types/array_node_type.hpp>
 
 TEST_CASE("Array Node Constructor") {
-  SECTION("Default Constructor") { [[maybe_unused]] mguid::ArrayNode an; }
+  SECTION("Default Constructor") { [[maybe_unused]] mguid::ArrayNodeType an; }
 }

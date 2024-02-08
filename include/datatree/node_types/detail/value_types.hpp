@@ -66,7 +66,7 @@ using VariantValueType =
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept ValidValueNodeValueType =
+concept ValidValueNodeTypeValueType =
     SatisfiesBoolType<TType> || SatisfiesStringType<TType> ||
     SatisfiesNumberType<TType> || SatisfiesNullType<TType>;
 

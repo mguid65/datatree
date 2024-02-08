@@ -4,13 +4,13 @@
  * @date 2024-02-05
  */
 
-#ifndef DATATREE_OBJECT_NODE_HPP
-#define DATATREE_OBJECT_NODE_HPP
+#ifndef DATATREE_OBJECT_NODE_TYPE_HPP
+#define DATATREE_OBJECT_NODE_TYPE_HPP
 
 namespace mguid {
 
-class ObjectNode {};
+class ObjectNodeType {};
 
 }  // namespace mguid
 
-#endif  // DATATREE_OBJECT_NODE_HPP
+#endif  // DATATREE_OBJECT_NODE_TYPE_HPP
