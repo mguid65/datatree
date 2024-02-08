@@ -24,7 +24,7 @@ struct Error {
    * @param status status code
    * @return status as a string
    */
-  static std::string_view StatusToString(Status status) {
+  [[nodiscard]] static std::string_view StatusToString(Status status) noexcept {
     switch (status) {
       case Status::BadAccess:
         return "Status::BadAccess";
