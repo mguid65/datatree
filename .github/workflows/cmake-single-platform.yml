@@ -37,6 +37,9 @@ jobs:
     - name: Build
       run: cmake --build --preset conan-release
 
+    - name: Conan Create
+      run: conan create .
+
     - name: Archive Build
       uses: actions/upload-artifact@v4
       with:
