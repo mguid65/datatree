@@ -9,5 +9,7 @@
 #include <datatree/node_types/value_node_type.hpp>
 
 TEST_CASE("Value Node Constructor") {
-  SECTION("Default Constructor") { [[maybe_unused]] mguid::ValueNodeType vn; }
+  SECTION("Default Constructor") {
+    REQUIRE(std::is_default_constructible_v<mguid::ValueNodeType>);
+  }
 }

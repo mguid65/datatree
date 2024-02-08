@@ -37,14 +37,18 @@ concept SatisfiesBoolType = std::same_as<std::remove_cvref_t<TType>, bool>;
  */
 template <typename TType>
 concept SatisfiesStringType =
+    !std::same_as<std::remove_cvref_t<TType>, nullptr_t> &&
     std::convertible_to<std::remove_cvref_t<TType>, std::string>;
 
 /**
  * @brief A type satisfies this concept if it satisfies AllowedNumericType
+ * or whose underlying type is a NumberType
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept SatisfiesNumberType = detail::AllowedNumericType<TType>;
+concept SatisfiesNumberType =
+    detail::AllowedNumericType<TType> ||
+    std::same_as<std::remove_cvref_t<TType>, NumberType>;
 
 /**
  * @brief A type satisfies this concept if it is the same as NullType without
@@ -63,6 +67,9 @@ using VariantValueType =
 /**
  * @brief A type satisfies this concept if it satisfies one of the value node
  * value type concepts
+ *
+ * What a name
+ *
  * @tparam TType type to constrain
  */
 template <typename TType>
