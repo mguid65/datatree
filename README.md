@@ -29,5 +29,10 @@ cmake --build --preset conan-debug
 - [x] tl::expected
 - [x] Error type
 - [x] Null type
-- [ ] Number type
-- [ ] Value types
+- [x] Number type
+- [x] Value types
+- [ ] Value node type
+- [ ] Object node type
+- [ ] Array node type
+- [ ] Tree Node
+- [ ] Data tree

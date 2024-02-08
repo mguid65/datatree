@@ -7,13 +7,69 @@
 #ifndef DATATREE_VALUE_TYPES_HPP
 #define DATATREE_VALUE_TYPES_HPP
 
+#include <string>
+#include <type_traits>
+#include <variant>
+
 #include "datatree/node_types/detail/null_type.hpp"
 #include "datatree/node_types/detail/number_type.hpp"
 
 namespace mguid {
 
+using BoolType = bool;
 
+using StringType = std::string;
+//    NumberType
+//    NullType
 
-}
+/**
+ * @brief A type satisfies this concept if it is the same as bool without
+ * cvref qualifiers
+ * @tparam TType type to constrain
+ */
+template <typename TType>
+concept SatisfiesBoolType = std::same_as<std::remove_cvref_t<TType>, bool>;
+
+/**
+ * @brief A type satisfies this concept if it is the convertible to
+ * std::string without cvref qualifiers
+ * @tparam TType type to constrain
+ */
+template <typename TType>
+concept SatisfiesStringType =
+    std::convertible_to<std::remove_cvref_t<TType>, std::string>;
+
+/**
+ * @brief A type satisfies this concept if it satisfies AllowedNumericType
+ * @tparam TType type to constrain
+ */
+template <typename TType>
+concept SatisfiesNumberType = detail::AllowedNumericType<TType>;
+
+/**
+ * @brief A type satisfies this concept if it is the same as NullType without
+ * cvref qualifiers
+ * @tparam TType type to constrain
+ */
+template <typename TType>
+concept SatisfiesNullType = std::same_as<std::remove_cvref_t<TType>, NullType>;
+
+/**
+ * @brief A variant type of allowed value node value types
+ */
+using VariantValueType =
+    std::variant<NullType, BoolType, StringType, NumberType>;
+
+/**
+ * @brief A type satisfies this concept if it satisfies one of the value node
+ * value type concepts
+ * @tparam TType type to constrain
+ */
+template <typename TType>
+concept ValidValueNodeValueType =
+    SatisfiesBoolType<TType> || SatisfiesStringType<TType> ||
+    SatisfiesNumberType<TType> || SatisfiesNullType<TType>;
+
+}  // namespace mguid
 
 #endif  // DATATREE_VALUE_TYPES_HPP

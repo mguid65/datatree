@@ -70,6 +70,10 @@ public:
    * Sets the tag to None
    */
   constexpr NumberType() noexcept = default;
+
+  /**
+   * @brief Explicit defaults for copy/move construction/assignment
+   */
   constexpr NumberType(const NumberType&) noexcept = default;
   constexpr NumberType(NumberType&&) noexcept = default;
   constexpr NumberType& operator=(const NumberType&) noexcept = default;
@@ -81,7 +85,7 @@ public:
    * This does the same thing as the default constructor but
    * it may help readability in usage scenarios by being explicit.
    */
-  constexpr NumberType(std::nullptr_t) noexcept {}
+  constexpr explicit NumberType(std::nullptr_t) noexcept {}
 
   /**
    * @brief Construct a NumberType from a value
@@ -89,7 +93,7 @@ public:
    * @param val numeric value
    */
   template <detail::AllowedNumericType TValueType>
-  constexpr NumberType(TValueType&& val) noexcept {
+  constexpr explicit NumberType(TValueType&& val) noexcept {
     this->operator=(val);
   }
 

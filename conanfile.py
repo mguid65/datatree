@@ -20,6 +20,7 @@ class DataTreeConan(ConanFile):
     def export_sources(self):
         copy(self, "LICENSE.md", self.recipe_folder, self.export_sources_folder)
         copy(self, "CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
+        copy(self, "cmake/*", self.recipe_folder, self.export_sources_folder)
         copy(self, "include/*", self.recipe_folder, self.export_sources_folder)
         copy(self, "source/*", self.recipe_folder, self.export_sources_folder)
         copy(self, "test/*", self.recipe_folder, self.export_sources_folder)
