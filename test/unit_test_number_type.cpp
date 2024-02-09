@@ -529,8 +529,12 @@ TEST_CASE("Number Type Comparison") {
     // We are not attempting to cast the Int to a Double
     // If the types are different, then it is compared by the tag enum value
     // None < Int < UInt < Double
+    REQUIRE_FALSE(mguid::NumberType() < mguid::NumberType());
     REQUIRE(mguid::NumberType() < mguid::NumberType(1));
     REQUIRE(mguid::NumberType() < mguid::NumberType(1u));
+    REQUIRE(mguid::NumberType(0u) < mguid::NumberType(1u));
+    REQUIRE(mguid::NumberType(0.0) < mguid::NumberType(1.0));
+    REQUIRE(mguid::NumberType(0) < mguid::NumberType(1));
     REQUIRE(mguid::NumberType() < mguid::NumberType(1.0));
     REQUIRE(mguid::NumberType(1) < mguid::NumberType(1.0));
 

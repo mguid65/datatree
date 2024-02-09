@@ -10,6 +10,17 @@ include(cmake/utilities.cmake)
 
 enable_warnings()
 
+option(COVERAGE "Enable code coverage flags")
+option(SANITIZER "Enable sanitizer flags")
+
+if (COVERAGE)
+    enable_coverage()
+endif ()
+
+if (SANITIZER)
+    enable_sanitizer()
+endif ()
+
 set(DATATREE_SOURCES
         source/datatree/datatree.cpp
         source/datatree/tree_node.cpp
