@@ -14,14 +14,14 @@
 
 TEST_CASE("Number Type Constructor") {
   SECTION("Default Construction") {
-    REQUIRE(std::is_default_constructible_v<mguid::NumberType>);
+    REQUIRE(std::is_nothrow_default_constructible_v<mguid::NumberType>);
     mguid::NumberType nt1;
     constexpr mguid::NumberType cnt1{};
     REQUIRE_FALSE(nt1.HasValue());
     REQUIRE_FALSE(cnt1.HasValue());
   }
   SECTION("Copy Construction") {
-    REQUIRE(std::is_copy_constructible_v<mguid::NumberType>);
+    REQUIRE(std::is_nothrow_copy_constructible_v<mguid::NumberType>);
     mguid::NumberType nt1;
     mguid::NumberType nt2(nt1);
     REQUIRE_FALSE(nt1.HasValue());
@@ -34,14 +34,14 @@ TEST_CASE("Number Type Constructor") {
     REQUIRE_FALSE(nt3.HasValue());
   }
   SECTION("Move Construction") {
-    REQUIRE(std::is_move_constructible_v<mguid::NumberType>);
+    REQUIRE(std::is_nothrow_move_constructible_v<mguid::NumberType>);
     mguid::NumberType nt1;
     mguid::NumberType nt2 = std::move(nt1);
     REQUIRE_FALSE(nt1.HasValue());
     REQUIRE_FALSE(nt2.HasValue());
   }
   SECTION("Copy Assignment") {
-    REQUIRE(std::is_copy_assignable_v<mguid::NumberType>);
+    REQUIRE(std::is_nothrow_copy_assignable_v<mguid::NumberType>);
     mguid::NumberType nt1, nt2;
     nt2 = nt1;
     REQUIRE_FALSE(nt1.HasValue());
@@ -53,66 +53,66 @@ TEST_CASE("Number Type Constructor") {
     REQUIRE_FALSE(nt3.HasValue());
   }
   SECTION("Move Assignment") {
-    REQUIRE(std::is_move_assignable_v<mguid::NumberType>);
+    REQUIRE(std::is_nothrow_move_assignable_v<mguid::NumberType>);
     mguid::NumberType nt1, nt2;
     nt2 = std::move(nt1);
     REQUIRE_FALSE(nt1.HasValue());
     REQUIRE_FALSE(nt2.HasValue());
   }
   SECTION("Construct From Nullptr") {
-    REQUIRE(std::is_constructible_v<mguid::NumberType, nullptr_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, nullptr_t>);
     mguid::NumberType nt1{nullptr};
     REQUIRE_FALSE(nt1.HasValue());
     constexpr mguid::NumberType nt2{nullptr};
     REQUIRE_FALSE(nt2.HasValue());
   }
   SECTION("Construct From Value") {
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::uint8_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::uint8_t>);
     {
       mguid::NumberType nt1{std::uint8_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::uint16_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::uint16_t>);
     {
       mguid::NumberType nt1{std::uint16_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::uint32_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::uint32_t>);
     {
       mguid::NumberType nt1{std::uint32_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::uint64_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::uint64_t>);
     {
       mguid::NumberType nt1{std::uint64_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::int8_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::int8_t>);
     {
       mguid::NumberType nt1{std::int8_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::int16_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::int16_t>);
     {
       mguid::NumberType nt1{std::int16_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::int32_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::int32_t>);
     {
       mguid::NumberType nt1{std::int32_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, std::int64_t>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, std::int64_t>);
     {
       mguid::NumberType nt1{std::int64_t{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, float>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, float>);
     {
       mguid::NumberType nt1{float{}};
       REQUIRE(nt1.HasValue());
     }
-    REQUIRE(std::is_constructible_v<mguid::NumberType, double>);
+    REQUIRE(std::is_nothrow_constructible_v<mguid::NumberType, double>);
     {
       mguid::NumberType nt1{double{}};
       REQUIRE(nt1.HasValue());

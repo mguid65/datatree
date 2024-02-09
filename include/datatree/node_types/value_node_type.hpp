@@ -22,7 +22,7 @@ public:
   /**
    * @brief Default construct a ValueNode with value Null
    */
-  constexpr ValueNodeType() noexcept = default;
+  ValueNodeType() noexcept = default;
 
   /**
    * @brief Explicit defaults for copy/move construction/assignment
@@ -35,7 +35,7 @@ public:
   /**
    * @brief Explicitly construct a null ValueNode
    */
-  constexpr explicit ValueNodeType(nullptr_t) noexcept {}
+  explicit ValueNodeType(nullptr_t) noexcept {}
 
   /**
    * @brief Construct a value node from a value
@@ -43,7 +43,7 @@ public:
    * @param value some value
    */
   template <ValidValueNodeTypeValueType TValueType>
-  constexpr explicit ValueNodeType(TValueType&& value) noexcept(
+  explicit ValueNodeType(TValueType&& value) noexcept(
       !SatisfiesStringType<TValueType>) {
     // This is for the case where the value is a number primitive
     if constexpr (SatisfiesNumberType<TValueType>) {
@@ -56,13 +56,17 @@ public:
   /**
    * @brief Assign a value to this value node type
    * @tparam TValueType type of value
-   * @param val value
+   * @param value some value
    * @return reference to this value node type
    */
   template <ValidValueNodeTypeValueType TValueType>
-  constexpr auto operator=(TValueType&& val) noexcept(
+  auto operator=(TValueType&& value) noexcept(
       !SatisfiesStringType<TValueType>) -> ValueNodeType& {
-    m_variant_value = std::forward<TValueType>(val);
+    if constexpr (SatisfiesNumberType<TValueType>) {
+      m_variant_value = NumberType(std::forward<TValueType>(value));
+    } else {
+      m_variant_value = std::forward<TValueType>(value);
+    }
     return *this;
   }
 

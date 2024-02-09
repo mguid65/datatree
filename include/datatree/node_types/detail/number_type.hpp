@@ -7,10 +7,10 @@
 #ifndef DATATREE_NUMBER_TYPE_HPP
 #define DATATREE_NUMBER_TYPE_HPP
 
+#include <compare>
 #include <concepts>
 #include <cstdint>
 #include <utility>
-#include <compare>
 
 #include "datatree/common.hpp"
 #include "datatree/error/error_type.hpp"
@@ -65,7 +65,7 @@ class NumberType {
 public:
   // The ordering of these enums matter
   // It affects the three-way comparison
-  enum class TypeTag { None, Int, UInt, Double};
+  enum class TypeTag { None, Int, UInt, Double };
 
   /**
    * @brief Default construct a number with no value
@@ -216,14 +216,15 @@ public:
    * @param other another NumberType
    * @return comparison category
    */
-  [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const -> std::partial_ordering {
+  [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const
+      -> std::partial_ordering {
     if (m_tag == TypeTag::None && m_tag == other.m_tag) {
       return std::strong_ordering::equal;
     }
     if (m_tag != other.m_tag) {
       return static_cast<int>(m_tag) <=> static_cast<int>(other.m_tag);
     }
-    switch(m_tag) {
+    switch (m_tag) {
       case TypeTag::Double:
         return m_union.f_value <=> other.m_union.f_value;
       case TypeTag::UInt:
@@ -240,14 +241,11 @@ public:
    * @param other Another NumberType to compare
    * @return true if equal, otherwise false
    */
-  [[nodiscard]] constexpr auto operator==(const NumberType& other) const -> bool {
-    if (m_tag == TypeTag::None && m_tag == other.m_tag) {
-      return true;
-    }
-    if (m_tag != other.m_tag) {
-      return false;
-    }
-    switch(m_tag) {
+  [[nodiscard]] constexpr auto operator==(const NumberType& other) const
+      -> bool {
+    if (m_tag == TypeTag::None && m_tag == other.m_tag) { return true; }
+    if (m_tag != other.m_tag) { return false; }
+    switch (m_tag) {
       case TypeTag::Double:
         return m_union.f_value == other.m_union.f_value;
       case TypeTag::UInt:
