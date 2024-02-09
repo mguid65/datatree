@@ -1,6 +1,6 @@
-# datatree
+# DataTree
 
-datatree library just for fun
+DataTree library just for fun
 
 You might look at this and say "that looks like JSON"...
 
@@ -23,3 +23,16 @@ cmake --preset conan-debug
 cmake --build --preset conan-debug
 ./build/Debug/sample
 ```
+
+### TODO
+
+- [x] tl::expected
+- [x] Error type
+- [x] Null type
+- [x] Number type
+- [x] Value types
+- [ ] Value node type
+- [ ] Object node type
+- [ ] Array node type
+- [ ] Tree Node
+- [ ] Data tree

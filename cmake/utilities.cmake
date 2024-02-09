@@ -1,0 +1,7 @@
+macro(enable_warnings)
+    if (MSVC)
+        add_compile_options(/W4 /permissive- /wd4324 /WX)
+    else ()
+        add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror)
+    endif ()
+endmacro()

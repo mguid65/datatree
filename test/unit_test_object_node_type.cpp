@@ -6,8 +6,8 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/object_node.hpp>
+#include <datatree/node_types/object_node_type.hpp>
 
 TEST_CASE("Object Node Constructor") {
-  SECTION("Default Constructor") { mguid::object_node on; }
+  SECTION("Default Constructor") { [[maybe_unused]] mguid::ObjectNodeType on; }
 }
