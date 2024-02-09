@@ -11,9 +11,9 @@
 
 auto main() -> int {
   mguid::ValueNodeType vnt("Hello");
-  auto v = vnt.ifStringThen(
+  auto v = vnt.IfStringThen(
                   [](auto s) { return mguid::ValueNodeType{s + ", World!"}; })
-               .ifStringElse([]() { return mguid::ValueNodeType{"Foo Bar"}; });
+               .IfNotString([]() { return mguid::ValueNodeType{"Foo Bar"}; });
 
-  std::cout << v.getString().value() << '\n';
+  std::cout << v.GetString().value() << '\n';
 }
