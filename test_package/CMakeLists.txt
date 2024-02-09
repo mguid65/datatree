@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(PackageTest CXX)
+project(test_package CXX)
 
-find_package(datatree CONFIG REQUIRED)
+find_package(datatree REQUIRED CONFIG)
 
-add_executable(example src/example.cpp)
-target_link_libraries(example datatree::datatree)
+add_executable(test_package src/example.cpp)
+target_link_libraries(test_package PRIVATE datatree::datatree)
+target_compile_features(test_package PRIVATE cxx_std_11)

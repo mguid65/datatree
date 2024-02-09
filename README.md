@@ -26,7 +26,8 @@ cmake --build --preset conan-debug
 
 ### TODO
 
-- [x] tl::expected
+- [x] Add expected-lite dependency
+- [x] Add stduuid dependency
 - [x] Error type
 - [x] Null type
 - [x] Number type

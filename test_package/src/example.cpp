@@ -1,9 +1,19 @@
 /**
- * @brief Conan Test Package
- * @author Matthew Guidry (github: mguid65)
- * @date 2024-02-05
- */
+* @brief Main for conan test package
+* @author Matthew Guidry(github: mguid65)
+* @date 2024-02-09
+*/
+
+#include <iostream>
 
 #include <datatree/datatree.hpp>
+#include <datatree/node_types/value_node_type.hpp>
 
-auto main() -> int { mguid::DataTree dt; }
+auto main() -> int {
+ mguid::ValueNodeType vnt("Hello");
+ auto v = vnt.IfStringThen(
+                 [](auto s) { return mguid::ValueNodeType{s + ", World!"}; })
+              .IfNotString([]() { return mguid::ValueNodeType{"Foo Bar"}; });
+
+ std::cout << v.GetString().value() << '\n';
+}
