@@ -199,7 +199,7 @@ public:
       // The concept should prevent this from happening but just in case,
       // we put a throw here which isn't allowed in constexpr contexts so this
       // will fail to compile
-      unreachable();
+      Unreachable();
     }
   }
 
