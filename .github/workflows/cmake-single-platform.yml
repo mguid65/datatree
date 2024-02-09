@@ -29,7 +29,7 @@ jobs:
       run: conan config install ${{github.workspace}}/.github/conan/release -tf=profiles
 
     - name: Run Conan
-      run: conan install . -b missing
+      run: conan install . -b missing --profile:build=release
 
     - name: Configure CMake
       run: cmake --preset conan-release
@@ -38,7 +38,7 @@ jobs:
       run: cmake --build --preset conan-release
 
     - name: Conan Create
-      run: conan create .
+      run: conan create . -b missing --profile:build=release
 
     - name: Archive Build
       uses: actions/upload-artifact@v4
