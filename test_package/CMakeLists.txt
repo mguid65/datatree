@@ -5,4 +5,3 @@ find_package(datatree REQUIRED CONFIG)
 
 add_executable(example src/example.cpp)
 target_link_libraries(example PRIVATE datatree::datatree)
-target_compile_features(example PRIVATE cxx_std_11)
