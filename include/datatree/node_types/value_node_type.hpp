@@ -158,7 +158,27 @@ public:
    * @return Expected with a NullType value or an Error
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNullOr(TDefault&& default_value) const noexcept
+  [[nodiscard]] auto GetNullOr(TDefault&& default_value) const&
+      -> expected<NullType, Error> {
+    auto* val = std::get_if<NullType>(&m_variant_value);
+    return val != nullptr
+               ? *val
+               : static_cast<NullType>(std::forward<TDefault>(default_value));
+  }
+
+  /**
+   * @brief Try to get a NullType value from this value node type, otherwise,
+   * return the provided default
+   *
+   * For consistency with get<Type>, these functions will also return expected,
+   * even though they will never return the Error
+   *
+   * @param default_value value to return in case this value doesn't hold a
+   * NullType
+   * @return Expected with a NullType value or an Error
+   */
+  template <typename TDefault>
+  [[nodiscard]] auto GetNullOr(TDefault&& default_value) &&
       -> expected<NullType, Error> {
     auto* val = std::get_if<NullType>(&m_variant_value);
     return val != nullptr
@@ -177,11 +197,30 @@ public:
    * @return Expected with a StringType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetStringOr(TDefault&& default_value) const noexcept
+  [[nodiscard]] auto GetStringOr(TDefault&& default_value) const&
       -> expected<StringType, Error> {
     auto* val = std::get_if<StringType>(&m_variant_value);
     return val != nullptr
                ? *val
+               : static_cast<StringType>(std::forward<TDefault>(default_value));
+  }
+  /**
+   * @brief Try to get a StringType value from this value node type, otherwise,
+   * return the provided default
+   *
+   * For consistency with get<Type>, these functions will also return expected,
+   * even though they will never return the Error
+   *
+   * @param default_value value to return in case this value doesn't hold a
+   * StringType
+   * @return Expected with a StringType value
+   */
+  template <typename TDefault>
+  [[nodiscard]] auto GetStringOr(TDefault&& default_value) &&
+      -> expected<StringType, Error> {
+    auto* val = std::get_if<StringType>(&m_variant_value);
+    return val != nullptr
+               ? std::move(*val)
                : static_cast<StringType>(std::forward<TDefault>(default_value));
   }
   /**
@@ -196,7 +235,26 @@ public:
    * @return Expected with a NumberType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNumberOr(TDefault&& default_value) const noexcept
+  [[nodiscard]] auto GetNumberOr(TDefault&& default_value) const&
+      -> expected<NumberType, Error> {
+    auto* val = std::get_if<NumberType>(&m_variant_value);
+    return val != nullptr
+               ? *val
+               : static_cast<NumberType>(std::forward<TDefault>(default_value));
+  }
+  /**
+   * @brief Try to get a NumberType value from this value node type, otherwise,
+   * return the provided default
+   *
+   * For consistency with get<Type>, these functions will also return expected,
+   * even though they will never return the Error
+   *
+   * @param default_value value to return in case this value doesn't hold a
+   * NumberType
+   * @return Expected with a NumberType value
+   */
+  template <typename TDefault>
+  [[nodiscard]] auto GetNumberOr(TDefault&& default_value) &&
       -> expected<NumberType, Error> {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     return val != nullptr
@@ -215,7 +273,26 @@ public:
    * @return Expected with a BoolType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetBoolOr(TDefault&& default_value) const noexcept
+  [[nodiscard]] auto GetBoolOr(TDefault&& default_value) const&
+      -> expected<BoolType, Error> {
+    auto* val = std::get_if<BoolType>(&m_variant_value);
+    return val != nullptr
+               ? *val
+               : static_cast<BoolType>(std::forward<TDefault>(default_value));
+  }
+  /**
+   * @brief Try to get a BoolType value from this value node type, otherwise,
+   * return the provided default
+   *
+   * For consistency with get<Type>, these functions will also return expected,
+   * even though they will never return the Error
+   *
+   * @param default_value value to return in case this value doesn't hold a
+   * BoolType
+   * @return Expected with a BoolType value
+   */
+  template <typename TDefault>
+  [[nodiscard]] auto GetBoolOr(TDefault&& default_value) &&
       -> expected<BoolType, Error> {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     return val != nullptr

@@ -7,6 +7,8 @@
 #ifndef DATATREE_COMMON_HPP
 #define DATATREE_COMMON_HPP
 
+#include <ranges>
+
 #include <nonstd/expected.hpp>
 #include <uuid.h>
 
@@ -15,8 +17,8 @@ namespace mguid {
 /**
  * @brief Doing this to get stduuid things
  */
-using uuids::uuid;
 using uuids::to_string;
+using uuids::uuid;
 
 /**
  * @brief Doing this to get expected-lite things
@@ -25,11 +27,11 @@ using nonstd::expected;
 using nonstd::make_unexpected;
 
 // Uses compiler specific extensions if possible.
-#ifdef __GNUC__ // GCC, Clang, ICC
+#ifdef __GNUC__  // GCC, Clang, ICC
 
 inline void Unreachable() { __builtin_unreachable(); }
 
-#elif defined(_MSC_VER) // MSVC
+#elif defined(_MSC_VER)  // MSVC
 
 inline void Unreachable() { __assume(false); }
 
@@ -41,6 +43,16 @@ inline void Unreachable() { __assume(false); }
 
 #endif
 
-}
+/**
+ * @brief Check if something is a range of TValueType
+ * @tparam TRange some range
+ * @tparam TValueType range value type
+ */
+template <typename TValueType, typename TRange>
+concept RangeOf = std::ranges::range<TRange> &&
+                  std::same_as<std::ranges::range_value_t<TRange>, TValueType>;
+
+
+}  // namespace mguid
 
 #endif  // DATATREE_COMMON_HPP
