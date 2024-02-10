@@ -37,3 +37,7 @@ cmake --build --preset conan-debug
 - [ ] Array node type
 - [ ] Tree Node
 - [ ] Data tree
+
+### Note
+
+I won't update the library version until I have an MVP of all existing stub classes; a usable data tree.
