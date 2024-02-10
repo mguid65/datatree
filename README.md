@@ -26,13 +26,18 @@ cmake --build --preset conan-debug
 
 ### TODO
 
-- [x] tl::expected
+- [x] Add expected-lite dependency
+- [x] Add stduuid dependency
 - [x] Error type
 - [x] Null type
 - [x] Number type
 - [x] Value types
-- [ ] Value node type
+- [x] Value node type
 - [ ] Object node type
 - [ ] Array node type
 - [ ] Tree Node
 - [ ] Data tree
+
+### Note
+
+I won't update the library version until I have an MVP of all existing stub classes; a usable data tree.

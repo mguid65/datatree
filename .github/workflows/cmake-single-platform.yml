@@ -25,8 +25,8 @@ jobs:
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
 
-    - name: Conan Profile Detect
-      run: conan profile detect
+    - name: Conan Profile Install
+      run: conan config install ${{github.workspace}}/.github/conan/default -tf=profiles
 
     - name: Run Conan
       run: conan install . -b missing
@@ -38,7 +38,7 @@ jobs:
       run: cmake --build --preset conan-release
 
     - name: Conan Create
-      run: conan create .
+      run: conan create . -b missing
 
     - name: Archive Build
       uses: actions/upload-artifact@v4

@@ -27,17 +27,17 @@ using nonstd::make_unexpected;
 // Uses compiler specific extensions if possible.
 #ifdef __GNUC__ // GCC, Clang, ICC
 
-inline void unreachable() { __builtin_unreachable(); }
+inline void Unreachable() { __builtin_unreachable(); }
 
 #elif defined(_MSC_VER) // MSVC
 
-inline void unreachable() { __assume(false); }
+inline void Unreachable() { __assume(false); }
 
 #else
 // Even if no extension is used, undefined behavior is still raised by
 // the empty function body and the noreturn attribute.
 
-[[noreturn]] inline void unreachable() {}
+[[noreturn]] inline void Unreachable() {}
 
 #endif
 

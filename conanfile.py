@@ -26,8 +26,8 @@ class DataTreeConan(ConanFile):
         copy(self, "test/*", self.recipe_folder, self.export_sources_folder)
 
     def requirements(self):
-        self.requires('expected-lite/0.6.3')
-        self.requires('stduuid/1.2.3')
+        self.requires('expected-lite/0.6.3', transitive_headers=True)
+        self.requires('stduuid/1.2.3', transitive_headers=True)
         self.test_requires('catch2/3.5.2')
 
     def test(self):
