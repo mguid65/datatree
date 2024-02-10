@@ -60,8 +60,8 @@ public:
    * @return reference to this value node type
    */
   template <ValidValueNodeTypeValueType TValueType>
-  auto operator=(TValueType&& value) noexcept(
-      !SatisfiesStringType<TValueType>) -> ValueNodeType& {
+  auto operator=(TValueType&& value) noexcept(!SatisfiesStringType<TValueType>)
+      -> ValueNodeType& {
     if constexpr (SatisfiesNumberType<TValueType>) {
       m_variant_value = NumberType(std::forward<TValueType>(value));
     } else {
