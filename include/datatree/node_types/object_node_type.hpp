@@ -7,8 +7,6 @@
 #ifndef DATATREE_OBJECT_NODE_TYPE_HPP
 #define DATATREE_OBJECT_NODE_TYPE_HPP
 
-#include <string>
-
 // Oh no, horrible bad map type
 // Could use martinus/robin-hood-hashing unordered_node_map which provides
 // similar reference and pointer stability as std::unordered_map but it is no
@@ -27,6 +25,9 @@
 
 namespace mguid {
 
+/**
+ * @brief Map like class that defines an object like node with children
+ */
 class ObjectNodeType {
   using MapType = std::unordered_map<std::string, uuid>;
   using ValueType = MapType::value_type;
