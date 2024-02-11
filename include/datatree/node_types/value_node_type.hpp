@@ -158,8 +158,8 @@ public:
    * @return Expected with a NullType value or an Error
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNullOr(TDefault&& default_value) const&
-      -> expected<NullType, Error> {
+  [[nodiscard]] auto GetNullOr(
+      TDefault&& default_value) const& -> expected<NullType, Error> {
     auto* val = std::get_if<NullType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -178,8 +178,8 @@ public:
    * @return Expected with a NullType value or an Error
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNullOr(TDefault&& default_value) &&
-      -> expected<NullType, Error> {
+  [[nodiscard]] auto GetNullOr(
+      TDefault&& default_value) && -> expected<NullType, Error> {
     auto* val = std::get_if<NullType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -197,8 +197,8 @@ public:
    * @return Expected with a StringType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetStringOr(TDefault&& default_value) const&
-      -> expected<StringType, Error> {
+  [[nodiscard]] auto GetStringOr(
+      TDefault&& default_value) const& -> expected<StringType, Error> {
     auto* val = std::get_if<StringType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -216,8 +216,8 @@ public:
    * @return Expected with a StringType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetStringOr(TDefault&& default_value) &&
-      -> expected<StringType, Error> {
+  [[nodiscard]] auto GetStringOr(
+      TDefault&& default_value) && -> expected<StringType, Error> {
     auto* val = std::get_if<StringType>(&m_variant_value);
     return val != nullptr
                ? std::move(*val)
@@ -235,8 +235,8 @@ public:
    * @return Expected with a NumberType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNumberOr(TDefault&& default_value) const&
-      -> expected<NumberType, Error> {
+  [[nodiscard]] auto GetNumberOr(
+      TDefault&& default_value) const& -> expected<NumberType, Error> {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -254,8 +254,8 @@ public:
    * @return Expected with a NumberType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetNumberOr(TDefault&& default_value) &&
-      -> expected<NumberType, Error> {
+  [[nodiscard]] auto GetNumberOr(
+      TDefault&& default_value) && -> expected<NumberType, Error> {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -273,8 +273,8 @@ public:
    * @return Expected with a BoolType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetBoolOr(TDefault&& default_value) const&
-      -> expected<BoolType, Error> {
+  [[nodiscard]] auto GetBoolOr(
+      TDefault&& default_value) const& -> expected<BoolType, Error> {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     return val != nullptr
                ? *val
@@ -292,8 +292,8 @@ public:
    * @return Expected with a BoolType value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetBoolOr(TDefault&& default_value) &&
-      -> expected<BoolType, Error> {
+  [[nodiscard]] auto GetBoolOr(
+      TDefault&& default_value) && -> expected<BoolType, Error> {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     return val != nullptr
                ? *val
