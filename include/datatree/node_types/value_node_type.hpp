@@ -111,7 +111,7 @@ public:
     if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) {
       return *val;
     }
-    return make_unexpected(Error{.category = Error::Status::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a StringType value from this value node type
@@ -121,7 +121,7 @@ public:
     if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
       return *val;
     }
-    return make_unexpected(Error{.category = Error::Status::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a NumberType value from this value node type
@@ -131,7 +131,7 @@ public:
     if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) {
       return *val;
     }
-    return make_unexpected(Error{.category = Error::Status::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a BoolType value from this value node type
@@ -141,7 +141,7 @@ public:
     if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) {
       return *val;
     }
-    return make_unexpected(Error{.category = Error::Status::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
   // VERY DRY SECTION, TRUST ME

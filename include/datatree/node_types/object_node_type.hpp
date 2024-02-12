@@ -27,6 +27,8 @@ namespace mguid {
 
 /**
  * @brief Map like class that defines an object like node with children
+ *
+ * Most of the functions here just forward to the underlying map
  */
 class ObjectNodeType {
   using MapType = std::unordered_map<std::string, uuid>;
@@ -52,6 +54,13 @@ public:
   ObjectNodeType& operator=(ObjectNodeType&&) noexcept = default;
 
   /**
+   * @brief Construct an ObjectNodeType from an initializer list of ValueType
+   * @param init_list an initializer list of ValueType
+   */
+  ObjectNodeType(std::initializer_list<ValueType> init_list)
+      : m_key_id_mapping{init_list} {}
+
+  /**
    * @brief Construct an ObjectNodeType from an existing map
    * @param init_mapping an initial mapping to initialize this with
    */
@@ -70,7 +79,7 @@ public:
         iter != m_key_id_mapping.end()) {
       return iter->second;
     }
-    return make_unexpected(Error{.category = Error::Status::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
   /**
@@ -83,7 +92,8 @@ public:
    * default value
    */
   template <typename TDefault>
-  [[nodiscard]] auto GetOr(const KeyType& key, TDefault&& default_value) const {
+  [[nodiscard]] auto GetOr(const KeyType& key, TDefault&& default_value) const
+      -> expected<MappedType, Error> {
     if (auto iter = m_key_id_mapping.find(key);
         iter != m_key_id_mapping.end()) {
       return iter->second;
@@ -180,8 +190,7 @@ public:
    */
   template <typename TConvertibleToValueType>
   Iterator InsertHint(ConstIterator hint, TConvertibleToValueType&& value) {
-    return m_key_id_mapping.insert(
-        std::forward<TConvertibleToValueType>(hint, value));
+    return m_key_id_mapping.insert(hint, value);
   }
 
   /**
