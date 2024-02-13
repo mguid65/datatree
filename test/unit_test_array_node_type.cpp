@@ -4,9 +4,9 @@
  * @date 2024-02-05
  */
 
-#include <iostream>
 #include <type_traits>
 #include <vector>
+#include <span>
 
 #include <catch2/catch_all.hpp>
 
@@ -684,11 +684,11 @@ TEST_CASE("Array Node Type Iterators") {
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
-  SECTION("Begin") {
-    mguid::ArrayNodeType ant1;
-    auto iter1 = ant1.Begin();
-    auto iter2 = ant1.Begin();
-    auto iter3 = ant1.begin();
+  SECTION("Begin Const") {
+    const mguid::ArrayNodeType ant1;
+    const auto iter1 = ant1.Begin();
+    const auto iter2 = ant1.Begin();
+    const auto iter3 = ant1.begin();
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
@@ -708,11 +708,11 @@ TEST_CASE("Array Node Type Iterators") {
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
-  SECTION("End") {
-    mguid::ArrayNodeType ant1;
-    auto iter1 = ant1.End();
-    auto iter2 = ant1.End();
-    auto iter3 = ant1.end();
+  SECTION("End Const") {
+    const mguid::ArrayNodeType ant1;
+    const auto iter1 = ant1.End();
+    const auto iter2 = ant1.End();
+    const auto iter3 = ant1.end();
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
@@ -732,11 +732,11 @@ TEST_CASE("Array Node Type Iterators") {
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
-  SECTION("RBegin") {
-    mguid::ArrayNodeType ant1;
-    auto iter1 = ant1.RBegin();
-    auto iter2 = ant1.RBegin();
-    auto iter3 = ant1.rbegin();
+  SECTION("RBegin Const") {
+    const mguid::ArrayNodeType ant1;
+    const auto iter1 = ant1.RBegin();
+    const auto iter2 = ant1.RBegin();
+    const auto iter3 = ant1.rbegin();
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
@@ -756,11 +756,11 @@ TEST_CASE("Array Node Type Iterators") {
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
-  SECTION("REnd") {
-    mguid::ArrayNodeType ant1;
-    auto iter1 = ant1.REnd();
-    auto iter2 = ant1.REnd();
-    auto iter3 = ant1.rend();
+  SECTION("REnd Const") {
+    const mguid::ArrayNodeType ant1;
+    const auto iter1 = ant1.REnd();
+    const auto iter2 = ant1.REnd();
+    const auto iter3 = ant1.rend();
     REQUIRE(iter1 == iter2);
     REQUIRE(iter3 == iter2);
   }
