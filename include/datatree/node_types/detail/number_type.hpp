@@ -138,7 +138,7 @@ public:
    */
   [[nodiscard]] auto GetDouble() const -> expected<DoubleType, Error> {
     if (m_tag == TypeTag::Double) return m_union.f_value;
-    return nonstd::make_unexpected(Error{.category = Error::Category::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
   /**
@@ -147,7 +147,7 @@ public:
    */
   [[nodiscard]] auto GetInt() const -> expected<IntegerType, Error> {
     if (m_tag == TypeTag::Int) return m_union.i_value;
-    return nonstd::make_unexpected(Error{.category = Error::Category::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
   /**
@@ -156,7 +156,7 @@ public:
    */
   [[nodiscard]] auto GetUInt() const -> expected<UnsignedIntegerType, Error> {
     if (m_tag == TypeTag::UInt) return m_union.u_value;
-    return nonstd::make_unexpected(Error{.category = Error::Category::BadAccess});
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
   /**
