@@ -150,31 +150,32 @@ public:
   void Clear() noexcept { m_array.clear(); }
 
   /**
-   * @brief TODO
-   * @param pos
-   * @param value
-   * @return
+   * @brief Inserts elements at the specified location in the container.
+   * @param pos	iterator before which the content will be inserted
+   * @param value element value to insert
+   * @return Iterator pointing to the inserted value
    */
   auto Insert(ConstIterator pos, const ValueType& value) -> Iterator {
     return m_array.insert(pos, value);
   }
 
   /**
-   * @brief TODO
-   * @param pos
-   * @param value
-   * @return
+   * @brief Inserts elements at the specified location in the container.
+   * @param pos	iterator before which the content will be inserted
+   * @param value element value to insert
+   * @return Iterator pointing to the inserted value
    */
   auto Insert(ConstIterator pos, ValueType&& value) -> Iterator {
     return m_array.insert(pos, value);
   }
 
   /**
-   * @brief TODO
-   * @param pos
-   * @param count
-   * @param value
-   * @return
+   * @brief Inserts count copies of the value before pos
+   * @param pos	iterator before which the content will be inserted
+   * @param count number of elements to insert
+   * @param value element value to insert
+   * @return Iterator pointing to the first element inserted, or pos if count ==
+   * 0.
    */
   auto Insert(ConstIterator pos, SizeType count, const ValueType& value)
       -> Iterator {
@@ -182,12 +183,13 @@ public:
   }
 
   /**
-   * @brief TODO
-   * @tparam TInputIt
-   * @param pos
-   * @param first
-   * @param last
-   * @return
+   * @brief Inserts elements from range [first, last) before pos
+   * @tparam TInputIt range iterator type
+   * @param pos iterator before which the content will be inserted
+   * @param first the beginning of the range of elements to insert
+   * @param last the end of the range of elements to insert
+   * @return Iterator pointing to the first element inserted, or pos if first ==
+   * last
    */
   template <typename TInputIt>
   auto Insert(ConstIterator pos, TInputIt first, TInputIt last) -> Iterator {
@@ -195,10 +197,11 @@ public:
   }
 
   /**
-   * @brief TODO
-   * @param pos
-   * @param init_list
-   * @return
+   * @brief Inserts elements from initializer list init_list before pos
+   * @param pos iterator before which the content will be inserted
+   * @param init_list initializer list to insert the values from
+   * @return Iterator pointing to the first element inserted, or pos if
+   * init_list is empty.
    */
   auto Insert(ConstIterator pos, std::initializer_list<ValueType> init_list)
       -> Iterator {
@@ -206,11 +209,12 @@ public:
   }
 
   /**
-   * @brief TODO
-   * @tparam TArgs
-   * @param pos
-   * @param args
-   * @return
+   * @brief Inserts a new element into the container directly before pos
+   * @tparam TArgs types of arguments to forward to the constructor of the
+   * element
+   * @param pos iterator before which the new element will be constructed
+   * @param args arguments to forward to the constructor of the element
+   * @return Iterator pointing to the emplaced element.
    */
   template <typename... TArgs>
   auto Emplace(ConstIterator pos, TArgs&&... args) -> Iterator {
@@ -218,41 +222,54 @@ public:
   }
 
   /**
-   * @brief TODO
-   * @param pos
-   * @return
+   * @brief Remove the element at pos from the container
+   * @param pos iterator to the element to remove
+   * @return Iterator following the last removed element. If pos refers to the
+   * last element, then the end() iterator is returned.
    */
   auto Erase(ConstIterator pos) -> Iterator { return m_array.erase(pos); }
 
   /**
-   * @brief TODO
-   * @param first
-   * @param last
-   * @return
+   * @brief Remove the elements in the range [first, last) from the container
+   * @param first iterator to the beginning of the range to remove
+   * @param last iterator to the end of the range to remove
+   * @return Iterator following the last removed element. If last == end() prior
+   * to removal, then the updated end() iterator is returned. If [first, last)
+   * is an empty range, then last is returned.
    */
   auto Erase(ConstIterator first, ConstIterator last) -> Iterator {
     return m_array.erase(first, last);
   }
 
   /**
-   * @brief TODO
-   * @param value
-   * @return
+   * @brief Appends the given element value to the end of the container.
+   *
+   * The new element is initialized as a copy of value.
+   *
+   * @param value the value of the element to append
    */
   void PushBack(const ValueType& value) { m_array.push_back(value); }
 
   /**
-   * @brief TODO
-   * @param value
-   * @return
+   * @brief Appends the given element value to the end of the container.
+   *
+   * value is moved into the new element.
+   *
+   * @param value the value of the element to append
    */
   void PushBack(ValueType&& value) { m_array.push_back(value); }
 
   /**
-   * @brief TODO
-   * @tparam TArgs
-   * @param args
-   * @return
+   * @brief Appends a new element to the end of the container.
+   *
+   * The element is constructed through std::allocator_traits::construct, which
+   * typically uses placement-new to construct the element in-place at the
+   * location provided by the container. The arguments args... are forwarded to
+   * the constructor as std::forward<TArgs>(args)....
+   *
+   * @tparam TArgs types of arguments to forward to the constructor of the
+   * element
+   * @param args arguments to forward to the constructor of the element
    */
   template <typename... TArgs>
   void EmplaceBack(TArgs&&... args) {
@@ -260,177 +277,263 @@ public:
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Removes the last element of the container.
    */
   void PopBack() { m_array.pop_back(); }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Compares the contents of two ArrayNodeTypes.
+   *
+   * Compares the contents of this and other lexicographically.
+   *
+   * @return The relative order of the first pair of non-equivalent elements in
+   * this and other if there are such elements, *this.Size() <=> other.Size()
+   * otherwise.
    */
   [[nodiscard]] auto operator<=>(const ArrayNodeType&) const
       -> std::weak_ordering = default;
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Equality compare the contents of two ArrayNodeTypes.
+   *
+   * Checks if the contents of this and other are equal, that is, they have the
+   * same number of elements and each element in this compares equal with the
+   * element in other at the same position.
+   *
+   * @return true if the contents of the ArrayNodeTypes are equal, false
+   * otherwise.
    */
   [[nodiscard]] auto operator==(const ArrayNodeType&) const -> bool = default;
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto Begin() noexcept -> Iterator { return m_array.begin(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
     return m_array.begin();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
     return m_array.cbegin();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto End() noexcept -> Iterator { return m_array.end(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto End() const noexcept -> ConstIterator {
     return m_array.end();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
     return m_array.cend();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto RBegin() noexcept -> ReverseIterator {
     return m_array.rbegin();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto RBegin() const noexcept -> ConstReverseIterator {
     return m_array.rbegin();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto CRBegin() const noexcept -> ConstReverseIterator {
     return m_array.crbegin();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto REnd() noexcept -> ReverseIterator {
     return m_array.rend();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto REnd() const noexcept -> ConstReverseIterator {
     return m_array.rend();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto CREnd() const noexcept -> ConstReverseIterator {
     return m_array.crend();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto begin() noexcept -> Iterator { return Begin(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto begin() const noexcept -> ConstIterator { return Begin(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the first element of the ArrayNodeType.
+   * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
     return CBegin();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto end() noexcept -> Iterator { return End(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto end() const noexcept -> ConstIterator { return End(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns an iterator to the element following the last element of the
+   * ArrayNodeType.
+   * @return an iterator to the element following the last element of the
+   * ArrayNodeType.
    */
   [[nodiscard]] auto cend() const noexcept -> ConstIterator { return CEnd(); }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto rbegin() noexcept -> ReverseIterator { return RBegin(); }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto rbegin() const noexcept -> ConstReverseIterator {
     return RBegin();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the first element of the reversed
+   * ArrayNodeType. It corresponds to the last element of the non-reversed
+   * ArrayNodeType. If the ArrayNodeType is empty, the returned iterator is
+   * equal to REnd().
+   * @return a reverse iterator to the first element of the reversed
+   * ArrayNodeType.
    */
   [[nodiscard]] auto crbegin() const noexcept -> ConstReverseIterator {
     return CRBegin();
   }
 
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto rend() noexcept -> ReverseIterator { return REnd(); }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto rend() const noexcept -> ConstReverseIterator {
     return REnd();
   }
+
   /**
-   * @brief TODO
-   * @return
+   * @brief Returns a reverse iterator to the element following the last element
+   * of the reversed ArrayNodeType. It corresponds to the element preceding the
+   * first element of the non-reversed ArrayNodeType. This element acts as a
+   * placeholder, attempting to access it results in undefined behavior.
+   * @return a reverse iterator to the element following the last element of the
+   * reversed ArrayNodeType.
    */
   [[nodiscard]] auto crend() const noexcept -> ConstReverseIterator {
     return CREnd();
