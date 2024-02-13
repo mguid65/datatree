@@ -119,13 +119,13 @@ public:
    * @brief Check if this ArrayNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const -> bool { return m_array.empty(); }
+  [[nodiscard]] auto Empty() const noexcept -> bool { return m_array.empty(); }
 
   /**
    * @brief Get the number of elements in this ArrayNodeType
    * @return the number of elements in this ArrayNodeType
    */
-  [[nodiscard]] auto Size() const -> SizeType { return m_array.size(); }
+  [[nodiscard]] auto Size() const noexcept -> SizeType { return m_array.size(); }
 
   /**
    * @brief Resizes the container to contain count elements
