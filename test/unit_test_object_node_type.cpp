@@ -72,6 +72,13 @@ TEST_CASE("Object Node Constructor") {
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
   }
+  SECTION("Assignment From Initializer List") {
+    REQUIRE(std::is_constructible_v<mguid::ObjectNodeType, TestMapType>);
+    mguid::ObjectNodeType ont1;
+    ont1 = {{"key", mguid::uuid{}}};
+    REQUIRE_FALSE(ont1.Empty());
+    REQUIRE(ont1.Size() == 1);
+  }
 }
 
 TEST_CASE("Object Node Type Get") {

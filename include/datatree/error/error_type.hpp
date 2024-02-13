@@ -14,7 +14,12 @@ namespace mguid {
  * @brief Simple aggregate error class
  */
 struct Error {
-  enum class Category { BadAccess, KeyError, Generic } category{Category::Generic};
+  enum class Category {
+    OutOfRange,
+    BadAccess,
+    KeyError,
+    Generic
+  } category{Category::Generic};
 
   /**
    * @brief Get category as a string
@@ -24,9 +29,11 @@ struct Error {
    * @param cat category value
    * @return category as a string
    */
-  [[nodiscard]] constexpr static std::string_view CategoryToString(
-      Category cat) noexcept {
+  [[nodiscard]] constexpr static auto CategoryToString(Category cat) noexcept
+      -> std::string_view {
     switch (cat) {
+      case Category::OutOfRange:
+        return "Category::OutOfRange";
       case Category::BadAccess:
         return "Category::BadAccess";
       case Category::Generic:

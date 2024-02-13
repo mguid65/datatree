@@ -31,6 +31,7 @@ namespace mguid {
  * Most of the functions here just forward to the underlying map
  */
 class ObjectNodeType {
+public:
   using MapType = std::unordered_map<std::string, uuid>;
   using ValueType = MapType::value_type;
   using KeyType = MapType::key_type;
@@ -39,7 +40,6 @@ class ObjectNodeType {
   using Iterator = MapType::iterator;
   using ConstIterator = MapType::const_iterator;
 
-public:
   /**
    * @brief Default construct an ObjectNodeType
    */
@@ -59,6 +59,16 @@ public:
    */
   ObjectNodeType(std::initializer_list<ValueType> init_list)
       : m_key_id_mapping{init_list} {}
+
+  /**
+   * @brief Assign an initializer list of ValueType to this
+   * @param init_list an initializer list of ValueType
+   * @return reference to this
+   */
+  ObjectNodeType& operator=(std::initializer_list<ValueType> init_list) {
+    m_key_id_mapping = init_list;
+    return *this;
+  }
 
   /**
    * @brief Construct an ObjectNodeType from an existing map
@@ -114,7 +124,7 @@ public:
    * to the element that prevented the insertion) and a bool denoting whether
    * the insertion took place (true if insertion happened, false if it did not).
    */
-  std::pair<Iterator, bool> Insert(const ValueType& value) {
+  auto Insert(const ValueType& value) -> std::pair<Iterator, bool> {
     return m_key_id_mapping.insert(value);
   }
 
@@ -126,7 +136,7 @@ public:
    * to the element that prevented the insertion) and a bool denoting whether
    * the insertion took place (true if insertion happened, false if it did not).
    */
-  std::pair<Iterator, bool> Insert(ValueType&& value) {
+  auto Insert(ValueType&& value) -> std::pair<Iterator, bool> {
     return m_key_id_mapping.insert(value);
   }
 
@@ -146,7 +156,7 @@ public:
    * the insertion took place (true if insertion happened, false if it did not).
    */
   template <typename TConvertibleToValueType>
-  std::pair<Iterator, bool> Insert(TConvertibleToValueType&& value) {
+  auto Insert(TConvertibleToValueType&& value) -> std::pair<Iterator, bool> {
     return m_key_id_mapping.insert(
         std::forward<TConvertibleToValueType>(value));
   }
@@ -158,7 +168,7 @@ public:
    * @return An iterator to the inserted value, or to the value that
    * prevented the insertion.
    */
-  Iterator InsertHint(ConstIterator hint, const ValueType& value) {
+  auto InsertHint(ConstIterator hint, const ValueType& value) -> Iterator {
     return m_key_id_mapping.insert(hint, value);
   }
 
@@ -169,7 +179,7 @@ public:
    * @return An iterator to the inserted value, or to the value that
    * prevented the insertion.
    */
-  Iterator InsertHint(ConstIterator hint, ValueType&& value) {
+  auto InsertHint(ConstIterator hint, ValueType&& value) -> Iterator {
     return m_key_id_mapping.insert(hint, value);
   }
 
@@ -189,7 +199,8 @@ public:
    * prevented the insertion.
    */
   template <typename TConvertibleToValueType>
-  Iterator InsertHint(ConstIterator hint, TConvertibleToValueType&& value) {
+  auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value)
+      -> Iterator {
     return m_key_id_mapping.insert(hint, value);
   }
 
@@ -222,7 +233,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  std::pair<Iterator, bool> InsertOrAssign(const KeyType& key, TValue&& obj) {
+  auto InsertOrAssign(const KeyType& key, TValue&& obj)
+      -> std::pair<Iterator, bool> {
     return m_key_id_mapping.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -242,7 +254,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  std::pair<Iterator, bool> InsertOrAssign(KeyType&& key, TValue&& obj) {
+  auto InsertOrAssign(KeyType&& key, TValue&& obj)
+      -> std::pair<Iterator, bool> {
     return m_key_id_mapping.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -273,8 +286,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  Iterator InsertOrAssignHint(ConstIterator hint, const KeyType& key,
-                              TValue&& obj) {
+  auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj)
+      -> Iterator {
     return m_key_id_mapping.insert_or_assign(hint, key,
                                              std::forward<TValue>(obj));
   }
@@ -306,7 +319,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  Iterator InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj) {
+  auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj)
+      -> Iterator {
     return m_key_id_mapping.insert_or_assign(hint, key,
                                              std::forward<TValue>(obj));
   }
@@ -322,7 +336,7 @@ public:
    * false if it did not).
    */
   template <typename... TArgs>
-  std::pair<Iterator, bool> Emplace(TArgs&&... args) {
+  auto Emplace(TArgs&&... args) -> std::pair<Iterator, bool> {
     return m_key_id_mapping.emplace(std::forward<TArgs>(args)...);
   }
 
@@ -338,7 +352,7 @@ public:
    * already existing element with the equivalent key.
    */
   template <typename... TArgs>
-  Iterator EmplaceHint(ConstIterator hint, TArgs&&... args) {
+  auto EmplaceHint(ConstIterator hint, TArgs&&... args) -> Iterator {
     return m_key_id_mapping.emplace_hint(hint, std::forward<TArgs>(args)...);
   }
 
@@ -362,7 +376,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  std::pair<Iterator, bool> TryEmplace(const KeyType& key, TArgs&&... args) {
+  auto TryEmplace(const KeyType& key, TArgs&&... args)
+      -> std::pair<Iterator, bool> {
     return m_key_id_mapping.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
@@ -386,7 +401,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  std::pair<Iterator, bool> TryEmplace(KeyType&& key, TArgs&&... args) {
+  auto TryEmplace(KeyType&& key, TArgs&&... args) -> std::pair<Iterator, bool> {
     return m_key_id_mapping.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
@@ -412,8 +427,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  Iterator TryEmplaceHint(ConstIterator hint, const KeyType& key,
-                          TArgs&&... args) {
+  auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args)
+      -> Iterator {
     return m_key_id_mapping.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
@@ -440,7 +455,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  Iterator TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args) {
+  auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args)
+      -> Iterator {
     return m_key_id_mapping.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
@@ -456,21 +472,25 @@ public:
    * @param pos iterator to the element to remove
    * @return Iterator following the last removed element.
    */
-  Iterator Erase(Iterator pos) { return m_key_id_mapping.erase(pos); }
+  auto Erase(Iterator pos) -> Iterator { return m_key_id_mapping.erase(pos); }
 
   /**
    * @brief Removes the element at pos
    * @param pos iterator to the element to remove
    * @return Iterator following the last removed element.
    */
-  Iterator Erase(ConstIterator pos) { return m_key_id_mapping.erase(pos); }
+  auto Erase(ConstIterator pos) -> Iterator {
+    return m_key_id_mapping.erase(pos);
+  }
 
   /**
    * @brief Removes the element (if one exists) with the key equivalent to key.
    * @param key key value of the elements to remove
    * @return Number of elements removed (0 or 1).
    */
-  SizeType Erase(const KeyType& key) { return m_key_id_mapping.erase(key); }
+  auto Erase(const KeyType& key) -> SizeType {
+    return m_key_id_mapping.erase(key);
+  }
 
   /**
    * @brief Check if there is a key equivalent to the provided key in this
@@ -522,13 +542,7 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] Iterator Begin() noexcept { return m_key_id_mapping.begin(); }
-
-  /**
-   * @brief Get an iterator to the first element of the underlying map.
-   * @return Iterator to the first element.
-   */
-  [[nodiscard]] ConstIterator Begin() const noexcept {
+  [[nodiscard]] auto Begin() noexcept -> Iterator {
     return m_key_id_mapping.begin();
   }
 
@@ -536,7 +550,15 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] ConstIterator CBegin() const noexcept {
+  [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
+    return m_key_id_mapping.begin();
+  }
+
+  /**
+   * @brief Get an iterator to the first element of the underlying map.
+   * @return Iterator to the first element.
+   */
+  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
     return m_key_id_mapping.cbegin();
   }
 
@@ -544,33 +566,28 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] Iterator begin() noexcept { return Begin(); }
+  [[nodiscard]] auto begin() noexcept -> Iterator { return Begin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] ConstIterator begin() const noexcept { return Begin(); }
+  [[nodiscard]] auto begin() const noexcept -> ConstIterator { return Begin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] ConstIterator cbegin() const noexcept { return CBegin(); }
+  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
+    return CBegin();
+  }
 
   /**
    * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] Iterator End() noexcept { return m_key_id_mapping.end(); }
-
-  /**
-   * @brief Get an iterator to the element following the last element of the
-   * unordered_map.
-   * @return Iterator to the element following the last element.
-   */
-  [[nodiscard]] ConstIterator End() const noexcept {
+  [[nodiscard]] auto End() noexcept -> Iterator {
     return m_key_id_mapping.end();
   }
 
@@ -579,7 +596,16 @@ public:
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] ConstIterator CEnd() const noexcept {
+  [[nodiscard]] auto End() const noexcept -> ConstIterator {
+    return m_key_id_mapping.end();
+  }
+
+  /**
+   * @brief Get an iterator to the element following the last element of the
+   * unordered_map.
+   * @return Iterator to the element following the last element.
+   */
+  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
     return m_key_id_mapping.cend();
   }
 
@@ -588,28 +614,29 @@ public:
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] Iterator end() noexcept { return End(); }
+  [[nodiscard]] auto end() noexcept -> Iterator { return End(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] ConstIterator end() const noexcept { return End(); }
+  [[nodiscard]] auto end() const noexcept -> ConstIterator { return End(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] ConstIterator cend() const noexcept { return CEnd(); }
+  [[nodiscard]] auto cend() const noexcept -> ConstIterator { return CEnd(); }
 
   /**
    * @brief Compares the contents of two ObjectNodeTypes.
    * @param other ObjectNodeType to compare against
    * @return true if the contents of the containers are equal, false otherwise.
    */
-  [[nodiscard]] bool operator==(const ObjectNodeType& other) const = default;
+  [[nodiscard]] auto operator==(const ObjectNodeType& other) const
+      -> bool = default;
 
 private:
   MapType m_key_id_mapping;
