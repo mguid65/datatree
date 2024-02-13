@@ -15,7 +15,7 @@
 namespace mguid {
 
 /**
- * @brief
+ * @brief A class that represents an Array Node Type
  */
 class ArrayNodeType {
 public:

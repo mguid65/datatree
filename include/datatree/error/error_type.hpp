@@ -14,7 +14,7 @@ namespace mguid {
  * @brief Simple aggregate error class
  */
 struct Error {
-  enum class Category {
+  enum class Category : std::uint8_t {
     OutOfRange,
     BadAccess,
     KeyError,
@@ -24,7 +24,7 @@ struct Error {
   /**
    * @brief Get category as a string
    *
-   * In case of an out of bounds status, "Unknown" will be returned.
+   * In case of an out of bounds category, "Category::Unknown" will be returned.
    *
    * @param cat category value
    * @return category as a string
@@ -36,12 +36,12 @@ struct Error {
         return "Category::OutOfRange";
       case Category::BadAccess:
         return "Category::BadAccess";
-      case Category::Generic:
-        return "Category::Generic";
       case Category::KeyError:
         return "Category::KeyError";
+      case Category::Generic:
+        return "Category::Generic";
       default:
-        return "Unknown";
+        return "Category::Unknown";
     }
   }
 };
