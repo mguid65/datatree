@@ -52,7 +52,6 @@ template <typename TValueType, typename TRange>
 concept RangeOf = std::ranges::range<TRange> &&
                   std::same_as<std::ranges::range_value_t<TRange>, TValueType>;
 
-
 }  // namespace mguid
 
 #endif  // DATATREE_COMMON_HPP

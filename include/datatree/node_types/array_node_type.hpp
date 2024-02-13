@@ -7,6 +7,8 @@
 #ifndef DATATREE_ARRAY_NODE_TYPE_HPP
 #define DATATREE_ARRAY_NODE_TYPE_HPP
 
+#include <algorithm>
+#include <compare>
 #include <vector>
 
 #include "datatree/common.hpp"
@@ -115,7 +117,9 @@ public:
    * @brief Get the number of elements in this ArrayNodeType
    * @return the number of elements in this ArrayNodeType
    */
-  [[nodiscard]] auto Size() const noexcept -> SizeType { return m_array.size(); }
+  [[nodiscard]] auto Size() const noexcept -> SizeType {
+    return m_array.size();
+  }
 
   /**
    * @brief Resizes the container to contain count elements
@@ -127,12 +131,10 @@ public:
    *
    * @param count new size of the container
    */
-  template<bool TShrinkToFit = false>
+  template <bool TShrinkToFit = false>
   void Resize(SizeType count) {
     m_array.resize(count);
-    if constexpr (TShrinkToFit) {
-      ShrinkToFit();
-    }
+    if constexpr (TShrinkToFit) { ShrinkToFit(); }
   }
 
   /**
@@ -142,12 +144,11 @@ public:
    *
    * @param new_cap new capacity of the ArrayNodeType, in number of elements
    */
-  void Reserve(SizeType new_cap) {
-    m_array.reserve(new_cap);
-  }
+  void Reserve(SizeType new_cap) { m_array.reserve(new_cap); }
 
   /**
-   * @brief Returns the number of elements that the ArrayNodeType has currently allocated space for.
+   * @brief Returns the number of elements that the ArrayNodeType has currently
+   * allocated space for.
    * @return Capacity of the currently allocated storage.
    */
   [[nodiscard]] auto Capacity() const noexcept -> SizeType {
@@ -162,12 +163,10 @@ public:
   /**
    * @brief Erases all elements from the container.
    */
-  template<bool TShrinkToFit = false>
+  template <bool TShrinkToFit = false>
   void Clear() noexcept(TShrinkToFit) {
     m_array.clear();
-    if constexpr (TShrinkToFit) {
-      ShrinkToFit();
-    }
+    if constexpr (TShrinkToFit) { ShrinkToFit(); }
   }
 
   /**
@@ -177,16 +176,6 @@ public:
    * @return Iterator pointing to the inserted value
    */
   auto Insert(ConstIterator pos, const ValueType& value) -> Iterator {
-    return m_array.insert(pos, value);
-  }
-
-  /**
-   * @brief Inserts elements at the specified location in the container.
-   * @param pos	iterator before which the content will be inserted
-   * @param value element value to insert
-   * @return Iterator pointing to the inserted value
-   */
-  auto Insert(ConstIterator pos, ValueType&& value) -> Iterator {
     return m_array.insert(pos, value);
   }
 
@@ -272,15 +261,6 @@ public:
   void PushBack(const ValueType& value) { m_array.push_back(value); }
 
   /**
-   * @brief Appends the given element value to the end of the container.
-   *
-   * value is moved into the new element.
-   *
-   * @param value the value of the element to append
-   */
-  void PushBack(ValueType&& value) { m_array.push_back(value); }
-
-  /**
    * @brief Appends a new element to the end of the container.
    *
    * The element is constructed through std::allocator_traits::construct, which
@@ -299,32 +279,13 @@ public:
 
   /**
    * @brief Removes the last element of the container.
+   *
+   * Calling PopBack on an empty container is equivalent to a no-op
    */
-  void PopBack() { m_array.pop_back(); }
-
-  /**
-   * @brief Compares the contents of two ArrayNodeTypes.
-   *
-   * Compares the contents of this and other lexicographically.
-   *
-   * @return The relative order of the first pair of non-equivalent elements in
-   * this and other if there are such elements, *this.Size() <=> other.Size()
-   * otherwise.
-   */
-  [[nodiscard]] auto operator<=>(const ArrayNodeType&) const
-      -> std::weak_ordering = default;
-
-  /**
-   * @brief Equality compare the contents of two ArrayNodeTypes.
-   *
-   * Checks if the contents of this and other are equal, that is, they have the
-   * same number of elements and each element in this compares equal with the
-   * element in other at the same position.
-   *
-   * @return true if the contents of the ArrayNodeTypes are equal, false
-   * otherwise.
-   */
-  [[nodiscard]] auto operator==(const ArrayNodeType&) const -> bool = default;
+  void PopBack() {
+    if (Empty()) { return; }
+    m_array.pop_back();
+  }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
@@ -559,6 +520,45 @@ public:
   [[nodiscard]] auto crend() const noexcept -> ConstReverseIterator {
     return CREnd();
   }
+
+  /**
+   * @brief Compares the contents of two ArrayNodeTypes.
+   *
+   * Compares the contents of this and other lexicographically.
+   *
+   * @return The relative order of the first pair of non-equivalent elements in
+   * this and other if there are such elements, *this.Size() <=> other.Size()
+   * otherwise.
+   */
+  [[nodiscard]] auto operator<=>(const ArrayNodeType& other) const
+      -> std::strong_ordering {
+    return std::lexicographical_compare_three_way(
+        Begin(), End(), other.Begin(), other.End(), [](auto lhs, auto rhs) {
+          using uuid_span = std::span<std::byte const, 16>;
+          const auto lhs_bytes = lhs.as_bytes();
+          const auto rhs_bytes = rhs.as_bytes();
+          for (uuid_span::size_type i{0}; i < 16; ++i) {
+            if (lhs_bytes[i] > rhs_bytes[i]) {
+              return std::strong_ordering::greater;
+            } else if (lhs_bytes[i] < rhs_bytes[i]) {
+              return std::strong_ordering::less;
+            }
+          }
+          return std::strong_ordering::equal;
+        });
+  }
+
+  /**
+   * @brief Equality compare the contents of two ArrayNodeTypes.
+   *
+   * Checks if the contents of this and other are equal, that is, they have the
+   * same number of elements and each element in this compares equal with the
+   * element in other at the same position.
+   *
+   * @return true if the contents of the ArrayNodeTypes are equal, false
+   * otherwise.
+   */
+  [[nodiscard]] auto operator==(const ArrayNodeType&) const -> bool = default;
 
 private:
   /**
