@@ -412,7 +412,8 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  Iterator TryEmplace(ConstIterator hint, const KeyType& key, TArgs&&... args) {
+  Iterator TryEmplaceHint(ConstIterator hint, const KeyType& key,
+                          TArgs&&... args) {
     return m_key_id_mapping.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
@@ -439,10 +440,16 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  Iterator TryEmplace(ConstIterator hint, KeyType&& key, TArgs&&... args) {
+  Iterator TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args) {
     return m_key_id_mapping.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
+
+  // Note: I haven't exposed the ranged erase:
+  // Iterator Erase(ConstIterator first, ConstIterator last);
+  // because I don't like it.
+  // Since unordered_map is *unordered* it is unpredictable what is within the
+  // range. It is hard to see how this could be useful.
 
   /**
    * @brief Removes the element at pos
@@ -457,17 +464,6 @@ public:
    * @return Iterator following the last removed element.
    */
   Iterator Erase(ConstIterator pos) { return m_key_id_mapping.erase(pos); }
-
-  /**
-   * @brief Removes the elements in the range [first, last), which must be a
-   * valid range in *this.
-   * @param first beginning of range of elements to remove
-   * @param last end of range of elements to remove
-   * @return Iterator following the last removed element.
-   */
-  Iterator Erase(ConstIterator first, ConstIterator last) {
-    return m_key_id_mapping.erase(first, last);
-  }
 
   /**
    * @brief Removes the element (if one exists) with the key equivalent to key.
