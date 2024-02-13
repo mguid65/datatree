@@ -69,23 +69,13 @@ public:
 
   /**
    * @brief Set the specified element with bounds checking
+   *
+   * UUID is trivially copyable so there will be no ValueType&& overload
+   *
    * @param pos position of the element to return
-   * @return
+   * @return the specified element with bounds checking
    */
   auto Set(SizeType pos, const ValueType& value) -> expected<void, Error> {
-    if (ValidIndex(pos)) {
-      m_array[pos] = value;
-      return {};
-    }
-    return make_unexpected(Error{.category = Error::Category::OutOfRange});
-  }
-
-  /**
-   * @brief Set the specified element with bounds checking
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  auto Set(SizeType pos, ValueType&& value) -> expected<void, Error> {
     if (ValidIndex(pos)) {
       m_array[pos] = value;
       return {};
@@ -112,7 +102,7 @@ public:
     if (Empty()) {
       return make_unexpected(Error{.category = Error::Category::OutOfRange});
     }
-    return m_array.front();
+    return m_array.back();
   }
 
   /**
@@ -137,7 +127,32 @@ public:
    *
    * @param count new size of the container
    */
-  void Resize(SizeType count) { m_array.resize(count); }
+  template<bool TShrinkToFit = false>
+  void Resize(SizeType count) {
+    m_array.resize(count);
+    if constexpr (TShrinkToFit) {
+      ShrinkToFit();
+    }
+  }
+
+  /**
+   * @brief Increase the capacity of the ArrayNodeType
+   *
+   * Reserve() does not change the size of the ArrayNodeType.
+   *
+   * @param new_cap new capacity of the ArrayNodeType, in number of elements
+   */
+  void Reserve(SizeType new_cap) {
+    m_array.reserve(new_cap);
+  }
+
+  /**
+   * @brief Returns the number of elements that the ArrayNodeType has currently allocated space for.
+   * @return Capacity of the currently allocated storage.
+   */
+  [[nodiscard]] auto Capacity() const noexcept -> SizeType {
+    return m_array.capacity();
+  }
 
   /**
    * @brief Requests the removal of unused capacity.
@@ -147,7 +162,13 @@ public:
   /**
    * @brief Erases all elements from the container.
    */
-  void Clear() noexcept { m_array.clear(); }
+  template<bool TShrinkToFit = false>
+  void Clear() noexcept(TShrinkToFit) {
+    m_array.clear();
+    if constexpr (TShrinkToFit) {
+      ShrinkToFit();
+    }
+  }
 
   /**
    * @brief Inserts elements at the specified location in the container.
