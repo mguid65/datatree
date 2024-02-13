@@ -24,15 +24,15 @@ struct Error {
    * @param cat category value
    * @return category as a string
    */
-  [[nodiscard]] static std::string_view CategoryToString(
+  [[nodiscard]] constexpr static std::string_view CategoryToString(
       Category cat) noexcept {
     switch (cat) {
       case Category::BadAccess:
-        return "Status::BadAccess";
+        return "Category::BadAccess";
       case Category::Generic:
-        return "Status::Generic";
+        return "Category::Generic";
       case Category::KeyError:
-        return "Status::KeyError";
+        return "Category::KeyError";
       default:
         return "Unknown";
     }
