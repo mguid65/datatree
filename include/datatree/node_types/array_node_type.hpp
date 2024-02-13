@@ -1,7 +1,7 @@
 /**
  * @brief Declarations for array node type
  * @author Matthew Guidry (github: mguid65)
- * @date 2024-02-05
+ * @date 2024-02-12
  */
 
 #ifndef DATATREE_ARRAY_NODE_TYPE_HPP
