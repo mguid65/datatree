@@ -21,22 +21,27 @@ if (SANITIZER)
     enable_sanitizer()
 endif ()
 
-set(DATATREE_SOURCES
-        source/datatree/datatree.cpp
-        source/datatree/tree_node.cpp
-        source/datatree/node_types/array_node.cpp
-        source/datatree/node_types/object_node.cpp
-        source/datatree/node_types/value_node.cpp
-)
-
 find_package(expected-lite REQUIRED)
 find_package(stduuid REQUIRED)
 
-# Static because I don't feel like dealing with shared shenanigans
-add_library(datatree STATIC)
-target_include_directories(datatree PUBLIC include)
-target_sources(datatree PRIVATE ${DATATREE_SOURCES})
-target_link_libraries(datatree PUBLIC nonstd::expected-lite stduuid::stduuid)
+set(DATATREE_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/common.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/datatree.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/tree_node.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/error/error_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/array_node_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/value_node_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/object_node_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/null_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/number_type.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/value_types.hpp
+)
+
+add_library(datatree INTERFACE)
+target_include_directories(datatree INTERFACE include)
+target_sources(datatree INTERFACE ${DATATREE_SOURCES})
+target_link_libraries(datatree INTERFACE nonstd::expected-lite stduuid::stduuid)
+set_target_properties(datatree PROPERTIES LINKER_LANGUAGE CXX)
 
 include(CTest)
 

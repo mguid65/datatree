@@ -16,6 +16,7 @@ class DataTreeConan(ConanFile):
     topics = 'tree', 'JSON'
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'CMakeDeps', 'CMakeToolchain'
+    package_type = 'header-library'
 
     def export_sources(self):
         copy(self, "LICENSE.md", self.recipe_folder, self.export_sources_folder)

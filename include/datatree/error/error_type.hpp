@@ -14,24 +14,34 @@ namespace mguid {
  * @brief Simple aggregate error class
  */
 struct Error {
-  enum class Status { BadAccess, Generic } category{Status::Generic};
+  enum class Category : std::uint8_t {
+    OutOfRange,
+    BadAccess,
+    KeyError,
+    Generic
+  } category{Category::Generic};
 
   /**
-   * @brief Get status as a string
+   * @brief Get category as a string
    *
-   * In case of an out of bounds status, "Unknown" will be returned.
+   * In case of an out of bounds category, "Category::Unknown" will be returned.
    *
-   * @param status status code
-   * @return status as a string
+   * @param cat category value
+   * @return category as a string
    */
-  [[nodiscard]] static std::string_view StatusToString(Status status) noexcept {
-    switch (status) {
-      case Status::BadAccess:
-        return "Status::BadAccess";
-      case Status::Generic:
-        return "Status::Generic";
+  [[nodiscard]] constexpr static auto CategoryToString(Category cat) noexcept
+      -> std::string_view {
+    switch (cat) {
+      case Category::OutOfRange:
+        return "Category::OutOfRange";
+      case Category::BadAccess:
+        return "Category::BadAccess";
+      case Category::KeyError:
+        return "Category::KeyError";
+      case Category::Generic:
+        return "Category::Generic";
       default:
-        return "Unknown";
+        return "Category::Unknown";
     }
   }
 };
