@@ -7,6 +7,7 @@
 #ifndef DATATREE_TREE_NODE_HPP
 #define DATATREE_TREE_NODE_HPP
 
+#include <concepts>
 #include <variant>
 
 #include "datatree/node_types/array_node_type.hpp"
@@ -16,6 +17,14 @@
 namespace mguid {
 
 using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
+
+template <typename TNodeType>
+concept ValidNodeType =
+    std::same_as<std::remove_cvref_t<TNodeType>, ObjectNodeType> ||
+    std::same_as<std::remove_cvref_t<TNodeType>, ArrayNodeType> ||
+    std::same_as<std::remove_cvref_t<TNodeType>, ValueNodeType>;
+
+enum class NodeTypeTag : std::uint8_t { Object, Array, Value };
 
 /**
  * @brief Represents a node in the data tree that can be an Object, Array, or
@@ -37,71 +46,144 @@ public:
   TreeNode& operator=(TreeNode&&) noexcept = default;
 
   /**
-   * @brief Construct a TreeNode from an ObjectNodeType
-   * @param node_item an ObjectNodeType
+   * @brief Construct a TreeNode from an TNodeType
+   * @tparam TNodeType type restricted by a concept to be ObjectNodeType,
+   * ArrayNodeType, or ValueNodeType so we can use perfect forwarding
+   * @param node_data one of the valid node types
    */
-  explicit TreeNode(const ObjectNodeType& node_item) : m_node_data{node_item} {}
+  template <ValidNodeType TNodeType>
+  explicit TreeNode(TNodeType&& node_data)
+      : m_node_data{std::forward<TNodeType>(node_data)} {}
 
   /**
-   * @brief Construct a TreeNode from an option array
-   * @param node_item an ArrayNodeType
+   * @brief Construct a TreeNode with the proper alternative given the tag
+   *
+   * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
+   *
+   * @tparam TTag tag corresponding with one of the node types
    */
-  explicit TreeNode(const ArrayNodeType& node_item) : m_node_data{node_item} {}
+  explicit TreeNode(NodeTypeTag tag) : m_node_data{TreeNode::FromTag(tag)} {}
 
   /**
-   * @brief Construct a TreeNode from an option value
-   * @param node_item a ValueNodeType
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held, otherwise Error
    */
-  explicit TreeNode(const ValueNodeType& node_item) : m_node_data{node_item} {}
+  template <ValidNodeType TRequestedType>
+  [[nodiscard]] auto Has() const -> bool {
+    return std::holds_alternative<TRequestedType>(m_node_data);
+  }
 
   /**
    * @brief Is this node holding an ObjectNodeType
    * @return true if holding an ObjectNodeType, otherwise false
    */
-  [[nodiscard]] auto HasObject() const -> bool {
-    return std::holds_alternative<ObjectNodeType>(m_node_data);
+  [[nodiscard]] auto HasObject() const noexcept -> bool {
+    return Has<ObjectNodeType>();
   }
 
   /**
    * @brief Is this node holding an ArrayNodeType
    * @return true if holding an ArrayNodeType, otherwise false
    */
-  [[nodiscard]] auto HasArray() const -> bool {
-    return std::holds_alternative<ArrayNodeType>(m_node_data);
+  [[nodiscard]] auto HasArray() const noexcept -> bool {
+    return Has<ArrayNodeType>();
   }
 
   /**
    * @brief Is this node holding an ValueNodeType
    * @return true if holding an ValueNodeType, otherwise false
    */
-  [[nodiscard]] auto HasValue() const -> bool {
-    return std::holds_alternative<ValueNodeType>(m_node_data);
+  [[nodiscard]] auto HasValue() const noexcept -> bool {
+    return Has<ValueNodeType>();
+  }
+
+  /**
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held, otherwise Error
+   */
+  template <ValidNodeType TRequestedType>
+  [[nodiscard]] auto Get() const -> expected<TRequestedType, Error> {
+    if (auto* result = std::get_if<TRequestedType>(&m_node_data);
+        result != nullptr) {
+      return *result;
+    }
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
   /**
    * @brief Try to get an ObjectNodeType from this node
    * @return ObjectNodeType if holding an ObjectNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetObject() const -> bool {
-    return std::holds_alternative<ObjectNodeType>(m_node_data);
+  [[nodiscard]] auto GetObject() const -> expected<ObjectNodeType, Error> {
+    return Get<ObjectNodeType>();
   }
 
   /**
    * @brief Try to get an ArrayNodeType from this node
    * @return ArrayNodeType if holding an ArrayNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetArray() const -> bool {
-    return std::holds_alternative<ArrayNodeType>(m_node_data);
+  [[nodiscard]] auto GetArray() const -> expected<ArrayNodeType, Error> {
+    return Get<ArrayNodeType>();
   }
 
   /**
    * @brief Try to get an ValueNodeType from this node
    * @return ValueNodeType if holding an ValueNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetValue() const -> bool {
-    return std::holds_alternative<ValueNodeType>(m_node_data);
+  [[nodiscard]] auto GetValue() const -> expected<ValueNodeType, Error> {
+    return Get<ValueNodeType>();
   }
+
+  /**
+   * @brief Reset this node, optionally specifying a new default node type by
+   * tag
+   * @tparam TTag tag corresponding with one of the node types
+   */
+  template <NodeTypeTag TTag = NodeTypeTag::Object>
+    requires(static_cast<std::uint8_t>(TTag) < 3)
+  void Reset() {
+    m_node_data = FromTagTemplate<TTag>();
+  }
+
 private:
+  /**
+   * @brief Based on a tag, create the corresponding node type
+   *
+   * This is effectively a static factory function
+   *
+   * @param tag tag corresponding with one of the node types
+   */
+  [[nodiscard]] static NodeType FromTag(NodeTypeTag tag) {
+    switch (tag) {
+      case NodeTypeTag::Array:
+        return {ArrayNodeType{}};
+      case NodeTypeTag::Value:
+        return {ValueNodeType{}};
+      default:
+        return {ObjectNodeType{}};
+    }
+  }
+
+  /**
+   * @brief Based on a tag, create the corresponding node type
+   *
+   * This is effectively a static factory function
+   *
+   * @tparam TTag tag corresponding with one of the node types
+   */
+  template <NodeTypeTag TTag>
+  [[nodiscard]] static auto FromTagTemplate() {
+    if constexpr (TTag == NodeTypeTag::Array) {
+      return ArrayNodeType{};
+    } else if constexpr (TTag == NodeTypeTag::Value) {
+      return ValueNodeType{};
+    } else {
+      return ObjectNodeType{};
+    }
+  }
+
   NodeType m_node_data{ObjectNodeType{}};
 };
 
