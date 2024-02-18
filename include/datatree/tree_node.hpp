@@ -60,7 +60,7 @@ public:
    *
    * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
    *
-   * @tparam TTag tag corresponding with one of the node types
+   * @tparam tag tag corresponding with one of the node types
    */
   explicit TreeNode(NodeTypeTag tag) : m_node_data{TreeNode::FromTag(tag)} {}
 
@@ -137,6 +137,17 @@ public:
   }
 
   /**
+   * @brief Set this TreeNode to an TNodeType
+   * @tparam TNodeType type restricted by a concept to be ObjectNodeType,
+   * ArrayNodeType, or ValueNodeType so we can use perfect forwarding
+   * @param node_data one of the valid node types
+   */
+  template <ValidNodeType TNodeType>
+  void Set(TNodeType&& node_data) {
+    m_node_data = std::forward<TNodeType>(node_data);
+  }
+
+  /**
    * @brief Reset this node, optionally specifying a new default node type by
    * tag
    * @tparam TTag tag corresponding with one of the node types
@@ -145,6 +156,25 @@ public:
     requires(static_cast<std::uint8_t>(TTag) < 3)
   void Reset() {
     m_node_data = FromTagTemplate<TTag>();
+  }
+
+  /**
+   * @brief Reset this node, optionally specifying a new default node type by
+   * tag
+   * @param tag tag corresponding with one of the node types
+   */
+  void Reset(NodeTypeTag tag) { m_node_data = FromTag(tag); }
+
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_node_data);
   }
 
 private:
