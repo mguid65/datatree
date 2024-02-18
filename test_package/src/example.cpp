@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <datatree/datatree.hpp>
+#include "datatree/data_tree.hpp"
 #include <datatree/node_types/value_node_type.hpp>
 
 auto main() -> int {

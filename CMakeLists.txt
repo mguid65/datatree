@@ -26,7 +26,7 @@ find_package(stduuid REQUIRED)
 
 set(DATATREE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/common.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/datatree.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/data_tree.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/tree_node.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/error/error_type.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/array_node_type.hpp

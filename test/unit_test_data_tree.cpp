@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/datatree.hpp>
+#include "datatree/data_tree.hpp"
 
 TEST_CASE("Datatree Constructor") {
   SECTION("Default Constructor") { [[maybe_unused]] mguid::DataTree dt; }
