@@ -280,3 +280,76 @@ TEST_CASE("Tree Node Visit") {
     }
   }
 }
+
+TEST_CASE("Tree Node Comparison") {
+  SECTION("Equality") {
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NullType{})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NullType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{})));
+
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"test"})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"test"})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{true})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{true})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NullType{})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NullType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{1})) ==
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{1})));
+
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) ==
+            mguid::TreeNode(mguid::ObjectNodeType()));
+
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType({{"key", {}}})) ==
+            mguid::TreeNode(mguid::ObjectNodeType({{"key", {}}})));
+
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) ==
+            mguid::TreeNode(mguid::ArrayNodeType()));
+
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType({{}, {}})) ==
+            mguid::TreeNode(mguid::ArrayNodeType({{}, {}})));
+  }
+  SECTION("Inquality") {
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NullType{})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})));
+
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"test"})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"nottest"})));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{true})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{false})));
+    // NullType is always equal to itself since it only has 1 value
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{1})) !=
+            mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{2})));
+
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) !=
+            mguid::TreeNode(mguid::ObjectNodeType({{"key", {}}})));
+
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType({{"key", {}}})) !=
+            mguid::TreeNode(mguid::ObjectNodeType({{"notkey", {}}})));
+
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) !=
+            mguid::TreeNode(mguid::ArrayNodeType({{}})));
+
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType({{}, {}})) !=
+            mguid::TreeNode(mguid::ArrayNodeType({{}, {}, {}})));
+
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) != mguid::TreeNode(mguid::ObjectNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) != mguid::TreeNode(mguid::ValueNodeType()));
+
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) != mguid::TreeNode(mguid::ArrayNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) != mguid::TreeNode(mguid::ValueNodeType()));
+
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) != mguid::TreeNode(mguid::ArrayNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) != mguid::TreeNode(mguid::ObjectNodeType()));
+  }
+}

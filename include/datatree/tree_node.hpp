@@ -177,6 +177,14 @@ public:
     return std::visit(overload_set, m_node_data);
   }
 
+  // Get If ?
+  // Emplace ?
+
+  /**
+   * @brief Equality compare this TreeNode to another
+   * @return true if they are equal, otherwise false
+   */
+  [[nodiscard]] bool operator==(const TreeNode&) const noexcept = default;
 private:
   /**
    * @brief Based on a tag, create the corresponding node type
