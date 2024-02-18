@@ -15,6 +15,21 @@
 namespace mguid {
 
 /**
+ * @brief A type to hold a set of callable overloads
+ * @tparam TNonFinalCallables a set of non-final callables
+ */
+template <typename... TNonFinalCallables>
+struct Overload : TNonFinalCallables... {
+  using TNonFinalCallables::operator()...;
+};
+
+/**
+ * @brief Deduction guide for Overload
+ */
+template <class... TNonFinalCallables>
+Overload(TNonFinalCallables...) -> Overload<TNonFinalCallables...>;
+
+/**
  * @brief Doing this to get stduuid things
  */
 using uuids::to_string;

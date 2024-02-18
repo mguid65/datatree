@@ -117,7 +117,7 @@ public:
    * @brief Try to get a StringType value from this value node type
    * @return Expected with a StringType value or an Error
    */
-  [[nodiscard]] auto GetString() const noexcept -> expected<StringType, Error> {
+  [[nodiscard]] auto GetString() const -> expected<StringType, Error> {
     if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
       return *val;
     }

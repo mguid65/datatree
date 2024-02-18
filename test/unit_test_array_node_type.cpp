@@ -73,7 +73,7 @@ TEST_CASE("Array Node Type Get") {
 }
 
 TEST_CASE("Array Node Type Set") {
-  SECTION("Set Valid Index const &") {
+  SECTION("Set Valid Index") {
     auto test_id =
         mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
@@ -82,11 +82,11 @@ TEST_CASE("Array Node Type Set") {
     REQUIRE_FALSE(ant1.Set(2, test_id.value()).has_exception<mguid::Error>());
     REQUIRE_FALSE(ant1.Set(3, test_id.value()).has_exception<mguid::Error>());
   }
-  SECTION("Set Invalid Index const &") {
-    auto test_id =
-        mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    mguid::ArrayNodeType ant1{{}, {}, {}, {}};
-    REQUIRE(ant1.Set(4, test_id.value()).has_exception<mguid::Error>());
+  SECTION("Set Invalid Index") {
+    mguid::ArrayNodeType ant1{mguid::uuid{}, mguid::uuid{}, mguid::uuid{}, mguid::uuid{}};
+    auto result = ant1.Set(4, mguid::uuid{});
+    REQUIRE(result.has_exception<mguid::Error>());
+    REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
 }
 

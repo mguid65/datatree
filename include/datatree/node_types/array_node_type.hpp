@@ -14,6 +14,13 @@
 #include "datatree/common.hpp"
 #include "datatree/error/error_type.hpp"
 
+#ifdef __GNUC__
+#define BEGIN_SUPPRESS_ARRAY_BOUNDS \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+#define END_SUPPRESS_ARRAY_BOUNDS _Pragma("GCC diagnostic pop")
+#endif
+
 namespace mguid {
 
 /**
@@ -47,7 +54,7 @@ public:
    * @param init_list an initializer list of uuids
    */
   ArrayNodeType(std::initializer_list<mguid::uuid> init_list)
-      : m_array{init_list} {}
+      : m_underlying{init_list} {}
 
   /**
    * @brief Assign an initializer list of uuids to this
@@ -55,7 +62,7 @@ public:
    * @return reference to this
    */
   ArrayNodeType& operator=(std::initializer_list<mguid::uuid> init_list) {
-    m_array = init_list;
+    m_underlying = init_list;
     return *this;
   }
 
@@ -65,7 +72,11 @@ public:
    * @return copy of the element at pos or Error
    */
   [[nodiscard]] auto Get(SizeType pos) const -> expected<ValueType, Error> {
-    if (ValidIndex(pos)) { return m_array[pos]; }
+    if (ValidIndex(pos)) {
+BEGIN_SUPPRESS_ARRAY_BOUNDS
+      return {m_underlying[pos]};
+END_SUPPRESS_ARRAY_BOUNDS
+    }
     return make_unexpected(Error{.category = Error::Category::OutOfRange});
   }
 
@@ -79,7 +90,9 @@ public:
    */
   auto Set(SizeType pos, const ValueType& value) -> expected<void, Error> {
     if (ValidIndex(pos)) {
-      m_array[pos] = value;
+BEGIN_SUPPRESS_ARRAY_BOUNDS
+      m_underlying[pos] = value;
+END_SUPPRESS_ARRAY_BOUNDS
       return {};
     }
     return make_unexpected(Error{.category = Error::Category::OutOfRange});
@@ -93,7 +106,7 @@ public:
     if (Empty()) {
       return make_unexpected(Error{.category = Error::Category::OutOfRange});
     }
-    return m_array.front();
+    return m_underlying.front();
   }
 
   /**
@@ -104,21 +117,21 @@ public:
     if (Empty()) {
       return make_unexpected(Error{.category = Error::Category::OutOfRange});
     }
-    return m_array.back();
+    return m_underlying.back();
   }
 
   /**
    * @brief Check if this ArrayNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const noexcept -> bool { return m_array.empty(); }
+  [[nodiscard]] auto Empty() const noexcept -> bool { return m_underlying.empty(); }
 
   /**
    * @brief Get the number of elements in this ArrayNodeType
    * @return the number of elements in this ArrayNodeType
    */
   [[nodiscard]] auto Size() const noexcept -> SizeType {
-    return m_array.size();
+    return m_underlying.size();
   }
 
   /**
@@ -133,7 +146,7 @@ public:
    */
   template <bool TShrinkToFit = false>
   void Resize(SizeType count) {
-    m_array.resize(count);
+    m_underlying.resize(count);
     if constexpr (TShrinkToFit) { ShrinkToFit(); }
   }
 
@@ -144,7 +157,7 @@ public:
    *
    * @param new_cap new capacity of the ArrayNodeType, in number of elements
    */
-  void Reserve(SizeType new_cap) { m_array.reserve(new_cap); }
+  void Reserve(SizeType new_cap) { m_underlying.reserve(new_cap); }
 
   /**
    * @brief Returns the number of elements that the ArrayNodeType has currently
@@ -152,20 +165,20 @@ public:
    * @return Capacity of the currently allocated storage.
    */
   [[nodiscard]] auto Capacity() const noexcept -> SizeType {
-    return m_array.capacity();
+    return m_underlying.capacity();
   }
 
   /**
    * @brief Requests the removal of unused capacity.
    */
-  void ShrinkToFit() { m_array.shrink_to_fit(); }
+  void ShrinkToFit() { m_underlying.shrink_to_fit(); }
 
   /**
    * @brief Erases all elements from the container.
    */
   template <bool TShrinkToFit = false>
   void Clear() noexcept(TShrinkToFit) {
-    m_array.clear();
+    m_underlying.clear();
     if constexpr (TShrinkToFit) { ShrinkToFit(); }
   }
 
@@ -176,7 +189,7 @@ public:
    * @return Iterator pointing to the inserted value
    */
   auto Insert(ConstIterator pos, const ValueType& value) -> Iterator {
-    return m_array.insert(pos, value);
+    return m_underlying.insert(pos, value);
   }
 
   /**
@@ -189,7 +202,7 @@ public:
    */
   auto Insert(ConstIterator pos, SizeType count, const ValueType& value)
       -> Iterator {
-    return m_array.insert(pos, count, value);
+    return m_underlying.insert(pos, count, value);
   }
 
   /**
@@ -203,7 +216,7 @@ public:
    */
   template <typename TInputIt>
   auto Insert(ConstIterator pos, TInputIt first, TInputIt last) -> Iterator {
-    return m_array.insert(pos, first, last);
+    return m_underlying.insert(pos, first, last);
   }
 
   /**
@@ -215,7 +228,7 @@ public:
    */
   auto Insert(ConstIterator pos, std::initializer_list<ValueType> init_list)
       -> Iterator {
-    return m_array.insert(pos, init_list);
+    return m_underlying.insert(pos, init_list);
   }
 
   /**
@@ -228,7 +241,7 @@ public:
    */
   template <typename... TArgs>
   auto Emplace(ConstIterator pos, TArgs&&... args) -> Iterator {
-    return m_array.emplace(pos, std::forward<TArgs>(args)...);
+    return m_underlying.emplace(pos, std::forward<TArgs>(args)...);
   }
 
   /**
@@ -237,7 +250,7 @@ public:
    * @return Iterator following the last removed element. If pos refers to the
    * last element, then the end() iterator is returned.
    */
-  auto Erase(ConstIterator pos) -> Iterator { return m_array.erase(pos); }
+  auto Erase(ConstIterator pos) -> Iterator { return m_underlying.erase(pos); }
 
   /**
    * @brief Remove the elements in the range [first, last) from the container
@@ -248,7 +261,7 @@ public:
    * is an empty range, then last is returned.
    */
   auto Erase(ConstIterator first, ConstIterator last) -> Iterator {
-    return m_array.erase(first, last);
+    return m_underlying.erase(first, last);
   }
 
   /**
@@ -258,7 +271,7 @@ public:
    *
    * @param value the value of the element to append
    */
-  void PushBack(const ValueType& value) { m_array.push_back(value); }
+  void PushBack(const ValueType& value) { m_underlying.push_back(value); }
 
   /**
    * @brief Appends a new element to the end of the container.
@@ -274,7 +287,7 @@ public:
    */
   template <typename... TArgs>
   void EmplaceBack(TArgs&&... args) {
-    m_array.emplace_back(std::forward<TArgs>(args)...);
+    m_underlying.emplace_back(std::forward<TArgs>(args)...);
   }
 
   /**
@@ -284,21 +297,21 @@ public:
    */
   void PopBack() {
     if (Empty()) { return; }
-    m_array.pop_back();
+    m_underlying.pop_back();
   }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto Begin() noexcept -> Iterator { return m_array.begin(); }
+  [[nodiscard]] auto Begin() noexcept -> Iterator { return m_underlying.begin(); }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
-    return m_array.begin();
+    return m_underlying.begin();
   }
 
   /**
@@ -306,7 +319,7 @@ public:
    * @return an iterator to the first element of the ArrayNodeType.
    */
   [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
-    return m_array.cbegin();
+    return m_underlying.cbegin();
   }
 
   /**
@@ -315,7 +328,7 @@ public:
    * @return an iterator to the element following the last element of the
    * ArrayNodeType.
    */
-  [[nodiscard]] auto End() noexcept -> Iterator { return m_array.end(); }
+  [[nodiscard]] auto End() noexcept -> Iterator { return m_underlying.end(); }
 
   /**
    * @brief Returns an iterator to the element following the last element of the
@@ -324,7 +337,7 @@ public:
    * ArrayNodeType.
    */
   [[nodiscard]] auto End() const noexcept -> ConstIterator {
-    return m_array.end();
+    return m_underlying.end();
   }
 
   /**
@@ -334,7 +347,7 @@ public:
    * ArrayNodeType.
    */
   [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
-    return m_array.cend();
+    return m_underlying.cend();
   }
 
   /**
@@ -346,7 +359,7 @@ public:
    * ArrayNodeType.
    */
   [[nodiscard]] auto RBegin() noexcept -> ReverseIterator {
-    return m_array.rbegin();
+    return m_underlying.rbegin();
   }
 
   /**
@@ -358,7 +371,7 @@ public:
    * ArrayNodeType.
    */
   [[nodiscard]] auto RBegin() const noexcept -> ConstReverseIterator {
-    return m_array.rbegin();
+    return m_underlying.rbegin();
   }
 
   /**
@@ -370,7 +383,7 @@ public:
    * ArrayNodeType.
    */
   [[nodiscard]] auto CRBegin() const noexcept -> ConstReverseIterator {
-    return m_array.crbegin();
+    return m_underlying.crbegin();
   }
 
   /**
@@ -382,7 +395,7 @@ public:
    * reversed ArrayNodeType.
    */
   [[nodiscard]] auto REnd() noexcept -> ReverseIterator {
-    return m_array.rend();
+    return m_underlying.rend();
   }
 
   /**
@@ -394,7 +407,7 @@ public:
    * reversed ArrayNodeType.
    */
   [[nodiscard]] auto REnd() const noexcept -> ConstReverseIterator {
-    return m_array.rend();
+    return m_underlying.rend();
   }
 
   /**
@@ -406,7 +419,7 @@ public:
    * reversed ArrayNodeType.
    */
   [[nodiscard]] auto CREnd() const noexcept -> ConstReverseIterator {
-    return m_array.crend();
+    return m_underlying.crend();
   }
 
   /**
@@ -566,13 +579,18 @@ private:
    * @param pos position of index to validate
    * @return true if the index is in bounds; otherwise false
    */
-  [[nodiscard]] bool ValidIndex(SizeType pos) const {
-    return pos < m_array.size();
+  [[nodiscard]] bool ValidIndex(SizeType pos) const noexcept {
+    return pos < m_underlying.size();
   }
 
-  ArrayType m_array;
+  ArrayType m_underlying;
 };
 
 }  // namespace mguid
+
+#ifdef __GNUC__
+#undef BEGIN_SUPPRESS_ARRAY_BOUNDS
+#undef END_SUPPRESS_ARRAY_BOUNDS
+#endif
 
 #endif  // DATATREE_ARRAY_NODE_TYPE_HPP
