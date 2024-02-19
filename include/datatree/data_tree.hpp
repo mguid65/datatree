@@ -40,8 +40,13 @@ public:
   template <std::size_t NLength>
   auto Get(const Path<NLength>& path) -> expected<TreeNode, Error> {
     for ([[maybe_unused]] auto& path_item : path.Items()) {}
+    return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
+  auto Get(std::initializer_list<KeyType> path)  -> expected<TreeNode, Error>{
+    for ([[maybe_unused]] auto& path_item : path) {}
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  }
 private:
   uuid m_root_id{RandomUUID()};
   MapType m_nodes;
