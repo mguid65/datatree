@@ -195,24 +195,6 @@ concept IntegerIndexable = requires(TContainer container, std::size_t idx) {
 /**
  * @brief Compile time for loop for a container with an integer subscript
  * operator
- *
- * If `TFunc::operator()(...) &&;` or `TContainer::operator[](...) &&` moves
- * their object, the result is undefined.
- *
- * Don't do something silly like this:
- *
- * ```c++
- * struct BadIdea;
- *
- * static std::unique_ptr<BadIdea> g_bad_idea{nullptr};
- *
- * struct BadIdea {
- *   void operator()() && {
- *     g_bad_idea = std::make_unique<BadIdea>(std::move(*this));
- *   }
- * };
- * ```
- *
  * @tparam NCount Number of iterations
  * @tparam TContainer Type of container with an integer subscript operator
  * @tparam TFunc Type of function to apply at each "iteration"
@@ -224,13 +206,15 @@ template <std::size_t NCount, IntegerIndexable TContainer, typename TFunc>
 constexpr void For(TContainer&& container, TFunc&& func) noexcept(
     std::is_nothrow_invocable_v<TFunc,
                                 decltype(std::declval<TContainer>()[0])>) {
-  constexpr auto ForImpl = []<std::size_t... NIdxs>(
-                               TContainer&& container_inner, TFunc&& func_inner,
-                               std::index_sequence<NIdxs...>) {
-    (std::invoke(std::forward<TFunc>(func_inner),
-                 std::forward<TContainer>(container_inner)[NIdxs]),
-     ...);
-  };
+  constexpr auto ForImpl =
+      []<std::size_t... NIdxs>(
+          std::add_lvalue_reference_t<std::remove_reference_t<TContainer>>
+              container_inner,
+          std::add_lvalue_reference_t<std::remove_reference_t<TFunc>>
+              func_inner,
+          std::index_sequence<NIdxs...>) {
+        (std::invoke(func_inner, container_inner[NIdxs]), ...);
+      };
   ForImpl(std::forward<TContainer>(container), std::forward<TFunc>(func),
           std::make_index_sequence<NCount>{});
 }
