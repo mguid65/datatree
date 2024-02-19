@@ -195,6 +195,24 @@ concept IntegerIndexable = requires(TContainer container, std::size_t idx) {
 /**
  * @brief Compile time for loop for a container with an integer subscript
  * operator
+ *
+ * If `TFunc::operator()(...) &&;` or `TContainer::operator[](...) &&` moves
+ * their object, the result is undefined.
+ *
+ * Don't do something silly like this:
+ *
+ * ```c++
+ * struct BadIdea;
+ *
+ * static std::unique_ptr<BadIdea> g_bad_idea{nullptr};
+ *
+ * struct BadIdea {
+ *   void operator()() && {
+ *     g_bad_idea = std::make_unique<BadIdea>(std::move(*this));
+ *   }
+ * };
+ * ```
+ *
  * @tparam NCount Number of iterations
  * @tparam TContainer Type of container with an integer subscript operator
  * @tparam TFunc Type of function to apply at each "iteration"
@@ -202,7 +220,7 @@ concept IntegerIndexable = requires(TContainer container, std::size_t idx) {
  * @param func function to apply at each "iteration"
  */
 template <std::size_t NCount, IntegerIndexable TContainer, typename TFunc>
-  requires(std::invocable<TFunc, decltype(std::declval<TContainer>()[0])>)
+  requires std::invocable<TFunc, decltype(std::declval<TContainer>()[0])>
 constexpr void For(TContainer&& container, TFunc&& func) noexcept(
     std::is_nothrow_invocable_v<TFunc,
                                 decltype(std::declval<TContainer>()[0])>) {
@@ -237,6 +255,7 @@ std::ostream& operator<<(std::ostream& os, const Path<NLength>& path) {
   });
   return os << std::endl;
 }
+
 /**
  * @brief Deduction guide to create a path from key path parameters
  */
