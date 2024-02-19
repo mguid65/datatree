@@ -7,6 +7,7 @@
 #ifndef DATATREE_COMMON_HPP
 #define DATATREE_COMMON_HPP
 
+#include <mutex>
 #include <ranges>
 
 #include <nonstd/expected.hpp>
@@ -34,6 +35,27 @@ Overload(TNonFinalCallables...) -> Overload<TNonFinalCallables...>;
  */
 using uuids::to_string;
 using uuids::uuid;
+
+/**
+ * @brief Get a random uuid
+ * @return a random uuid
+ */
+[[nodiscard]] inline uuid RandomUUID() {
+  using uuids::uuid_random_generator;
+  static std::mutex uuid_mutex;
+  static auto gen = std::invoke([]() -> uuid_random_generator {
+    std::random_device rd;
+    auto seed_data = std::array<int, std::mt19937::state_size>{};
+    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+    // Not sure if this needs to stay alive as long as the generator, the
+    // generator takes it by reference
+    static std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+    static std::mt19937 generator(seq);
+    return uuid_random_generator{generator};
+  });
+  std::lock_guard lock(uuid_mutex);
+  return gen();
+}
 
 /**
  * @brief Doing this to get expected-lite things

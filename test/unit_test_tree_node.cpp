@@ -16,13 +16,13 @@ TEST_CASE("Tree Node Construction/Assignment") {
     REQUIRE(std::is_copy_constructible_v<mguid::TreeNode>);
   }
   SECTION("Move Constructor") {
-    REQUIRE(std::is_move_constructible_v<mguid::TreeNode>);
+    REQUIRE(std::is_nothrow_move_constructible_v<mguid::TreeNode>);
   }
   SECTION("Copy Assignment") {
     REQUIRE(std::is_copy_assignable_v<mguid::TreeNode>);
   }
   SECTION("Move Assignment") {
-    REQUIRE(std::is_move_assignable_v<mguid::TreeNode>);
+    REQUIRE(std::is_nothrow_move_assignable_v<mguid::TreeNode>);
   }
   SECTION("From Object") {
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ObjectNodeType>);
