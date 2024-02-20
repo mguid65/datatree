@@ -172,7 +172,7 @@ public:
   }
 
   /**
-   * @brief Get the type tag of this number container
+   * @brief TryGet the type tag of this number container
    * @return the type tag of this number container
    */
   [[nodiscard]] constexpr auto GetTypeTag() const noexcept -> TypeTag {
@@ -209,6 +209,56 @@ public:
   constexpr void Reset() noexcept {
     m_tag = TypeTag::None;
     m_union.none = NullType{};
+  }
+
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    switch (m_tag) {
+      case TypeTag::Int: {
+        return std::invoke(overload_set, m_union.i_value);
+      }
+      case TypeTag::UInt: {
+        return std::invoke(overload_set, m_union.u_value);
+      }
+      case TypeTag::Double: {
+        return std::invoke(overload_set, m_union.f_value);
+      }
+      case TypeTag::None: {
+        return std::invoke(overload_set, m_union.none);
+      }
+    }
+  }
+
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) const {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    switch (m_tag) {
+      case TypeTag::Int: {
+        return std::invoke(overload_set, m_union.i_value);
+      }
+      case TypeTag::UInt: {
+        return std::invoke(overload_set, m_union.u_value);
+      }
+      case TypeTag::Double: {
+        return std::invoke(overload_set, m_union.f_value);
+      }
+      case TypeTag::None: {
+        return std::invoke(overload_set, m_union.none);
+      }
+    }
   }
 
   /**

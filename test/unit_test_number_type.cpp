@@ -353,8 +353,8 @@ TEST_CASE("Number Type Value") {
   }
 }
 
-TEST_CASE("Number Type Get Value") {
-  SECTION("Get Valid") {
+TEST_CASE("Number Type TryGet Value") {
+  SECTION("TryGet Valid") {
     {
       mguid::NumberType nt1{std::int8_t{}};
       REQUIRE(nt1.GetInt().has_value());
@@ -396,7 +396,7 @@ TEST_CASE("Number Type Get Value") {
       REQUIRE(nt1.GetDouble().has_value());
     }
   }
-  SECTION("Get Invalid") {
+  SECTION("TryGet Invalid") {
     {
       mguid::NumberType nt1;
       REQUIRE_FALSE(nt1.GetInt().has_value());
@@ -445,7 +445,7 @@ TEST_CASE("Number Type Tag") {
     mguid::NumberType nt1{nullptr};
     REQUIRE(nt1.GetTypeTag() == mguid::NumberType::TypeTag::None);
   }
-  SECTION("Get Valid") {
+  SECTION("TryGet Valid") {
     {
       mguid::NumberType nt1{std::int8_t{}};
       REQUIRE(nt1.GetTypeTag() == mguid::NumberType::TypeTag::Int);

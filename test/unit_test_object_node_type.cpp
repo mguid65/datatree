@@ -81,7 +81,7 @@ TEST_CASE("Object Node Constructor") {
   }
 }
 
-TEST_CASE("Object Node Type Get") {
+TEST_CASE("Object Node Type TryGet") {
   SECTION("Key Exists") {
     mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
     REQUIRE(ont1.Get("key").has_value());
@@ -94,7 +94,7 @@ TEST_CASE("Object Node Type Get") {
   }
 }
 
-TEST_CASE("Object Node Type Get Or") {
+TEST_CASE("Object Node Type TryGet Or") {
   SECTION("Key Exists") {
     mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
     REQUIRE(ont1.GetOr("key", mguid::uuid{}).has_value());

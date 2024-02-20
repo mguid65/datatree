@@ -505,8 +505,8 @@ TEST_CASE("Value Node Type Value") {
   }
 }
 
-TEST_CASE("Value Node Type Get Or Default") {
-  SECTION("Get Null Or const &") {
+TEST_CASE("Value Node Type TryGet Or Default") {
+  SECTION("TryGet Null Or const &") {
     {
       mguid::ValueNodeType vnt1{mguid::StringType{}};
       REQUIRE(vnt1.GetNullOr(mguid::NullType{}).value() == mguid::NullType{});
@@ -516,7 +516,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE(vnt1.GetNullOr(mguid::NullType{}).value() == mguid::NullType{});
     }
   }
-  SECTION("Get Null Or &&") {
+  SECTION("TryGet Null Or &&") {
     {
       mguid::ValueNodeType vnt1{mguid::StringType{}};
       REQUIRE(std::move(vnt1).GetNullOr(mguid::NullType{}).value() == mguid::NullType{});
@@ -526,7 +526,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE(std::move(vnt1).GetNullOr(mguid::NullType{}).value() == mguid::NullType{});
     }
   }
-  SECTION("Get Bool Or const &") {
+  SECTION("TryGet Bool Or const &") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(vnt1.GetBoolOr(true).value());
@@ -544,7 +544,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE_FALSE(vnt1.GetBoolOr(true).value());
     }
   }
-  SECTION("Get Bool Or &&") {
+  SECTION("TryGet Bool Or &&") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(std::move(vnt1).GetBoolOr(true).value());
@@ -562,7 +562,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE_FALSE(std::move(vnt1).GetBoolOr(true).value());
     }
   }
-  SECTION("Get Number Or const &") {
+  SECTION("TryGet Number Or const &") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(vnt1.GetNumberOr(2).value() == mguid::NumberType(2));
@@ -572,7 +572,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE(vnt1.GetNumberOr(2).value() == mguid::NumberType(3));
     }
   }
-  SECTION("Get Number Or &&") {
+  SECTION("TryGet Number Or &&") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(std::move(vnt1).GetNumberOr(2).value() == mguid::NumberType(2));
@@ -582,7 +582,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE(std::move(vnt1).GetNumberOr(2).value() == mguid::NumberType(3));
     }
   }
-  SECTION("Get String Or const &") {
+  SECTION("TryGet String Or const &") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(vnt1.GetStringOr("test").value() == "test");
@@ -592,7 +592,7 @@ TEST_CASE("Value Node Type Get Or Default") {
       REQUIRE(vnt1.GetStringOr("nottest").value() == "test");
     }
   }
-  SECTION("Get String Or &&") {
+  SECTION("TryGet String Or &&") {
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
       REQUIRE(std::move(vnt1).GetStringOr("test").value() == "test");

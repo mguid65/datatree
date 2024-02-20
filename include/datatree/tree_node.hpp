@@ -65,6 +65,23 @@ public:
   explicit TreeNode(NodeTypeTag tag) : m_node_data{TreeNode::FromTag(tag)} {}
 
   /**
+   * @brief TryGet type tag for this tree node
+   * @return type tag
+   */
+  [[nodiscard]] constexpr NodeTypeTag Tag() const noexcept {
+    switch (m_node_data.index()) {
+      case 0:
+        return NodeTypeTag::Object;
+      case 1:
+        return NodeTypeTag::Array;
+      case 2:
+        return NodeTypeTag::Value;
+      default:
+        Unreachable();
+    }
+  }
+
+  /**
    * @brief Try to get the requested type from this TreeNode
    * @tparam TRequestedType the type requested
    * @return The requested type if it is the type being held, otherwise Error
@@ -104,7 +121,7 @@ public:
    * @return The requested type if it is the type being held, otherwise Error
    */
   template <ValidNodeType TRequestedType>
-  [[nodiscard]] auto Get() const -> expected<TRequestedType, Error> {
+  [[nodiscard]] auto TryGet() const -> expected<TRequestedType, Error> {
     if (auto* result = std::get_if<TRequestedType>(&m_node_data);
         result != nullptr) {
       return *result;
@@ -116,23 +133,92 @@ public:
    * @brief Try to get an ObjectNodeType from this node
    * @return ObjectNodeType if holding an ObjectNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetObject() const -> expected<ObjectNodeType, Error> {
-    return Get<ObjectNodeType>();
+  [[nodiscard]] auto TryGetObject() const -> expected<ObjectNodeType, Error> {
+    return TryGet<ObjectNodeType>();
   }
 
   /**
    * @brief Try to get an ArrayNodeType from this node
    * @return ArrayNodeType if holding an ArrayNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetArray() const -> expected<ArrayNodeType, Error> {
-    return Get<ArrayNodeType>();
+  [[nodiscard]] auto TryGetArray() const -> expected<ArrayNodeType, Error> {
+    return TryGet<ArrayNodeType>();
   }
 
   /**
    * @brief Try to get an ValueNodeType from this node
    * @return ValueNodeType if holding an ValueNodeType, otherwise Error
    */
-  [[nodiscard]] auto GetValue() const -> expected<ValueNodeType, Error> {
+  [[nodiscard]] auto TryGetValue() const -> expected<ValueNodeType, Error> {
+    return TryGet<ValueNodeType>();
+  }
+
+  /**
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held or exception
+   */
+  template <ValidNodeType TRequestedType>
+  [[nodiscard]] auto Get() const -> const TRequestedType& {
+    return std::get<TRequestedType>(m_node_data);
+  }
+
+  /**
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held or exception
+   */
+  template <ValidNodeType TRequestedType>
+  [[nodiscard]] auto Get() -> TRequestedType& {
+    return std::get<TRequestedType>(m_node_data);
+  }
+
+  /**
+   * @brief Try to get an ObjectNodeType from this node
+   * @return ObjectNodeType if holding an ObjectNodeType or exception
+   */
+  [[nodiscard]] auto GetObject() const -> const ObjectNodeType& {
+    return Get<ObjectNodeType>();
+  }
+
+
+  /**
+   * @brief Try to get an ObjectNodeType from this node
+   * @return ObjectNodeType if holding an ObjectNodeType or exception
+   */
+  [[nodiscard]] auto GetObject() -> ObjectNodeType& {
+    return Get<ObjectNodeType>();
+  }
+
+  /**
+   * @brief Try to get an ArrayNodeType from this node
+   * @return ArrayNodeType if holding an ArrayNodeType or exception
+   */
+  [[nodiscard]] auto GetArray() const -> const ArrayNodeType& {
+    return Get<ArrayNodeType>();
+  }
+
+  /**
+   * @brief Try to get an ArrayNodeType from this node
+   * @return ArrayNodeType if holding an ArrayNodeType or exception
+   */
+  [[nodiscard]] auto GetArray() -> ArrayNodeType& {
+    return Get<ArrayNodeType>();
+  }
+
+  /**
+   * @brief Try to get an ValueNodeType from this node
+   * @return ValueNodeType if holding an ValueNodeType or exception
+   */
+  [[nodiscard]] auto GetValue() -> ValueNodeType& {
+    return Get<ValueNodeType>();
+  }
+
+  /**
+   * @brief Try to get an ValueNodeType from this node
+   * @return ValueNodeType if holding an ValueNodeType or exception
+   */
+  [[nodiscard]] auto GetValue() const -> const ValueNodeType& {
     return Get<ValueNodeType>();
   }
 
@@ -177,6 +263,18 @@ public:
     return std::visit(overload_set, m_node_data);
   }
 
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) const {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_node_data);
+  }
+
   // Get If ?
   // Emplace ?
 
@@ -185,6 +283,7 @@ public:
    * @return true if they are equal, otherwise false
    */
   [[nodiscard]] bool operator==(const TreeNode&) const noexcept = default;
+
 private:
   /**
    * @brief Based on a tag, create the corresponding node type

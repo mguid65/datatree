@@ -38,6 +38,15 @@ inline constexpr std::strong_ordering operator<=>(NullType, NullType) noexcept {
   return std::strong_ordering::equal;
 }
 
+/**
+ * @brief Ostream overload for NullType
+ * @param os reference to an ostream
+ * @return reference to an ostream
+ */
+inline std::ostream& operator<<(std::ostream& os, const mguid::NullType&) {
+  return os << "Null";
+}
+
 }  // namespace mguid
 
 namespace std {

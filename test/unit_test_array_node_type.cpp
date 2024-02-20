@@ -45,14 +45,14 @@ TEST_CASE("Array Node Type Constructor") {
   }
 }
 
-TEST_CASE("Array Node Type Get") {
-  SECTION("Get Invalid Index Empty") {
+TEST_CASE("Array Node Type TryGet") {
+  SECTION("TryGet Invalid Index Empty") {
     mguid::ArrayNodeType ant1;
     auto result = ant1.Get(0);
     REQUIRE(result.has_exception<mguid::Error>());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
-  SECTION("Get Not Empty") {
+  SECTION("TryGet Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
     auto result1 = ant1.Get(0);
     auto result2 = ant1.Get(1);
@@ -64,7 +64,7 @@ TEST_CASE("Array Node Type Get") {
     REQUIRE(result3.has_value());
     REQUIRE(result4.has_value());
   }
-  SECTION("Get Invalid Index Not Empty") {
+  SECTION("TryGet Invalid Index Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
     auto result = ant1.Get(4);
     REQUIRE(result.has_exception<mguid::Error>());

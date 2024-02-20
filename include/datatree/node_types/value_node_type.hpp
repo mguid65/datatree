@@ -1045,6 +1045,30 @@ public:
   }
 
   /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_variant_value);
+  }
+
+  /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) const {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_variant_value);
+  }
+
+  /**
    * @brief Compare this ValueNodeType with another ValueNodeType
    * @return comparison category
    */

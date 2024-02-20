@@ -37,7 +37,7 @@ using uuids::to_string;
 using uuids::uuid;
 
 /**
- * @brief Get a random uuid
+ * @brief TryGet a random uuid
  * @return a random uuid
  */
 [[nodiscard]] inline uuid RandomUUID() {
@@ -63,22 +63,24 @@ using uuids::uuid;
 using nonstd::expected;
 using nonstd::make_unexpected;
 
-// Uses compiler specific extensions if possible.
-#ifdef __GNUC__  // GCC, Clang, ICC
-
-inline void Unreachable() { __builtin_unreachable(); }
-
-#elif defined(_MSC_VER)  // MSVC
-
-inline void Unreachable() { __assume(false); }
-
-#else
-// Even if no extension is used, undefined behavior is still raised by
-// the empty function body and the noreturn attribute.
-
-[[noreturn]] inline void Unreachable() {}
-
+/**
+ * @brief Invokes undefined behavior. An implementation may use this to optimize
+ * impossible code branches away (typically, in optimized builds) or to trap
+ * them to prevent further execution (typically, in debug builds).
+ *
+ * From "Possible implementation" section for `std::unreachable` here:
+ * https://en.cppreference.com/w/cpp/utility/unreachable
+ */
+[[noreturn]] inline void Unreachable() {
+  // Uses compiler specific extensions if possible.
+  // Even if no extension is used, undefined behavior is still raised by
+  // an empty function body and the noreturn attribute.
+#if defined(_MSC_VER) && !defined(__clang__)  // MSVC
+  __assume(false);
+#else  // GCC, Clang
+  __builtin_unreachable();
 #endif
+}
 
 /**
  * @brief Check if something is a range of TValueType

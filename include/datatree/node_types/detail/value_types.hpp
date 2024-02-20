@@ -172,7 +172,7 @@ struct Path {
             TArgs, StringKeyType, IntegerKeyType>::type>(path_items)...}} {}
 
   /**
-   * @brief Get array of KeyType path items
+   * @brief TryGet array of KeyType path items
    * @return array of KeyType path items
    */
   [[nodiscard]] const std::array<KeyType, NLength>& Items() const {

@@ -99,7 +99,7 @@ END_SUPPRESS_ARRAY_BOUNDS
   }
 
   /**
-   * @brief Get the element at the front of this ArrayNodeType
+   * @brief TryGet the element at the front of this ArrayNodeType
    * @return the element at the front of this ArrayNodeType
    */
   [[nodiscard]] auto Front() const -> expected<ValueType, Error> {
@@ -110,7 +110,7 @@ END_SUPPRESS_ARRAY_BOUNDS
   }
 
   /**
-   * @brief Get the element at the Back of this ArrayNodeType
+   * @brief TryGet the element at the Back of this ArrayNodeType
    * @return the element at the Back of this ArrayNodeType
    */
   [[nodiscard]] auto Back() const -> expected<ValueType, Error> {
@@ -127,7 +127,7 @@ END_SUPPRESS_ARRAY_BOUNDS
   [[nodiscard]] auto Empty() const noexcept -> bool { return m_underlying.empty(); }
 
   /**
-   * @brief Get the number of elements in this ArrayNodeType
+   * @brief TryGet the number of elements in this ArrayNodeType
    * @return the number of elements in this ArrayNodeType
    */
   [[nodiscard]] auto Size() const noexcept -> SizeType {
