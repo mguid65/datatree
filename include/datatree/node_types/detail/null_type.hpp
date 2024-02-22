@@ -1,9 +1,13 @@
 /**
+ * Copyright (c) 2024 Matthew Guidry
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ *
  * @brief Definition of NullType value type
  *
  * Based on the libc++ implementation of std::monostate
  *
- * src: https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h
+ * src:
+ * https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h
  *
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
@@ -67,7 +71,8 @@ struct hash<mguid::NullType> {
    * In the comments there it claims that
    * this is "a fundamentally attractive random value"
    *
-   * src: https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h#L56C32-L56C71
+   * src:
+   * https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h#L56C32-L56C71
    *
    * @return always returns the same unsigned integer value
    */

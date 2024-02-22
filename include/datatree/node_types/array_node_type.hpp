@@ -1,4 +1,7 @@
 /**
+ * Copyright (c) 2024 Matthew Guidry
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ *
  * @brief Declarations for array node type
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-12
