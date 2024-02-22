@@ -44,7 +44,7 @@ inline constexpr std::strong_ordering operator<=>(NullType, NullType) noexcept {
  * @return reference to an ostream
  */
 inline std::ostream& operator<<(std::ostream& os, const mguid::NullType&) {
-  return os << "Null";
+  return os << "null";
 }
 
 }  // namespace mguid

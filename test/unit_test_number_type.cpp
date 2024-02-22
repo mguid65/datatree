@@ -544,3 +544,12 @@ TEST_CASE("Number Type Comparison") {
     REQUIRE(mguid::NumberType(1.0) > mguid::NumberType(1));
   }
 }
+
+TEST_CASE("Number Type Visit") {
+  SECTION("Visit") {
+
+  }
+  SECTION("Visit Const") {
+
+  }
+}
