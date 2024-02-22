@@ -69,7 +69,8 @@ struct hash<mguid::NullType> {
    * std::hash<std::monostate> specialization in llvm/libc++.
    *
    * In the comments there it claims that
-   * this is "a fundamentally attractive random value"
+   * this is "a fundamentally attractive random value" but it is really just the
+   * fundamental gravitational constant
    *
    * src:
    * https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h#L56C32-L56C71
