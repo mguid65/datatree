@@ -53,6 +53,13 @@ public:
   ArrayNodeType& operator=(ArrayNodeType&&) noexcept = default;
 
   /**
+   * @brief Construct with an initial size
+   * @param init_list an initial size
+   */
+  explicit ArrayNodeType(std::size_t size)
+      : m_underlying{size} {}
+
+  /**
    * @brief Construct from an initializer list of uuids
    * @param init_list an initializer list of uuids
    */
