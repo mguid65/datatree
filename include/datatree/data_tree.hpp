@@ -185,55 +185,27 @@ public:
    * @param items
    * @param node
    */
-  void Set(std::initializer_list<KeyType> items, const ValueNodeType& node) {
-    if (items.size() == 0) {
-      m_nodes.at(uuid{}).Set(node);
-    } else {
-      // Begin with root: nil uuid
-      uuid current_parent_id{};
-      for (const auto& item : items) {
-        auto& parent = m_nodes[current_parent_id];
-        switch (item.index()) {
-          case 0: {
-            const auto& key = std::get<StringKeyType>(item);
-            if (!parent.HasObject()) {
-              if (parent.HasArray()) { DeleteSubtree(current_parent_id, true); }
-              parent.Reset<NodeTypeTag::Object>();
-            }
-            auto& object = parent.GetObject();
-            auto result = object.TryEmplace(key, RandomUUID());
-            current_parent_id = std::get<0>(result)->second;
-            break;
-          }
-          case 1: {
-            const auto& idx = std::get<IntegerKeyType>(item);
-            if (!parent.HasArray()) {
-              if (parent.HasObject()) {
-                DeleteSubtree(current_parent_id, true);
-              }
-              parent.Reset<NodeTypeTag::Array>();
-            }
-            auto& array = parent.GetArray();
-            const auto previous_size = array.Size();
-            if (previous_size < idx + 1) {
-              array.Resize(idx + 1);
-              const auto new_size = array.Size();
-              for (auto new_idx{previous_size}; new_idx < new_size; ++new_idx) {
-                array.Set(new_idx, RandomUUID());
-                m_nodes.emplace(array.Get(new_idx).value(), TreeNode{});
-              }
-            }
-            current_parent_id = array.Get(idx).value();
-            break;
-          }
-          default: {
-            Unreachable();
-          }
-        }
-      }
-      auto& last = m_nodes[current_parent_id];
-      last.Set(node);
-    }
+  void SetValue(std::initializer_list<KeyType> items,
+                const ValueNodeType& node) {
+    Set(items, node);
+  }
+
+  /**
+   * @brief
+   * @param items
+   * @param node
+   */
+  void SetArray(std::initializer_list<KeyType> items) {
+    Set(items, ArrayNodeType{});
+  }
+
+  /**
+   * @brief
+   * @param items
+   * @param node
+   */
+  void SetObject(std::initializer_list<KeyType> items) {
+    Set(items, ObjectNodeType{});
   }
 
   template <std::size_t NLength>
@@ -258,7 +230,7 @@ private:
   void Set(const Path<NLength>& path, ValidNodeType auto&& node) {
     // If path is empty, then we are setting the root node to something
     if constexpr (NLength == 0) {
-      m_nodes.at(uuid{}).Set(node);
+      m_nodes.at(uuid{}).Set(std::forward<decltype(node)>(node));
     } else {
       const auto& items = path.Items();
       // Begin with root: nil uuid
@@ -334,7 +306,63 @@ private:
           std::make_index_sequence<NLength>{});
       // We are at the end of the path, set the value
       auto& last = m_nodes[current_parent_id];
-      last.Set(node);
+      last.Set(std::forward<decltype(node)>(node));
+    }
+  }
+
+  /**
+   * @brief
+   * @param items
+   * @param node
+   */
+  void Set(std::initializer_list<KeyType>& items, ValidNodeType auto&& node) {
+    if (items.size() == 0) {
+      m_nodes.at(uuid{}).Set(std::forward<decltype(node)>(node));
+    } else {
+      // Begin with root: nil uuid
+      uuid current_parent_id{};
+      for (const auto& item : items) {
+        auto& parent = m_nodes[current_parent_id];
+        switch (item.index()) {
+          case 0: {
+            const auto& key = std::get<StringKeyType>(item);
+            if (!parent.HasObject()) {
+              if (parent.HasArray()) { DeleteSubtree(current_parent_id, true); }
+              parent.Reset<NodeTypeTag::Object>();
+            }
+            auto& object = parent.GetObject();
+            auto result = object.TryEmplace(key, RandomUUID());
+            current_parent_id = std::get<0>(result)->second;
+            break;
+          }
+          case 1: {
+            const auto& idx = std::get<IntegerKeyType>(item);
+            if (!parent.HasArray()) {
+              if (parent.HasObject()) {
+                DeleteSubtree(current_parent_id, true);
+              }
+              parent.Reset<NodeTypeTag::Array>();
+            }
+            auto& array = parent.GetArray();
+            const auto previous_size = array.Size();
+            if (previous_size < idx + 1) {
+              array.Resize(idx + 1);
+              const auto new_size = array.Size();
+              for (auto new_idx{previous_size}; new_idx < new_size; ++new_idx) {
+                array.Set(new_idx, RandomUUID());
+                m_nodes.emplace(array.Get(new_idx).value(), TreeNode{});
+              }
+            }
+            current_parent_id = array.Get(idx).value();
+            break;
+          }
+          default: {
+            Unreachable();
+          }
+        }
+      }
+      auto& last = m_nodes[current_parent_id];
+      last.Set(std::forward<decltype(node)>(node));
     }
   }
 
