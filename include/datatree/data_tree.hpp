@@ -245,61 +245,58 @@ private:
                   // Get or init node at `current_parent_id`
                   auto& parent = m_nodes[current_parent_id];
                   // check if path item is key or value
-                  auto& item = items[NIdxs];
-                  switch (item.index()) {
-                    case 0: {
-                      const auto& key = std::get<StringKeyType>(item);
-                      // If the parent has an array or a value, then we delete
-                      // that node and its children if it's an array and then
-                      // reset the node type to object
-                      if (!parent.HasObject()) {
-                        if (parent.HasArray()) {
-                          DeleteSubtree(current_parent_id, true);
-                        }
-                        parent.Reset<NodeTypeTag::Object>();
-                      }
+                  const auto& item = items[NIdxs];
+                  current_parent_id = std::visit(
+                      Overload{[&](const StringKeyType& key) {
+                                 // If the parent has an array or a value, then
+                                 // we delete that node and its children if it's
+                                 // an array and then reset the node type to
+                                 // object
+                                 if (!parent.HasObject()) {
+                                   if (parent.HasArray()) {
+                                     DeleteSubtree(current_parent_id, true);
+                                   }
+                                   parent.Reset<NodeTypeTag::Object>();
+                                 }
 
-                      // Get the object and potentially add a new key, id pair
-                      auto& object = parent.GetObject();
-                      const auto result = object.TryEmplace(key, RandomUUID());
-                      current_parent_id = std::get<0>(result)->second;
-                      break;
-                    }
-                    case 1: {
-                      const auto& idx = std::get<IntegerKeyType>(item);
-                      // If the parent has an object or a value, then we delete
-                      // that node and its children if it's an object and then
-                      // reset the node type to array
-                      if (!parent.HasArray()) {
-                        if (parent.HasObject()) {
-                          DeleteSubtree(current_parent_id, true);
-                        }
-                        parent.Reset<NodeTypeTag::Array>();
-                      }
+                                 // Get the object and potentially add a new
+                                 // key, id pair
+                                 auto& object = parent.GetObject();
+                                 const auto result =
+                                     object.TryEmplace(key, RandomUUID());
+                                 return std::get<0>(result)->second;
+                               },
+                               [&](const IntegerKeyType& idx) {
+                                 // If the parent has an object or a value, then
+                                 // we delete that node and its children if it's
+                                 // an object and then reset the node type to
+                                 // array
+                                 if (!parent.HasArray()) {
+                                   if (parent.HasObject()) {
+                                     DeleteSubtree(current_parent_id, true);
+                                   }
+                                   parent.Reset<NodeTypeTag::Array>();
+                                 }
 
-                      auto& array = parent.GetArray();
+                                 auto& array = parent.GetArray();
 
-                      // If index not in array then, we resize to that point and
-                      // create new nodes for new indices
-                      const auto prev_size = array.Size();
-                      if (prev_size < idx + 1) {
-                        array.Resize(idx + 1);
-                        const auto new_size = array.Size();
-
-                        for (auto new_idx{prev_size}; new_idx < new_size;
-                             ++new_idx) {
-                          array.Set(new_idx, RandomUUID());
-                          m_nodes.emplace(array.Get(new_idx).value(),
-                                          TreeNode{ValueNodeType{}});
-                        }
-                      }
-                      current_parent_id = array.Get(idx).value();
-                      break;
-                    }
-                    default: {
-                      Unreachable();
-                    }
-                  }
+                                 // If index not in array then, we resize to
+                                 // that point and create new nodes for new
+                                 // indices
+                                 const auto prev_size = array.Size();
+                                 if (prev_size < idx + 1) {
+                                   array.Resize(idx + 1);
+                                   const auto new_size = array.Size();
+                                   for (auto new_idx{prev_size};
+                                        new_idx < new_size; ++new_idx) {
+                                     array.Set(new_idx, RandomUUID());
+                                     m_nodes.emplace(array.Get(new_idx).value(),
+                                                     TreeNode{ValueNodeType{}});
+                                   }
+                                 }
+                                 return array.Get(idx).value();
+                               }},
+                      item);
                 }(),
                 ...);
           },
@@ -323,43 +320,57 @@ private:
       uuid current_parent_id{};
       for (const auto& item : items) {
         auto& parent = m_nodes[current_parent_id];
-        switch (item.index()) {
-          case 0: {
-            const auto& key = std::get<StringKeyType>(item);
-            if (!parent.HasObject()) {
-              if (parent.HasArray()) { DeleteSubtree(current_parent_id, true); }
-              parent.Reset<NodeTypeTag::Object>();
-            }
-            auto& object = parent.GetObject();
-            auto result = object.TryEmplace(key, RandomUUID());
-            current_parent_id = std::get<0>(result)->second;
-            break;
-          }
-          case 1: {
-            const auto& idx = std::get<IntegerKeyType>(item);
-            if (!parent.HasArray()) {
-              if (parent.HasObject()) {
-                DeleteSubtree(current_parent_id, true);
-              }
-              parent.Reset<NodeTypeTag::Array>();
-            }
-            auto& array = parent.GetArray();
-            const auto previous_size = array.Size();
-            if (previous_size < idx + 1) {
-              array.Resize(idx + 1);
-              const auto new_size = array.Size();
-              for (auto new_idx{previous_size}; new_idx < new_size; ++new_idx) {
-                array.Set(new_idx, RandomUUID());
-                m_nodes.emplace(array.Get(new_idx).value(), TreeNode{});
-              }
-            }
-            current_parent_id = array.Get(idx).value();
-            break;
-          }
-          default: {
-            Unreachable();
-          }
-        }
+        current_parent_id = std::visit(
+            Overload{[&](const StringKeyType& key) {
+                       // If the parent has an array or a value, then
+                       // we delete that node and its children if it's
+                       // an array and then reset the node type to
+                       // object
+                       if (!parent.HasObject()) {
+                         if (parent.HasArray()) {
+                           DeleteSubtree(current_parent_id, true);
+                         }
+                         parent.Reset<NodeTypeTag::Object>();
+                       }
+
+                       // Get the object and potentially add a new
+                       // key, id pair
+                       auto& object = parent.GetObject();
+                       const auto result = object.TryEmplace(key, RandomUUID());
+                       return std::get<0>(result)->second;
+                     },
+                     [&](const IntegerKeyType& idx) {
+                       // If the parent has an object or a value, then
+                       // we delete that node and its children if it's
+                       // an object and then reset the node type to
+                       // array
+                       if (!parent.HasArray()) {
+                         if (parent.HasObject()) {
+                           DeleteSubtree(current_parent_id, true);
+                         }
+                         parent.Reset<NodeTypeTag::Array>();
+                       }
+
+                       auto& array = parent.GetArray();
+
+                       // If index not in array then, we resize to
+                       // that point and create new nodes for new
+                       // indices
+                       const auto prev_size = array.Size();
+                       if (prev_size < idx + 1) {
+                         array.Resize(idx + 1);
+                         const auto new_size = array.Size();
+                         m_nodes.reserve(m_nodes.size() + new_size);
+                         for (auto new_idx{prev_size}; new_idx < new_size;
+                              ++new_idx) {
+                           array.Set(new_idx, RandomUUID());
+                           m_nodes.emplace(array.Get(new_idx).value(),
+                                           TreeNode{ValueNodeType{}});
+                         }
+                       }
+                       return array.Get(idx).value();
+                     }},
+            item);
       }
       auto& last = m_nodes[current_parent_id];
       last.Set(std::forward<decltype(node)>(node));
