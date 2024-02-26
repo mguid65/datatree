@@ -175,7 +175,7 @@ public:
   }
 
   /**
-   * @brief TryGet the type tag of this number container
+   * @brief Get the type tag of this number container
    * @return the type tag of this number container
    */
   [[nodiscard]] constexpr auto GetTypeTag() const noexcept -> TypeTag {

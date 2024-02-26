@@ -544,7 +544,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto Begin() noexcept -> Iterator {
@@ -552,7 +552,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
@@ -560,7 +560,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
@@ -568,19 +568,19 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto begin() noexcept -> Iterator { return Begin(); }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto begin() const noexcept -> ConstIterator { return Begin(); }
 
   /**
-   * @brief TryGet an iterator to the first element of the underlying map.
+   * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
@@ -588,7 +588,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
@@ -597,7 +597,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
@@ -606,7 +606,7 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
@@ -615,21 +615,21 @@ public:
   }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
   [[nodiscard]] auto end() noexcept -> Iterator { return End(); }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
   [[nodiscard]] auto end() const noexcept -> ConstIterator { return End(); }
 
   /**
-   * @brief TryGet an iterator to the element following the last element of the
+   * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */

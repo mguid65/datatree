@@ -25,7 +25,7 @@ struct Error {
   } category{Category::Generic};
 
   /**
-   * @brief TryGet category as a string
+   * @brief Get category as a string
    *
    * In case of an out of bounds category, "Category::Unknown" will be returned.
    *

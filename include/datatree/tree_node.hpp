@@ -87,7 +87,7 @@ public:
   explicit inline TreeNode(NodeTypeTag tag);
 
   /**
-   * @brief TryGet type tag for this tree node
+   * @brief Get type tag for this tree node
    * @return type tag
    */
   [[nodiscard]] inline NodeTypeTag Tag() const noexcept;
