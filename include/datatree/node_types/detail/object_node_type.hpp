@@ -28,6 +28,8 @@
 
 namespace mguid {
 
+class TreeNode;
+
 /**
  * @brief Map like class that defines an object like node with children
  *
@@ -35,7 +37,7 @@ namespace mguid {
  */
 class ObjectNodeType {
 public:
-  using MapType = std::unordered_map<std::string, uuid>;
+  using MapType = std::unordered_map<std::string, TreeNode>;
   using ValueType = MapType::value_type;
   using KeyType = MapType::key_type;
   using MappedType = MapType::mapped_type;
@@ -61,7 +63,7 @@ public:
    * @param init_list an initializer list of ValueType
    */
   ObjectNodeType(std::initializer_list<ValueType> init_list)
-      : m_key_id_mapping{init_list} {}
+      : m_children{init_list} {}
 
   /**
    * @brief Assign an initializer list of ValueType to this
@@ -69,7 +71,7 @@ public:
    * @return reference to this
    */
   ObjectNodeType& operator=(std::initializer_list<ValueType> init_list) {
-    m_key_id_mapping = init_list;
+    m_children = init_list;
     return *this;
   }
 
@@ -78,7 +80,7 @@ public:
    * @param init_mapping an initial mapping to initialize this with
    */
   explicit ObjectNodeType(MapType init_mapping)
-      : m_key_id_mapping{std::move(init_mapping)} {}
+      : m_children{std::move(init_mapping)} {}
 
   /**
    * @brief Try to get a copy of the node id with the specified key
@@ -88,8 +90,8 @@ public:
    */
   [[nodiscard]] auto Get(const KeyType& key) const
       -> expected<MappedType, Error> {
-    if (auto iter = m_key_id_mapping.find(key);
-        iter != m_key_id_mapping.end()) {
+    if (auto iter = m_children.find(key);
+        iter != m_children.end()) {
       return iter->second;
     }
     return make_unexpected(Error{.category = Error::Category::KeyError});
@@ -107,8 +109,8 @@ public:
   template <typename TDefault>
   [[nodiscard]] auto GetOr(const KeyType& key, TDefault&& default_value) const
       -> expected<MappedType, Error> {
-    if (auto iter = m_key_id_mapping.find(key);
-        iter != m_key_id_mapping.end()) {
+    if (auto iter = m_children.find(key);
+        iter != m_children.end()) {
       return iter->second;
     }
     return static_cast<MappedType>(std::forward<TDefault>(default_value));
@@ -117,7 +119,7 @@ public:
   /**
    * @brief Erase all elements from this ObjectNodeType
    */
-  void Clear() noexcept { m_key_id_mapping.clear(); }
+  void Clear() noexcept { m_children.clear(); }
 
   /**
    * @brief Insert value if the container doesn't already contain an element
@@ -128,7 +130,7 @@ public:
    * the insertion took place (true if insertion happened, false if it did not).
    */
   auto Insert(const ValueType& value) -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.insert(value);
+    return m_children.insert(value);
   }
 
   /**
@@ -140,7 +142,7 @@ public:
    * the insertion took place (true if insertion happened, false if it did not).
    */
   auto Insert(ValueType&& value) -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.insert(value);
+    return m_children.insert(value);
   }
 
   /**
@@ -160,7 +162,7 @@ public:
    */
   template <typename TConvertibleToValueType>
   auto Insert(TConvertibleToValueType&& value) -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.insert(
+    return m_children.insert(
         std::forward<TConvertibleToValueType>(value));
   }
 
@@ -172,7 +174,7 @@ public:
    * prevented the insertion.
    */
   auto InsertHint(ConstIterator hint, const ValueType& value) -> Iterator {
-    return m_key_id_mapping.insert(hint, value);
+    return m_children.insert(hint, value);
   }
 
   /**
@@ -183,7 +185,7 @@ public:
    * prevented the insertion.
    */
   auto InsertHint(ConstIterator hint, ValueType&& value) -> Iterator {
-    return m_key_id_mapping.insert(hint, value);
+    return m_children.insert(hint, value);
   }
 
   /**
@@ -204,7 +206,7 @@ public:
   template <typename TConvertibleToValueType>
   auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value)
       -> Iterator {
-    return m_key_id_mapping.insert(hint, value);
+    return m_children.insert(hint, value);
   }
 
   /**
@@ -217,7 +219,7 @@ public:
    * @param init_list initializer list to insert the values from
    */
   void Insert(std::initializer_list<ValueType> init_list) {
-    m_key_id_mapping.insert(init_list);
+    m_children.insert(init_list);
   }
 
   /**
@@ -238,7 +240,7 @@ public:
   template <typename TValue>
   auto InsertOrAssign(const KeyType& key, TValue&& obj)
       -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.insert_or_assign(key, std::forward<TValue>(obj));
+    return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
   /**
@@ -259,7 +261,7 @@ public:
   template <typename TValue>
   auto InsertOrAssign(KeyType&& key, TValue&& obj)
       -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.insert_or_assign(key, std::forward<TValue>(obj));
+    return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
   /**
@@ -291,7 +293,7 @@ public:
   template <typename TValue>
   auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj)
       -> Iterator {
-    return m_key_id_mapping.insert_or_assign(hint, key,
+    return m_children.insert_or_assign(hint, key,
                                              std::forward<TValue>(obj));
   }
 
@@ -324,7 +326,7 @@ public:
   template <typename TValue>
   auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj)
       -> Iterator {
-    return m_key_id_mapping.insert_or_assign(hint, key,
+    return m_children.insert_or_assign(hint, key,
                                              std::forward<TValue>(obj));
   }
 
@@ -340,7 +342,7 @@ public:
    */
   template <typename... TArgs>
   auto Emplace(TArgs&&... args) -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.emplace(std::forward<TArgs>(args)...);
+    return m_children.emplace(std::forward<TArgs>(args)...);
   }
 
   /**
@@ -356,7 +358,7 @@ public:
    */
   template <typename... TArgs>
   auto EmplaceHint(ConstIterator hint, TArgs&&... args) -> Iterator {
-    return m_key_id_mapping.emplace_hint(hint, std::forward<TArgs>(args)...);
+    return m_children.emplace_hint(hint, std::forward<TArgs>(args)...);
   }
 
   /**
@@ -381,7 +383,7 @@ public:
   template <typename... TArgs>
   auto TryEmplace(const KeyType& key, TArgs&&... args)
       -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.try_emplace(key, std::forward<TArgs>(args)...);
+    return m_children.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
   /**
@@ -405,7 +407,7 @@ public:
    */
   template <typename... TArgs>
   auto TryEmplace(KeyType&& key, TArgs&&... args) -> std::pair<Iterator, bool> {
-    return m_key_id_mapping.try_emplace(key, std::forward<TArgs>(args)...);
+    return m_children.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
   /**
@@ -432,7 +434,7 @@ public:
   template <typename... TArgs>
   auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args)
       -> Iterator {
-    return m_key_id_mapping.try_emplace(hint, key,
+    return m_children.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
 
@@ -460,7 +462,7 @@ public:
   template <typename... TArgs>
   auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args)
       -> Iterator {
-    return m_key_id_mapping.try_emplace(hint, key,
+    return m_children.try_emplace(hint, key,
                                         std::forward<TArgs>(args)...);
   }
 
@@ -475,7 +477,7 @@ public:
    * @param pos iterator to the element to remove
    * @return Iterator following the last removed element.
    */
-  auto Erase(Iterator pos) -> Iterator { return m_key_id_mapping.erase(pos); }
+  auto Erase(Iterator pos) -> Iterator { return m_children.erase(pos); }
 
   /**
    * @brief Removes the element at pos
@@ -483,7 +485,7 @@ public:
    * @return Iterator following the last removed element.
    */
   auto Erase(ConstIterator pos) -> Iterator {
-    return m_key_id_mapping.erase(pos);
+    return m_children.erase(pos);
   }
 
   /**
@@ -492,7 +494,7 @@ public:
    * @return Number of elements removed (0 or 1).
    */
   auto Erase(const KeyType& key) -> SizeType {
-    return m_key_id_mapping.erase(key);
+    return m_children.erase(key);
   }
 
   /**
@@ -502,7 +504,7 @@ public:
    * @return true if there is such a node id, otherwise false
    */
   [[nodiscard]] auto Contains(const KeyType& key) const -> bool {
-    return m_key_id_mapping.contains(key);
+    return m_children.contains(key);
   }
 
   /**
@@ -510,7 +512,7 @@ public:
    * @return the number of children in this ObjectNodeType
    */
   [[nodiscard]] auto Size() const noexcept -> SizeType {
-    return m_key_id_mapping.size();
+    return m_children.size();
   }
 
   /**
@@ -518,7 +520,7 @@ public:
    * @return true if empty, otherwise false
    */
   [[nodiscard]] auto Empty() const noexcept -> bool {
-    return m_key_id_mapping.empty();
+    return m_children.empty();
   }
 
   /**
@@ -528,7 +530,7 @@ public:
    * past-the-end (see end()) iterator is returned.
    */
   [[nodiscard]] auto Find(const KeyType& key) -> Iterator {
-    return m_key_id_mapping.find(key);
+    return m_children.find(key);
   }
 
   /**
@@ -538,7 +540,7 @@ public:
    * past-the-end (see end()) iterator is returned.
    */
   [[nodiscard]] auto Find(const KeyType& key) const -> ConstIterator {
-    return m_key_id_mapping.find(key);
+    return m_children.find(key);
   }
 
   /**
@@ -546,7 +548,7 @@ public:
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto Begin() noexcept -> Iterator {
-    return m_key_id_mapping.begin();
+    return m_children.begin();
   }
 
   /**
@@ -554,7 +556,7 @@ public:
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
-    return m_key_id_mapping.begin();
+    return m_children.begin();
   }
 
   /**
@@ -562,7 +564,7 @@ public:
    * @return Iterator to the first element.
    */
   [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
-    return m_key_id_mapping.cbegin();
+    return m_children.cbegin();
   }
 
   /**
@@ -591,7 +593,7 @@ public:
    * @return Iterator to the element following the last element.
    */
   [[nodiscard]] auto End() noexcept -> Iterator {
-    return m_key_id_mapping.end();
+    return m_children.end();
   }
 
   /**
@@ -600,7 +602,7 @@ public:
    * @return Iterator to the element following the last element.
    */
   [[nodiscard]] auto End() const noexcept -> ConstIterator {
-    return m_key_id_mapping.end();
+    return m_children.end();
   }
 
   /**
@@ -609,7 +611,7 @@ public:
    * @return Iterator to the element following the last element.
    */
   [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
-    return m_key_id_mapping.cend();
+    return m_children.cend();
   }
 
   /**
@@ -642,7 +644,7 @@ public:
       -> bool = default;
 
 private:
-  MapType m_key_id_mapping;
+  MapType m_children;
 };
 
 }  // namespace mguid

@@ -16,22 +16,25 @@
 
 #include "datatree/common.hpp"
 #include "datatree/error/error_type.hpp"
+#include "datatree/node_types/detail/value_node_type.hpp"
 
 #ifdef __GNUC__
 #define BEGIN_SUPPRESS_ARRAY_BOUNDS \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+  _Pragma("GCC diagnostic push")    \
+      _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define END_SUPPRESS_ARRAY_BOUNDS _Pragma("GCC diagnostic pop")
 #endif
 
 namespace mguid {
+
+class TreeNode;
 
 /**
  * @brief A class that represents an Array Node Type
  */
 class ArrayNodeType {
 public:
-  using ArrayType = std::vector<mguid::uuid>;
+  using ArrayType = std::vector<TreeNode>;
   using ValueType = ArrayType::value_type;
   using SizeType = ArrayType::size_type;
   using Iterator = ArrayType::iterator;
@@ -56,22 +59,21 @@ public:
    * @brief Construct with an initial size
    * @param init_list an initial size
    */
-  explicit ArrayNodeType(std::size_t size)
-      : m_underlying{size} {}
+  explicit ArrayNodeType(SizeType size) : m_underlying(size) {}
 
   /**
    * @brief Construct from an initializer list of uuids
    * @param init_list an initializer list of uuids
    */
-  ArrayNodeType(std::initializer_list<mguid::uuid> init_list)
-      : m_underlying{init_list} {}
+  ArrayNodeType(std::initializer_list<TreeNode> init_list)
+      : m_underlying(init_list) {}
 
   /**
    * @brief Assign an initializer list of uuids to this
    * @param init_list an initializer list of uuids
    * @return reference to this
    */
-  ArrayNodeType& operator=(std::initializer_list<mguid::uuid> init_list) {
+  ArrayNodeType& operator=(std::initializer_list<TreeNode> init_list) {
     m_underlying = init_list;
     return *this;
   }
@@ -81,13 +83,50 @@ public:
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
-  [[nodiscard]] auto Get(SizeType pos) const -> expected<ValueType, Error> {
+  [[nodiscard]] auto TryGet(SizeType pos) const -> expected<ValueType, Error> {
     if (ValidIndex(pos)) {
-BEGIN_SUPPRESS_ARRAY_BOUNDS
+      BEGIN_SUPPRESS_ARRAY_BOUNDS
       return {m_underlying[pos]};
-END_SUPPRESS_ARRAY_BOUNDS
+      END_SUPPRESS_ARRAY_BOUNDS
     }
     return make_unexpected(Error{.category = Error::Category::OutOfRange});
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto Get(SizeType pos) -> ValueType& {
+    return m_underlying[pos];
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto Get(SizeType pos) const -> const ValueType& {
+    return m_underlying[pos];
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto operator[](SizeType pos) -> ValueType& {
+    if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
+    return m_underlying[pos];
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto operator[](SizeType pos) const -> const ValueType& {
+    return m_underlying[pos];
   }
 
   /**
@@ -100,9 +139,9 @@ END_SUPPRESS_ARRAY_BOUNDS
    */
   auto Set(SizeType pos, const ValueType& value) -> expected<void, Error> {
     if (ValidIndex(pos)) {
-BEGIN_SUPPRESS_ARRAY_BOUNDS
+      BEGIN_SUPPRESS_ARRAY_BOUNDS
       m_underlying[pos] = value;
-END_SUPPRESS_ARRAY_BOUNDS
+      END_SUPPRESS_ARRAY_BOUNDS
       return {};
     }
     return make_unexpected(Error{.category = Error::Category::OutOfRange});
@@ -134,7 +173,9 @@ END_SUPPRESS_ARRAY_BOUNDS
    * @brief Check if this ArrayNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const noexcept -> bool { return m_underlying.empty(); }
+  [[nodiscard]] auto Empty() const noexcept -> bool {
+    return m_underlying.empty();
+  }
 
   /**
    * @brief TryGet the number of elements in this ArrayNodeType
@@ -157,6 +198,22 @@ END_SUPPRESS_ARRAY_BOUNDS
   template <bool TShrinkToFit = false>
   void Resize(SizeType count) {
     m_underlying.resize(count);
+    if constexpr (TShrinkToFit) { ShrinkToFit(); }
+  }
+
+  /**
+   * @brief Resizes the container to contain count elements
+   *
+   * Does nothing if count == Size().
+   * If the current size is greater than count, the container is reduced to its
+   * first count elements. If the current size is less than count additional
+   * default-inserted elements are appended.
+   *
+   * @param count new size of the container
+   */
+  template <bool TShrinkToFit = false>
+  void Resize(SizeType count, const ValueType& value) {
+    m_underlying.resize(count, value);
     if constexpr (TShrinkToFit) { ShrinkToFit(); }
   }
 
@@ -314,7 +371,9 @@ END_SUPPRESS_ARRAY_BOUNDS
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto Begin() noexcept -> Iterator { return m_underlying.begin(); }
+  [[nodiscard]] auto Begin() noexcept -> Iterator {
+    return m_underlying.begin();
+  }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
@@ -542,33 +601,6 @@ END_SUPPRESS_ARRAY_BOUNDS
    */
   [[nodiscard]] auto crend() const noexcept -> ConstReverseIterator {
     return CREnd();
-  }
-
-  /**
-   * @brief Compares the contents of two ArrayNodeTypes.
-   *
-   * Compares the contents of this and other lexicographically.
-   *
-   * @return The relative order of the first pair of non-equivalent elements in
-   * this and other if there are such elements, *this.Size() <=> other.Size()
-   * otherwise.
-   */
-  [[nodiscard]] auto operator<=>(const ArrayNodeType& other) const
-      -> std::strong_ordering {
-    return std::lexicographical_compare_three_way(
-        Begin(), End(), other.Begin(), other.End(), [](auto lhs, auto rhs) {
-          using uuid_span = std::span<std::byte const, 16>;
-          const auto lhs_bytes = lhs.as_bytes();
-          const auto rhs_bytes = rhs.as_bytes();
-          for (uuid_span::size_type i{0}; i < 16; ++i) {
-            if (lhs_bytes[i] > rhs_bytes[i]) {
-              return std::strong_ordering::greater;
-            } else if (lhs_bytes[i] < rhs_bytes[i]) {
-              return std::strong_ordering::less;
-            }
-          }
-          return std::strong_ordering::equal;
-        });
   }
 
   /**

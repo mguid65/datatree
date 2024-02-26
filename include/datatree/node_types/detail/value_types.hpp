@@ -93,7 +93,47 @@ using IntegerKeyType = std::size_t;
  *
  * The same applies for this DataTree
  */
-using KeyType = std::variant<StringKeyType, IntegerKeyType>;
+struct KeyType : std::variant<StringKeyType, IntegerKeyType> {
+  using BaseType = std::variant<StringKeyType, IntegerKeyType>;
+
+  KeyType() = default;
+  KeyType(const KeyType&) = default;
+  KeyType(KeyType&&) = default;
+  KeyType& operator=(const KeyType&) = default;
+  KeyType& operator=(KeyType&&) = default;
+
+  KeyType(const std::string& key) : BaseType{key} { }
+  KeyType(std::string&& key) : BaseType{std::move(key)} {}
+
+  KeyType(const char* key) : BaseType{key} { }
+
+  KeyType(const std::size_t& idx) : BaseType{idx} { }
+  KeyType(std::size_t&& idx) : BaseType{idx} {}
+
+  /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  decltype(auto) Visit(TCallables&&... callables) {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, *this);
+  }
+
+  /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  decltype(auto) Visit(TCallables&&... callables) const {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, *this);
+  }
+};
 
 namespace key_literals {
 /**

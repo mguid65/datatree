@@ -12,11 +12,59 @@
 
 #include <mutex>
 #include <ranges>
+#include <string>
+#include <cstdint>
 
 #include <nonstd/expected.hpp>
-#include <uuid.h>
 
 namespace mguid {
+
+/**
+ * @brief
+ * @param json
+ * @param tab_width
+ * @return
+ */
+[[nodiscard]] inline std::string PrettifyJson(const std::string& json,
+                                              std::size_t tab_width = 2) {
+  std::size_t indent{0};
+  std::string result;
+
+  auto append_indent = [&]() { result.append(indent * tab_width, ' '); };
+
+  for (const auto& ch : json) {
+    switch (ch) {
+      case '{':
+        [[fallthrough]];
+      case '[': {
+        indent += 1;
+        result += ch;
+        result += '\n';
+        append_indent();
+        break;
+      }
+      case '}':
+        [[fallthrough]];
+      case ']': {
+        indent -= 1;
+        result += '\n';
+        append_indent();
+        result += ch;
+        break;
+      }
+      case ',': {
+        result += ch;
+        result += '\n';
+        append_indent();
+        break;
+      }
+      default:
+        result += ch;
+    }
+  }
+
+  return result;
+}
 
 /**
  * @brief A type to hold a set of callable overloads
@@ -32,33 +80,6 @@ struct Overload : TNonFinalCallables... {
  */
 template <class... TNonFinalCallables>
 Overload(TNonFinalCallables...) -> Overload<TNonFinalCallables...>;
-
-/**
- * @brief Doing this to get stduuid things
- */
-using uuids::to_string;
-using uuids::uuid;
-
-/**
- * @brief TryGet a random uuid
- * @return a random uuid
- */
-[[nodiscard]] inline uuid RandomUUID() {
-  using uuids::uuid_random_generator;
-  static std::mutex uuid_mutex;
-  static auto gen = std::invoke([]() -> uuid_random_generator {
-    std::random_device rd;
-    auto seed_data = std::array<int, std::mt19937::state_size>{};
-    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
-    // Not sure if this needs to stay alive as long as the generator, the
-    // generator takes it by reference
-    static std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-    static std::mt19937 generator(seq);
-    return uuid_random_generator{generator};
-  });
-  std::lock_guard lock(uuid_mutex);
-  return gen();
-}
 
 /**
  * @brief Doing this to get expected-lite things

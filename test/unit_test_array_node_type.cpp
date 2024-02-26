@@ -10,7 +10,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/array_node_type.hpp>
+#include <datatree/tree_node.hpp>
 
 TEST_CASE("Array Node Type Constructor") {
   SECTION("Default Constructor") {
@@ -35,29 +35,29 @@ TEST_CASE("Array Node Type Constructor") {
   }
   SECTION("Initializer List Constructor") {
     REQUIRE(std::is_constructible_v<mguid::ArrayNodeType,
-                                    std::initializer_list<mguid::uuid>>);
+                                    std::initializer_list<mguid::TreeNode>>);
     REQUIRE(std::is_constructible_v<const mguid::ArrayNodeType,
-                                    std::initializer_list<mguid::uuid>>);
+                                    std::initializer_list<mguid::TreeNode>>);
   }
   SECTION("Initializer List Assignment") {
     REQUIRE(std::is_assignable_v<mguid::ArrayNodeType,
-                                 std::initializer_list<mguid::uuid>>);
+                                 std::initializer_list<mguid::TreeNode>>);
   }
 }
 
 TEST_CASE("Array Node Type TryGet") {
   SECTION("TryGet Invalid Index Empty") {
     mguid::ArrayNodeType ant1;
-    auto result = ant1.Get(0);
+    auto result = ant1.TryGet(0);
     REQUIRE(result.has_exception<mguid::Error>());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
   SECTION("TryGet Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
-    auto result1 = ant1.Get(0);
-    auto result2 = ant1.Get(1);
-    auto result3 = ant1.Get(2);
-    auto result4 = ant1.Get(3);
+    auto result1 = ant1.TryGet(0);
+    auto result2 = ant1.TryGet(1);
+    auto result3 = ant1.TryGet(2);
+    auto result4 = ant1.TryGet(3);
 
     REQUIRE(result1.has_value());
     REQUIRE(result2.has_value());
@@ -66,7 +66,7 @@ TEST_CASE("Array Node Type TryGet") {
   }
   SECTION("TryGet Invalid Index Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
-    auto result = ant1.Get(4);
+    auto result = ant1.TryGet(4);
     REQUIRE(result.has_exception<mguid::Error>());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }

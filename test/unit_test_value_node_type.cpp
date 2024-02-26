@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/value_node_type.hpp>
+#include <datatree/tree_node.hpp>
 
 TEST_CASE("Value Node Type Constructor") {
   SECTION("Default Constructor") {

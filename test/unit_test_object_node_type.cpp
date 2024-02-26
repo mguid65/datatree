@@ -6,9 +6,9 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/object_node_type.hpp>
+#include <datatree/tree_node.hpp>
 
-using TestMapType = std::unordered_map<std::string, mguid::uuid>;
+using TestMapType = std::unordered_map<std::string, mguid::TreeNode>;
 
 TEST_CASE("Object Node Constructor") {
   SECTION("Default Constructor") {
@@ -19,7 +19,7 @@ TEST_CASE("Object Node Constructor") {
   }
   SECTION("Copy Constructor") {
     REQUIRE(std::is_copy_constructible_v<mguid::ObjectNodeType>);
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
     mguid::ObjectNodeType ont2{ont1};
@@ -28,7 +28,7 @@ TEST_CASE("Object Node Constructor") {
   }
   SECTION("Move Constructor") {
     REQUIRE(std::is_nothrow_move_constructible_v<mguid::ObjectNodeType>);
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
     mguid::ObjectNodeType ont2{std::move(ont1)};
@@ -37,7 +37,7 @@ TEST_CASE("Object Node Constructor") {
   }
   SECTION("Copy Assignment") {
     REQUIRE(std::is_copy_assignable_v<mguid::ObjectNodeType>);
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     mguid::ObjectNodeType ont2;
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
@@ -49,7 +49,7 @@ TEST_CASE("Object Node Constructor") {
   }
   SECTION("Move Assignment") {
     REQUIRE(std::is_nothrow_move_assignable_v<mguid::ObjectNodeType>);
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     mguid::ObjectNodeType ont2;
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
@@ -61,21 +61,21 @@ TEST_CASE("Object Node Constructor") {
   }
   SECTION("Construction From Map") {
     REQUIRE(std::is_constructible_v<mguid::ObjectNodeType, TestMapType>);
-    TestMapType init_map{{"key", mguid::uuid{}}};
+    TestMapType init_map{{"key", mguid::TreeNode{}}};
     mguid::ObjectNodeType ont1{init_map};
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
   }
   SECTION("Construction From Initializer List") {
     REQUIRE(std::is_constructible_v<mguid::ObjectNodeType, TestMapType>);
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
   }
   SECTION("Assignment From Initializer List") {
     REQUIRE(std::is_constructible_v<mguid::ObjectNodeType, TestMapType>);
     mguid::ObjectNodeType ont1;
-    ont1 = {{"key", mguid::uuid{}}};
+    ont1 = {{"key", mguid::TreeNode{}}};
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
   }
@@ -83,7 +83,7 @@ TEST_CASE("Object Node Constructor") {
 
 TEST_CASE("Object Node Type TryGet") {
   SECTION("Key Exists") {
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
     REQUIRE(ont1.Get("key").has_value());
   }
   SECTION("Key Doesn't Exist") {
@@ -96,12 +96,12 @@ TEST_CASE("Object Node Type TryGet") {
 
 TEST_CASE("Object Node Type TryGet Or") {
   SECTION("Key Exists") {
-    mguid::ObjectNodeType ont1{{"key", mguid::uuid{}}};
-    REQUIRE(ont1.GetOr("key", mguid::uuid{}).has_value());
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1.GetOr("key", mguid::TreeNode{}).has_value());
   }
   SECTION("Key Doesn't Exist") {
     mguid::ObjectNodeType ont1;
-    REQUIRE(ont1.GetOr("key", mguid::uuid{}).has_value());
+    REQUIRE(ont1.GetOr("key", mguid::TreeNode{}).has_value());
   }
 }
 
@@ -123,7 +123,7 @@ TEST_CASE("Object Node Type Clear") {
   SECTION("Many Elements") {
     mguid::ObjectNodeType ont1;
     for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::uuid{});
+      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1024);
@@ -136,7 +136,7 @@ TEST_CASE("Object Node Type Clear") {
 TEST_CASE("Object Node Insert") {
   SECTION("Insert const &") {
     mguid::ObjectNodeType ont1;
-    const std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    const std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(p1);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -146,7 +146,7 @@ TEST_CASE("Object Node Insert") {
   }
   SECTION("Insert const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    const std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    const std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(p1);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -156,7 +156,7 @@ TEST_CASE("Object Node Insert") {
   }
   SECTION("Insert &&") {
     mguid::ObjectNodeType ont1;
-    std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(std::move(p1));
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -166,7 +166,7 @@ TEST_CASE("Object Node Insert") {
   }
   SECTION("Insert && Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(std::move(p1));
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -176,7 +176,7 @@ TEST_CASE("Object Node Insert") {
   }
   SECTION("Insert Convertible Type") {
     mguid::ObjectNodeType ont1;
-    std::pair<std::string, mguid::uuid> p1{"key", {}};
+    std::pair<std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(p1);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -186,7 +186,7 @@ TEST_CASE("Object Node Insert") {
   }
   SECTION("Insert Convertible Type Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    std::pair<std::string, mguid::uuid> p1{"key", {}};
+    std::pair<std::string, mguid::TreeNode> p1{"key", {}};
     auto result = ont1.Insert(p1);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
@@ -221,7 +221,7 @@ TEST_CASE("Object Node Insert") {
 TEST_CASE("Object Node Insert Hint") {
   SECTION("Insert Hint const &") {
     mguid::ObjectNodeType ont1;
-    const std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    const std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto iter = ont1.InsertHint(ont1.Begin(), p1);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
@@ -229,7 +229,7 @@ TEST_CASE("Object Node Insert Hint") {
   }
   SECTION("Insert Hint const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    const std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    const std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto iter = ont1.InsertHint(ont1.Begin(), p1);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
@@ -237,7 +237,7 @@ TEST_CASE("Object Node Insert Hint") {
   }
   SECTION("Insert Hint &&") {
     mguid::ObjectNodeType ont1;
-    std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto iter = ont1.InsertHint(ont1.Begin(), std::move(p1));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
@@ -245,7 +245,7 @@ TEST_CASE("Object Node Insert Hint") {
   }
   SECTION("Insert && Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    std::pair<const std::string, mguid::uuid> p1{"key", {}};
+    std::pair<const std::string, mguid::TreeNode> p1{"key", {}};
     auto iter = ont1.InsertHint(ont1.Begin(), std::move(p1));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
@@ -253,14 +253,14 @@ TEST_CASE("Object Node Insert Hint") {
   }
   SECTION("Insert Convertible Type") {
     mguid::ObjectNodeType ont1;
-    auto iter = ont1.InsertHint(ont1.Begin(), {"key", mguid::uuid{}});
+    auto iter = ont1.InsertHint(ont1.Begin(), {"key", mguid::TreeNode{}});
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
   }
   SECTION("Insert Convertible Type Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto iter = ont1.InsertHint(ont1.Begin(), {"key", mguid::uuid{}});
+    auto iter = ont1.InsertHint(ont1.Begin(), {"key", mguid::TreeNode{}});
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
@@ -270,232 +270,238 @@ TEST_CASE("Object Node Insert Hint") {
 TEST_CASE("Object Node Insert Or Assign") {
   SECTION("Insert const &") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto result = ont1.InsertOrAssign("key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto result = ont1.InsertOrAssign("key", node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Insert const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto result = ont1.InsertOrAssign("key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto result = ont1.InsertOrAssign("key", node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Insert const & Key, && Value") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto result = ont1.InsertOrAssign(key, std::move(id.value()));
+    auto result = ont1.InsertOrAssign(key, std::move(node));
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
   SECTION("Insert const & Key, && Value Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto result = ont1.InsertOrAssign(key, std::move(id.value()));
+    auto result = ont1.InsertOrAssign(key, std::move(node));
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
 }
 
 TEST_CASE("Object Node Insert Or Assign Hint") {
   SECTION("Insert const &") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), "key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), "key", node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Insert const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), "key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), "key", node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Insert const & Key, && Value") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
     auto iter =
-        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(id.value()));
+        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
   SECTION("Insert const & Key, && Value Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
     auto iter =
-        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(id.value()));
+        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
 }
 
 TEST_CASE("Object Node Type Emplace") {
   SECTION("Emplace") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto result = ont1.Emplace("key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto result = ont1.Emplace("key", node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Emplace Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto result = ont1.Emplace("key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto result = ont1.Emplace("key", node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
 }
 
 TEST_CASE("Object Node Type Emplace Hint") {
   SECTION("Emplace") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto iter = ont1.EmplaceHint(ont1.Begin(), "key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto iter = ont1.EmplaceHint(ont1.Begin(), "key", node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Emplace Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
-    auto iter = ont1.EmplaceHint(ont1.Begin(), "key", id.value());
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto iter = ont1.EmplaceHint(ont1.Begin(), "key", node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
 }
 
 TEST_CASE("Object Node Type Try Emplace") {
   SECTION("Try Emplace const & Key") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto result = ont1.TryEmplace(key, id.value());
+    auto result = ont1.TryEmplace(key, node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Try Emplace Key Already Exists const & Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto result = ont1.TryEmplace(key, id.value());
+    auto result = ont1.TryEmplace(key, node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
   SECTION("Try Emplace && Key") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     std::string key{"key"};
-    auto result = ont1.TryEmplace(std::move(key), id.value());
+    auto result = ont1.TryEmplace(std::move(key), node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
   SECTION("Try Emplace Key Already Exists && Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     std::string key{"key"};
-    auto result = ont1.TryEmplace(std::move(key), id.value());
+    auto result = ont1.TryEmplace(std::move(key), node);
     const auto& [iter, inserted] = result;
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
 }
 
 TEST_CASE("Object Node Type Try Emplace Hint") {
   SECTION("Try Emplace Hint const & Key") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto iter = ont1.TryEmplaceHint(ont1.Begin(), key, id.value());
+    auto iter = ont1.TryEmplaceHint(ont1.Begin(), key, node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == node);
   }
   SECTION("Try Emplace Hint Key Already Exists const & Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto iter = ont1.TryEmplaceHint(ont1.Begin(), key, id.value());
+    auto iter = ont1.TryEmplaceHint(ont1.Begin(), key, node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
   SECTION("Try Emplace Hint && Key") {
     mguid::ObjectNodeType ont1;
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
+    auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     std::string key{"key"};
-    auto iter = ont1.TryEmplaceHint(ont1.Begin(), std::move(key), id.value());
+    auto iter = ont1.TryEmplaceHint(ont1.Begin(), std::move(key), node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == id);
+    REQUIRE(ont1.Get("key").value() == expected);
   }
   SECTION("Try Emplace Hint Key Already Exists && Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
-    auto id = mguid::uuid::from_string("087704fb-54bd-4b5e-a323-2f954d7aae9d");
+    auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     std::string key{"key"};
-    auto iter = ont1.TryEmplaceHint(ont1.Begin(), std::move(key), id.value());
+    auto iter = ont1.TryEmplaceHint(ont1.Begin(), std::move(key), node);
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().is_nil());
+    REQUIRE(ont1.Get("key").value().HasObject());
   }
 }
 
@@ -601,7 +607,7 @@ TEST_CASE("Object Node Type Find") {
   SECTION("Find Element Exists Many Element In Map") {
     mguid::ObjectNodeType ont1;
     for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::uuid{});
+      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     auto iter = ont1.Find("512");
     REQUIRE(iter != ont1.End());
@@ -609,7 +615,7 @@ TEST_CASE("Object Node Type Find") {
   SECTION("Find Element Does Not Exist Many Element In Map") {
     mguid::ObjectNodeType ont1;
     for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::uuid{});
+      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     auto iter = ont1.Find("1025");
     REQUIRE(iter == ont1.End());
@@ -632,7 +638,7 @@ TEST_CASE("Object Node Type Find") {
   SECTION("Find Element Exists Many Element In Map Const") {
     mguid::ObjectNodeType ont_init;
     for (auto i{0}; i < 1024; ++i) {
-      ont_init.Emplace(std::to_string(i), mguid::uuid{});
+      ont_init.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     const mguid::ObjectNodeType ont1{ont_init};
     auto iter = ont1.Find("512");
@@ -641,7 +647,7 @@ TEST_CASE("Object Node Type Find") {
   SECTION("Find Element Does Not Exist Many Element In Map Const") {
     mguid::ObjectNodeType ont_init;
     for (auto i{0}; i < 1024; ++i) {
-      ont_init.Emplace(std::to_string(i), mguid::uuid{});
+      ont_init.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     const mguid::ObjectNodeType ont1{ont_init};
     auto iter = ont1.Find("1025");
@@ -709,8 +715,8 @@ TEST_CASE("Object Node Type Equality Comparison") {
     mguid::ObjectNodeType ont1;
     mguid::ObjectNodeType ont2;
     for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::uuid{});
-      ont2.Emplace(std::to_string(i), mguid::uuid{});
+      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
+      ont2.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     REQUIRE(ont1 == ont2);
   }
@@ -718,10 +724,10 @@ TEST_CASE("Object Node Type Equality Comparison") {
     mguid::ObjectNodeType ont1;
     mguid::ObjectNodeType ont2;
     for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::uuid{});
+      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     for (auto i{1024}; i < 2048; ++i) {
-      ont2.Emplace(std::to_string(i), mguid::uuid{});
+      ont2.Emplace(std::to_string(i), mguid::TreeNode{});
     }
     REQUIRE(ont1 != ont2);
   }
