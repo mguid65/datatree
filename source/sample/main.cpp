@@ -14,15 +14,16 @@
 auto main() -> int {
   static constexpr auto time_it = [](auto name, auto func,
                                      std::size_t samples = 1) {
-    std::cout << "Timing " << name << std::endl;
+    std::cout << "Timing " << name << std::endl << "Warmup Runs 1";
     std::chrono::nanoseconds time_span{0};
     // Allow for cache warmup
-    for (std::size_t i{0}; i < 12; ++i) {
-      std::cout << "Warmup Run #" << i << std::endl;
+    for (std::size_t i{1}; i < 13; ++i) {
+      std::cout << "..." << i + 1 << std::flush;
       (void)func();
     }
 
-    std::cout << "Timing With " << samples << " Samples..." << std::endl;
+    std::cout << std::endl
+              << "Timing With " << samples << " Samples..." << std::endl;
     for (std::size_t i{0}; i < samples; ++i) {
       auto t1 = std::chrono::steady_clock::now();
       func();
@@ -52,18 +53,22 @@ auto main() -> int {
   //      },
   //      48);
 
+  // const auto iterations = 8192;
+  const auto iterations = 4194303;
+  const auto samples = 12;
+
   time_it(
       "Data Tree",
       []() {
         mguid::DataTree dt;
 
         dt["first"]["second"]["third"] = mguid::ArrayNodeType{};
-
-        for (std::size_t i{0}; i < 2048; ++i) {
-          dt["first"]["second"]["third"][i] = i;
+        auto& third = dt["first"]["second"]["third"];
+        for (std::size_t i{0}; i < iterations; ++i) {
+          third[i] = i;
         }
       },
-      48);
+      samples);
 
   time_it(
       "Nlohmann JSON",
@@ -71,12 +76,12 @@ auto main() -> int {
         nlohmann::json j;
 
         j["first"]["second"]["third"] = nlohmann::json::array();
-
-        for (std::size_t i{0}; i < 2048; ++i) {
-          j["first"]["second"]["third"][i] = i;
+        auto& third = j["first"]["second"]["third"];
+        for (std::size_t i{0}; i < iterations; ++i) {
+          third[i] = i;
         }
       },
-      48);
+      samples);
 
   //  dt.Print<true>();
 }
