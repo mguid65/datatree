@@ -1,19 +1,50 @@
 /**
-* @brief Main for conan test package
+* @brief Main for sample executable
 * @author Matthew Guidry(github: mguid65)
-* @date 2024-02-09
+* @date 2024-02-21
 */
 
+#include <chrono>
 #include <iostream>
 
 #include "datatree/data_tree.hpp"
-#include <datatree/node_types/value_node_type.hpp>
 
 auto main() -> int {
- mguid::ValueNodeType vnt("Hello");
- auto v = vnt.IfStringThen(
-                 [](auto s) { return mguid::ValueNodeType{s + ", World!"}; })
-              .IfNotString([]() { return mguid::ValueNodeType{"Foo Bar"}; });
+ static constexpr auto time_it = [](auto name, auto func,
+                                    std::size_t samples = 1) {
+   std::cout << "Timing " << name << std::endl;
+   std::chrono::nanoseconds time_span{0};
+   // Allow for cache warmup
+   for (std::size_t i{0}; i < 12; ++i) {
+     std::cout << "Warmup Run #" << i << std::endl;
+     (void)func();
+   }
 
- std::cout << v.GetString().value() << '\n';
+   std::cout << "Timing With " << samples << " Samples..." << std::endl;
+   for (std::size_t i{0}; i < samples; ++i) {
+     auto t1 = std::chrono::steady_clock::now();
+     func();
+     auto t2 = std::chrono::steady_clock::now();
+
+     auto duration =
+         std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
+     time_span += duration;
+   }
+
+   std::cout << "Avg Time: " << (time_span / samples).count() << "ns"
+             << std::endl;
+ };
+
+ time_it(
+     "Data Tree",
+     []() {
+       mguid::DataTree dt;
+
+       dt["first"]["second"]["third"] = mguid::ArrayNodeType{};
+
+       for (std::size_t i{0}; i < 2048; ++i) {
+         dt["first"]["second"]["third"][i] = i;
+       }
+     },
+     48);
 }
