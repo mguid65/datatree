@@ -5,9 +5,7 @@
  */
 
 #include <chrono>
-#include <ctime>
 #include <iostream>
-#include <ratio>
 
 #include "datatree/data_tree.hpp"
 
