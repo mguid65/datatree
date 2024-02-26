@@ -98,6 +98,7 @@ public:
    * @return copy of the element at pos or Error
    */
   [[nodiscard]] auto Get(SizeType pos) -> ValueType& {
+    if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
     return m_underlying[pos];
   }
 
@@ -111,7 +112,9 @@ public:
   }
 
   /**
-   * @brief Access the specified element with bounds checking
+   * @brief Access the specified element, if the element does not exist, creates
+   * all elements up to and including the new index initialized to
+   * ValueNodeType{NullType}
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
@@ -121,7 +124,7 @@ public:
   }
 
   /**
-   * @brief Access the specified element with bounds checking
+   * @brief Access the specified element without bounds checking
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
@@ -131,13 +134,20 @@ public:
 
   /**
    * @brief Set the specified element with bounds checking
-   *
-   * UUID is trivially copyable so there will be no ValueType&& overload
-   *
    * @param pos position of the element to return
    * @return the specified element with bounds checking
    */
-  auto Set(SizeType pos, const ValueType& value) -> expected<void, Error> {
+  void Set(SizeType pos, const ValueType& value) {
+    if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
+    m_underlying[pos] = value;
+  }
+
+  /**
+   * @brief Set the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return the specified element with bounds checking
+   */
+  auto TrySet(SizeType pos, const ValueType& value) -> expected<void, Error> {
     if (ValidIndex(pos)) {
       BEGIN_SUPPRESS_ARRAY_BOUNDS
       m_underlying[pos] = value;

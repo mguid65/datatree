@@ -459,12 +459,18 @@ inline auto TreeNode::TryGetValue() const -> expected<ValueNodeType, Error> {
 inline auto TreeNode::GetObject() const -> const ObjectNodeType& {
   return Get<ObjectNodeType>();
 }
-inline auto TreeNode::GetObject() -> ObjectNodeType& { return Get<ObjectNodeType>(); }
+inline auto TreeNode::GetObject() -> ObjectNodeType& {
+  return Get<ObjectNodeType>();
+}
 inline auto TreeNode::GetArray() const -> const ArrayNodeType& {
   return Get<ArrayNodeType>();
 }
-inline auto TreeNode::GetArray() -> ArrayNodeType& { return Get<ArrayNodeType>(); }
-inline auto TreeNode::GetValue() -> ValueNodeType& { return Get<ValueNodeType>(); }
+inline auto TreeNode::GetArray() -> ArrayNodeType& {
+  return Get<ArrayNodeType>();
+}
+inline auto TreeNode::GetValue() -> ValueNodeType& {
+  return Get<ValueNodeType>();
+}
 inline auto TreeNode::GetValue() const -> const ValueNodeType& {
   return Get<ValueNodeType>();
 }
