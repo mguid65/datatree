@@ -34,8 +34,14 @@ jobs:
           - os: windows-latest
             c_compiler: gcc
             conan_profile: default-ubuntu
+          - os: windows-latest
+            c_compiler: gcc
+            conan_profile: default-ubuntu
           - os: ubuntu-latest
             c_compiler: cl
+            conan_profile: default-windows
+          - os: ubuntu-latest
+            c_compiler: gcc
             conan_profile: default-windows
     
     steps:
@@ -48,7 +54,11 @@ jobs:
         version: 2.0.17
 
     - name: Conan Profile Install
-      run:  conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
+      run: conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
+
+    - name: Rename Conan Profile
+      shell: bash
+      run: mv ${conan config home}/profiles/${{matrix.conan_profile}} ${conan config home}/profiles/default
 
     - name: Run Conan
       run: conan install . -b missing
