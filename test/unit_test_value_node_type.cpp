@@ -834,13 +834,15 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfBoolTransform(transform_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfBoolTransform(transform_func) ==
               mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::BoolType{true}};
+      auto&& vntrref = std::move(vnt1);
       REQUIRE_FALSE(
-          std::move(vnt1).IfBoolTransform(transform_func).TryGetBool().value());
+          vntrref.IfBoolTransform(transform_func).TryGetBool().value());
     }
   }
   SECTION("If Bool Then const &&") {
@@ -849,15 +851,15 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE([transform_func](const auto&& vnt) {
-        return (vnt.IfBoolTransform(transform_func) == mguid::ValueNodeType{});
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfBoolTransform(transform_func) ==
+              mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::BoolType{true}};
-      REQUIRE_FALSE([transform_func](const auto&& vnt) {
-        return (vnt.IfBoolTransform(transform_func).TryGetBool().value());
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE_FALSE(
+          vntrref.IfBoolTransform(transform_func).TryGetBool().value());
     }
   }
   SECTION("If Number Then &") {
@@ -894,12 +896,14 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfNumberTransform(transform_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNumberTransform(transform_func) ==
               mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::NumberType{3}};
-      REQUIRE(std::move(vnt1).IfNumberTransform(transform_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNumberTransform(transform_func) ==
               mguid::ValueNodeType{5});
     }
   }
@@ -909,17 +913,15 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE([transform_func](const auto&& vnt) {
-        return (vnt.IfNumberTransform(transform_func) ==
-                mguid::ValueNodeType{});
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNumberTransform(transform_func) ==
+              mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::NumberType{3}};
-      REQUIRE([transform_func](const auto&& vnt) {
-        return (vnt.IfNumberTransform(transform_func) ==
-                mguid::ValueNodeType{5});
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNumberTransform(transform_func) ==
+              mguid::ValueNodeType{5});
     }
   }
   SECTION("If String Then &") {
@@ -956,12 +958,14 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfStringTransform(transform_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfStringTransform(transform_func) ==
               mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::StringType{"test"}};
-      REQUIRE(std::move(vnt1).IfStringTransform(transform_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfStringTransform(transform_func) ==
               mguid::ValueNodeType{"testtest"});
     }
   }
@@ -971,17 +975,15 @@ TEST_CASE("Value Node Type If Type Transform") {
     };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE([transform_func](const auto&& vnt) {
-        return (vnt.IfStringTransform(transform_func) ==
-                mguid::ValueNodeType{});
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfStringTransform(transform_func) ==
+              mguid::ValueNodeType{});
     }
     {
       mguid::ValueNodeType vnt1{mguid::StringType{"test"}};
-      REQUIRE([transform_func](const auto&& vnt) {
-        return (vnt.IfStringTransform(transform_func) ==
-                mguid::ValueNodeType{"testtest"});
-      }(std::move(vnt1)));
+      const auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfStringTransform(transform_func) ==
+              mguid::ValueNodeType{"testtest"});
     }
   }
 }
@@ -1004,12 +1006,14 @@ TEST_CASE("Value Node Type If Not Type") {
     constexpr auto else_func = []() { return mguid::ValueNodeType{}; };
     {
       mguid::ValueNodeType vnt1{mguid::StringType{}};
-      REQUIRE(std::move(vnt1).IfNotNull(else_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotNull(else_func) ==
               mguid::ValueNodeType{mguid::NullType{}});
     }
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfNotNull(else_func) ==
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotNull(else_func) ==
               mguid::ValueNodeType{mguid::NullType{}});
     }
   }
@@ -1028,12 +1032,13 @@ TEST_CASE("Value Node Type If Not Type") {
     constexpr auto else_func = []() { return mguid::ValueNodeType{true}; };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfNotBool(else_func) ==
-              mguid::ValueNodeType{true});
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotBool(else_func) == mguid::ValueNodeType{true});
     }
     {
       mguid::ValueNodeType vnt1{mguid::BoolType{false}};
-      REQUIRE_FALSE(std::move(vnt1).IfNotBool(else_func).TryGetBool().value());
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE_FALSE(vntrref.IfNotBool(else_func).TryGetBool().value());
     }
   }
   SECTION("If Number Then const &") {
@@ -1051,13 +1056,13 @@ TEST_CASE("Value Node Type If Not Type") {
     constexpr auto else_func = []() { return mguid::ValueNodeType{2}; };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfNotNumber(else_func) ==
-              mguid::ValueNodeType{2});
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotNumber(else_func) == mguid::ValueNodeType{2});
     }
     {
       mguid::ValueNodeType vnt1{mguid::NumberType{3}};
-      REQUIRE(std::move(vnt1).IfNotNumber(else_func) ==
-              mguid::ValueNodeType{3});
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotNumber(else_func) == mguid::ValueNodeType{3});
     }
   }
   SECTION("If String Then const &") {
@@ -1075,13 +1080,13 @@ TEST_CASE("Value Node Type If Not Type") {
     constexpr auto else_func = []() { return mguid::ValueNodeType{"test"}; };
     {
       mguid::ValueNodeType vnt1{mguid::NullType{}};
-      REQUIRE(std::move(vnt1).IfNotString(else_func) ==
-              mguid::ValueNodeType{"test"});
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotString(else_func) == mguid::ValueNodeType{"test"});
     }
     {
       mguid::ValueNodeType vnt1{mguid::StringType{"test2"}};
-      REQUIRE(std::move(vnt1).IfNotString(else_func) ==
-              mguid::ValueNodeType{"test2"});
+      auto&& vntrref = std::move(vnt1);
+      REQUIRE(vntrref.IfNotString(else_func) == mguid::ValueNodeType{"test2"});
     }
   }
 }
