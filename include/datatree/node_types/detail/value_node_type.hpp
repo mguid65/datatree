@@ -12,6 +12,7 @@
 
 #include <utility>
 #include <variant>
+#include <cstddef>
 
 #include "datatree/common.hpp"
 #include "datatree/node_types/detail/value_types.hpp"
@@ -39,7 +40,7 @@ public:
   /**
    * @brief Explicitly construct a null ValueNode
    */
-  explicit ValueNodeType(nullptr_t) noexcept {}
+  explicit ValueNodeType(std::nullptr_t) noexcept {}
 
   /**
    * @brief Construct a value node from a value

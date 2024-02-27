@@ -20,18 +20,23 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
         c_compiler: [gcc, cl]
+        conan_profile: [default-ubuntu, default-windows]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
+            conan_profile: default-windows
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+            conan_profile: default-ubuntu
         exclude:
           - os: windows-latest
             c_compiler: gcc
+            conan_profile: default-ubuntu
           - os: ubuntu-latest
             c_compiler: cl
+            conan_profile: default-windows
     
     steps:
     - uses: actions/checkout@v3
@@ -43,7 +48,7 @@ jobs:
         version: 2.0.17
 
     - name: Conan Profile Install
-      run: conan config install ${{github.workspace}}/.github/conan/default -tf=profiles
+      run:  conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
 
     - name: Run Conan
       run: conan install . -b missing
