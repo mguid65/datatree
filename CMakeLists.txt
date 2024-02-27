@@ -21,7 +21,7 @@ if (SANITIZER)
     enable_sanitizer()
 endif ()
 
-find_package(expected-lite REQUIRED)
+find_package(tl-expected REQUIRED)
 
 set(DATATREE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/common.hpp
@@ -41,7 +41,7 @@ set(DATATREE_HEADERS
 add_library(datatree INTERFACE)
 target_include_directories(datatree INTERFACE include)
 target_sources(datatree INTERFACE ${DATATREE_HEADERS})
-target_link_libraries(datatree INTERFACE nonstd::expected-lite)
+target_link_libraries(datatree INTERFACE tl::expected)
 set_target_properties(datatree PROPERTIES LINKER_LANGUAGE CXX)
 
 include(CTest)

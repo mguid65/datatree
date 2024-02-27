@@ -89,7 +89,7 @@ TEST_CASE("Object Node Type TryGet") {
   SECTION("Key Doesn't Exist") {
     mguid::ObjectNodeType ont1;
     auto result = ont1.Get("key");
-    REQUIRE(result.has_exception<mguid::Error>());
+    REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::KeyError);
   }
 }

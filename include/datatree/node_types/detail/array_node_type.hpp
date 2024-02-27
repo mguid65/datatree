@@ -23,6 +23,9 @@
   _Pragma("GCC diagnostic push")    \
       _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define END_SUPPRESS_ARRAY_BOUNDS _Pragma("GCC diagnostic pop")
+#else
+#define BEGIN_SUPPRESS_ARRAY_BOUNDS
+#define END_SUPPRESS_ARRAY_BOUNDS
 #endif
 
 namespace mguid {
@@ -724,8 +727,11 @@ private:
 
 }  // namespace mguid
 
-#ifdef __GNUC__
+#ifdef BEGIN_SUPPRESS_ARRAY_BOUNDS
 #undef BEGIN_SUPPRESS_ARRAY_BOUNDS
+#endif
+
+#ifdef END_SUPPRESS_ARRAY_BOUNDS
 #undef END_SUPPRESS_ARRAY_BOUNDS
 #endif
 
