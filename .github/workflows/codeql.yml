@@ -68,15 +68,12 @@ jobs:
       with:
         version: 2.0.17
 
-    - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
-
     - name: Conan Profile Install
-      run: conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
+      run: conan config install ${{github.workspace}}/.github/conan/default-ubuntu -tf=profiles
 
     - name: Rename Conan Profile
       shell: bash
-      run: mv $(conan config home)/profiles/${{matrix.conan_profile}} $(conan config home)/profiles/default
+      run: mv $(conan config home)/profiles/default-ubuntu $(conan config home)/profiles/default
 
     - name: Run Conan
       run: conan install . -b missing
