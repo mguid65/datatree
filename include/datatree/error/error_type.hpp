@@ -32,8 +32,8 @@ struct Error {
    * @param cat category value
    * @return category as a string
    */
-  [[nodiscard]] constexpr static auto CategoryToString(Category cat) noexcept
-      -> std::string_view {
+  [[nodiscard]] static auto CategoryToString(Category cat) noexcept
+      -> std::string {
     switch (cat) {
       case Category::OutOfRange:
         return "Category::OutOfRange";
