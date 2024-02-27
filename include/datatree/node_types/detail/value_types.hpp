@@ -93,22 +93,22 @@ using IntegerKeyType = std::size_t;
  *
  * The same applies for this DataTree
  */
-struct KeyType : std::variant<StringKeyType, IntegerKeyType> {
+struct KeyOrIdxType : std::variant<StringKeyType, IntegerKeyType> {
   using BaseType = std::variant<StringKeyType, IntegerKeyType>;
 
-  KeyType() = default;
-  KeyType(const KeyType&) = default;
-  KeyType(KeyType&&) = default;
-  KeyType& operator=(const KeyType&) = default;
-  KeyType& operator=(KeyType&&) = default;
+  KeyOrIdxType() = default;
+  KeyOrIdxType(const KeyOrIdxType&) = default;
+  KeyOrIdxType(KeyOrIdxType&&) = default;
+  KeyOrIdxType& operator=(const KeyOrIdxType&) = default;
+  KeyOrIdxType& operator=(KeyOrIdxType&&) = default;
 
-  KeyType(const std::string& key) : BaseType{key} { }
-  KeyType(std::string&& key) : BaseType{std::move(key)} {}
+  KeyOrIdxType(const std::string& key) : BaseType{key} { }
+  KeyOrIdxType(std::string&& key) : BaseType{std::move(key)} {}
 
-  KeyType(const char* key) : BaseType{key} { }
+  KeyOrIdxType(const char* key) : BaseType{key} { }
 
-  KeyType(const std::size_t& idx) : BaseType{idx} { }
-  KeyType(std::size_t&& idx) : BaseType{idx} {}
+  KeyOrIdxType(const std::size_t& idx) : BaseType{idx} { }
+  KeyOrIdxType(std::size_t&& idx) : BaseType{idx} {}
 
   /**
    * @brief Visit a value node type with a visitor overload set
@@ -141,7 +141,7 @@ namespace key_literals {
  * @param idx an index
  * @return a KeyType created from an index
  */
-inline KeyType operator""_k(unsigned long long idx) { return KeyType{idx}; }
+inline KeyOrIdxType operator""_k(unsigned long long idx) { return KeyOrIdxType{idx}; }
 
 /**
  * @brief Helper for string literal KeyType UDL
@@ -165,8 +165,8 @@ struct KeyTypeStringLiteralHelper {
  * @return a KeyType created from a string literal
  */
 template <KeyTypeStringLiteralHelper TLiteralStrKey>
-KeyType operator""_k() {
-  return KeyType{TLiteralStrKey.data};
+KeyOrIdxType operator""_k() {
+  return KeyOrIdxType{TLiteralStrKey.data};
 }
 }  // namespace key_literals
 
@@ -218,12 +218,12 @@ struct Path {
    * @brief Get array of KeyType path items
    * @return array of KeyType path items
    */
-  [[nodiscard]] const std::array<KeyType, NLength>& Items() const {
+  [[nodiscard]] const std::array<KeyOrIdxType, NLength>& Items() const {
     return items;
   }
 
 private:
-  std::array<KeyType, NLength> items;
+  std::array<KeyOrIdxType, NLength> items;
 };
 
 /**
@@ -278,7 +278,7 @@ std::ostream& operator<<(std::ostream& os, const Path<NLength>& path) {
                         [&os](const IntegerKeyType& key_or_idx) {
                           os << "[" << key_or_idx << "]";
                         }},
-               KeyType{arg});
+               KeyOrIdxType{arg});
   });
   return os << std::endl;
 }

@@ -10,20 +10,20 @@
 #ifndef DATATREE_COMMON_HPP
 #define DATATREE_COMMON_HPP
 
+#include <cstdint>
 #include <mutex>
 #include <ranges>
 #include <string>
-#include <cstdint>
 
 #include <nonstd/expected.hpp>
 
 namespace mguid {
 
 /**
- * @brief
- * @param json
- * @param tab_width
- * @return
+ * @brief Prettify a JSON string
+ * @param json a JSON string
+ * @param tab_width width of indentation in pretty printed output
+ * @return pretty formatted json
  */
 [[nodiscard]] inline std::string PrettifyJson(const std::string& json,
                                               std::size_t tab_width = 2) {
@@ -86,6 +86,99 @@ Overload(TNonFinalCallables...) -> Overload<TNonFinalCallables...>;
  */
 using nonstd::expected;
 using nonstd::make_unexpected;
+
+/**
+ * @brief Extension for expected that hides the usage of a reference wrapper for
+ * reference types
+ * @tparam TExpectedType reference value type
+ * @tparam TErrorType error type
+ */
+template <typename TExpectedType, typename TErrorType>
+struct RefExpected
+    : private nonstd::expected<std::reference_wrapper<TExpectedType>,
+                               TErrorType> {
+  using BaseType = expected<std::reference_wrapper<TExpectedType>, TErrorType>;
+  using ValueType = TExpectedType;
+
+  using BaseType::BaseType;
+  using BaseType::operator=;
+  using BaseType::operator bool;
+  using BaseType::emplace;
+  using BaseType::error;
+  using BaseType::has_exception;
+  using BaseType::has_value;
+  using BaseType::swap;
+
+  /**
+   * @brief Construct a RefExpected from a TExpectedType reference
+   * @param ref a TExpectedType reference
+   */
+  constexpr RefExpected(TExpectedType& ref) : BaseType(std::ref(ref)) {}
+
+  /**
+   * @brief Get const reference to value from this
+   *
+   * The normal expected::value overloads are private
+   *
+   * @return const reference to ValueType
+   */
+  [[nodiscard]] constexpr const ValueType& value() const& {
+    return this->BaseType::value().get();
+  }
+
+  /**
+   * @brief Get value from this
+   *
+   * The normal expected::value overloads are private
+   *
+   * @return reference to ValueType
+   */
+  [[nodiscard]] ValueType& value() & { return this->BaseType::value().get(); }
+
+  /**
+   * @brief Get const pointer to value from this
+   *
+   * The normal expected::operator-> overloads are private
+   *
+   * @return const pointer to ValueType
+   */
+  [[nodiscard]] constexpr const ValueType* operator->() const {
+    return &(this->BaseType::value().get());
+  }
+
+  /**
+   * @brief Get pointer to value from this
+   *
+   * The normal expected::operator-> overloads are private
+   *
+   * @return pointer to ValueType
+   */
+  [[nodiscard]] ValueType* operator->() {
+    return &(this->BaseType::value().get());
+  }
+
+  /**
+   * @brief Get const reference to value from this
+   *
+   * The normal expected::operator* overloads are private
+   *
+   * @return const reference to ValueType
+   */
+  [[nodiscard]] constexpr const ValueType& operator*() const& {
+    return this->BaseType::value().get();
+  }
+
+  /**
+   * @brief Get reference to value from this
+   *
+   * The normal expected::operator* overloads are private
+   *
+   * @return reference to ValueType
+   */
+  [[nodiscard]] ValueType& operator*() & {
+    return this->BaseType::value().get();
+  }
+};
 
 /**
  * @brief Invokes undefined behavior. An implementation may use this to optimize

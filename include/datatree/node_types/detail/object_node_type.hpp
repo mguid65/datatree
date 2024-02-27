@@ -45,6 +45,9 @@ public:
   using Iterator = MapType::iterator;
   using ConstIterator = MapType::const_iterator;
 
+  using ExpectedRType = RefExpected<MappedType, Error>;
+  using ConstExpectedRType = RefExpected<const MappedType, Error>;
+
   /**
    * @brief Default construct an ObjectNodeType
    */
@@ -89,31 +92,11 @@ public:
    * error
    */
   [[nodiscard]] auto Get(const KeyType& key) const
-      -> expected<MappedType, Error> {
-    if (auto iter = m_children.find(key);
-        iter != m_children.end()) {
+      -> ConstExpectedRType {
+    if (auto iter = m_children.find(key); iter != m_children.end()) {
       return iter->second;
     }
     return make_unexpected(Error{.category = Error::Category::KeyError});
-  }
-
-  /**
-   * @brief Try to get a copy of the node id with the specified key, or return
-   * the provided default value
-   * @tparam TDefault type of the default value, must be convertible to uuid
-   * @param key the key of the node id to find
-   * @param default_value the default value to return if the key is not found
-   * @return the associated node id if the key it exists, otherwise the provided
-   * default value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetOr(const KeyType& key, TDefault&& default_value) const
-      -> expected<MappedType, Error> {
-    if (auto iter = m_children.find(key);
-        iter != m_children.end()) {
-      return iter->second;
-    }
-    return static_cast<MappedType>(std::forward<TDefault>(default_value));
   }
 
   /**
@@ -162,8 +145,7 @@ public:
    */
   template <typename TConvertibleToValueType>
   auto Insert(TConvertibleToValueType&& value) -> std::pair<Iterator, bool> {
-    return m_children.insert(
-        std::forward<TConvertibleToValueType>(value));
+    return m_children.insert(std::forward<TConvertibleToValueType>(value));
   }
 
   /**
@@ -293,8 +275,7 @@ public:
   template <typename TValue>
   auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj)
       -> Iterator {
-    return m_children.insert_or_assign(hint, key,
-                                             std::forward<TValue>(obj));
+    return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
   /**
@@ -326,8 +307,7 @@ public:
   template <typename TValue>
   auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj)
       -> Iterator {
-    return m_children.insert_or_assign(hint, key,
-                                             std::forward<TValue>(obj));
+    return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
   /**
@@ -434,8 +414,7 @@ public:
   template <typename... TArgs>
   auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args)
       -> Iterator {
-    return m_children.try_emplace(hint, key,
-                                        std::forward<TArgs>(args)...);
+    return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
   /**
@@ -462,8 +441,7 @@ public:
   template <typename... TArgs>
   auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args)
       -> Iterator {
-    return m_children.try_emplace(hint, key,
-                                        std::forward<TArgs>(args)...);
+    return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
   // Note: I haven't exposed the ranged erase:
@@ -484,17 +462,73 @@ public:
    * @param pos iterator to the element to remove
    * @return Iterator following the last removed element.
    */
-  auto Erase(ConstIterator pos) -> Iterator {
-    return m_children.erase(pos);
-  }
+  auto Erase(ConstIterator pos) -> Iterator { return m_children.erase(pos); }
 
   /**
    * @brief Removes the element (if one exists) with the key equivalent to key.
    * @param key key value of the elements to remove
    * @return Number of elements removed (0 or 1).
    */
-  auto Erase(const KeyType& key) -> SizeType {
-    return m_children.erase(key);
+  auto Erase(const KeyType& key) -> SizeType { return m_children.erase(key); }
+
+  /**
+   * @brief Returns a reference to the mapped value of the element with
+   * specified key.
+   *
+   * @throws std::out_of_range if key doesnt exist
+   * @param key the key of the element to find
+   * @return A reference to the mapped value of the requested element.
+   */
+  [[nodiscard]] auto At(const KeyType& key) -> MappedType& {
+    return m_children.at(key);
+  }
+
+  /**
+   * @brief Returns a reference to the mapped value of the element with
+   * specified key.
+   *
+   * @throws std::out_of_range if key doesnt exist
+   * @param key the key of the element to find
+   * @return A reference to the mapped value of the requested element.
+   */
+  [[nodiscard]] auto At(const KeyType& key) const -> const MappedType& {
+    return m_children.at(key);
+  }
+
+  /**
+   * @brief Returns a reference to the value that is mapped to a key equivalent
+   * to `key`, performing an insertion if such key does not already exist.
+   * @param key the key of the element to find
+   * @return A reference to the mapped value of the requested element.
+   */
+  [[nodiscard]] auto operator[](const KeyType& key) -> MappedType& {
+    return m_children[key];
+  }
+
+  /**
+   * @brief Returns a reference to the value that is mapped to a key equivalent
+   * to `key`, performing an insertion if such key does not already exist.
+   * @param key the key of the element to find
+   * @return A reference to the mapped value of the requested element.
+   */
+  [[nodiscard]] auto operator[](KeyType&& key) -> MappedType& {
+    return m_children[std::move(key)];
+  }
+
+  /**
+   * @brief Returns a reference to the value that is mapped to a key
+   * equivalent to `key`
+   *
+   * NOTE_BEGIN: Not sure if this overload should be included, however, this is
+   * consistent with what ArrayNodeType does. The functionality for what
+   * ArrayNodeType does is based on what nlohmann::json does. NOTE_END
+   *
+   * @throws std::out_of_range if key doesnt exist
+   * @param key the key of the element to find
+   * @return A reference to the mapped value of the requested element.
+   */
+  [[nodiscard]] auto operator[](const KeyType& key) const -> const MappedType& {
+    return m_children.at(key);
   }
 
   /**
@@ -547,9 +581,7 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto Begin() noexcept -> Iterator {
-    return m_children.begin();
-  }
+  [[nodiscard]] auto Begin() noexcept -> Iterator { return m_children.begin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
@@ -592,9 +624,7 @@ public:
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] auto End() noexcept -> Iterator {
-    return m_children.end();
-  }
+  [[nodiscard]] auto End() noexcept -> Iterator { return m_children.end(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the

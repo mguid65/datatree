@@ -51,6 +51,8 @@ inline std::ostream& operator<<(std::ostream& os, const mguid::NullType&) {
   return os << "null";
 }
 
+constexpr static auto Null = NullType{};
+
 }  // namespace mguid
 
 namespace std {

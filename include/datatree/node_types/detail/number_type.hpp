@@ -221,7 +221,7 @@ public:
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  auto Visit(TCallables&&... callables) {
+  decltype(auto) Visit(TCallables&&... callables) {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     switch (m_tag) {
       case TypeTag::Int: {
@@ -246,7 +246,7 @@ public:
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  auto Visit(TCallables&&... callables) const {
+  decltype(auto) Visit(TCallables&&... callables) const {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     switch (m_tag) {
       case TypeTag::Int: {

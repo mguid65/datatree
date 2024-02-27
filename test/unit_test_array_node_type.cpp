@@ -90,32 +90,32 @@ TEST_CASE("Array Node Type Try Set") {
   }
 }
 
-TEST_CASE("Array Node Type Front") {
+TEST_CASE("Array Node Type TryFront") {
   auto test_id_1 = mguid::TreeNode{mguid::ValueNodeType{1}};
   auto test_id_2 = mguid::TreeNode{mguid::ValueNodeType{2}};
-  SECTION("Front Has Elements") {
+  SECTION("TryFront Has Elements") {
     mguid::ArrayNodeType ant1{test_id_1, test_id_2};
-    auto result = ant1.Front();
+    auto result = ant1.TryFront();
     REQUIRE(result.has_value());
     REQUIRE(result.value() == test_id_1);
   }
-  SECTION("Front Empty") {
+  SECTION("TryFront Empty") {
     mguid::ArrayNodeType ant1;
-    REQUIRE(ant1.Front().has_exception<mguid::Error>());
+    REQUIRE(ant1.TryFront().has_exception<mguid::Error>());
   }
 }
 
-TEST_CASE("Array Node Type Back") {
+TEST_CASE("Array Node Type TryBack") {
   auto test_id_1 = mguid::TreeNode{mguid::ValueNodeType{1}};
   auto test_id_2 = mguid::TreeNode{mguid::ValueNodeType{2}};
-  SECTION("Back Has Elements") {
+  SECTION("TryBack Has Elements") {
     mguid::ArrayNodeType ant1{test_id_1, test_id_2};
-    auto result = ant1.Back();
+    auto result = ant1.TryBack();
     REQUIRE(result.value() == test_id_2);
   }
-  SECTION("Back Empty") {
+  SECTION("TryBack Empty") {
     mguid::ArrayNodeType ant1;
-    REQUIRE(ant1.Back().has_exception<mguid::Error>());
+    REQUIRE(ant1.TryBack().has_exception<mguid::Error>());
   }
 }
 
@@ -472,29 +472,29 @@ TEST_CASE("Array Node Type Erase") {
     }
   }
 }
-TEST_CASE("Array Node Type Push Back") {
-  SECTION("Push Back") {
+TEST_CASE("Array Node Type Push TryBack") {
+  SECTION("Push TryBack") {
     mguid::ArrayNodeType ant1;
     ant1.PushBack({});
     ant1.PushBack(mguid::TreeNode{});
     REQUIRE(ant1.Size() == 2);
   }
 }
-TEST_CASE("Array Node Type Emplace Back") {
-  SECTION("Emplace Back") {
+TEST_CASE("Array Node Type Emplace TryBack") {
+  SECTION("Emplace TryBack") {
     mguid::ArrayNodeType ant1;
     ant1.EmplaceBack(mguid::TreeNode{});
     REQUIRE(ant1.Size() == 1);
   }
 }
 
-TEST_CASE("Array Node Type Pop Back") {
-  SECTION("Pop Back Empty") {
+TEST_CASE("Array Node Type Pop TryBack") {
+  SECTION("Pop TryBack Empty") {
     mguid::ArrayNodeType ant1;
     ant1.PopBack();
     REQUIRE(ant1.Empty());
   }
-  SECTION("Pop Back Not Empty") {
+  SECTION("Pop TryBack Not Empty") {
     {
       mguid::ArrayNodeType ant1{{}};
       REQUIRE(ant1.Size() == 1);
@@ -506,7 +506,7 @@ TEST_CASE("Array Node Type Pop Back") {
 
       mguid::ArrayNodeType ant1{mguid::TreeNode{}, test_id_1};
       ant1.PopBack();
-      REQUIRE(ant1.Back().value().HasObject());
+      REQUIRE(ant1.TryBack().value().HasObject());
     }
   }
 }

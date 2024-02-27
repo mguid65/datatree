@@ -37,10 +37,14 @@ public:
   using ArrayType = std::vector<TreeNode>;
   using ValueType = ArrayType::value_type;
   using SizeType = ArrayType::size_type;
+  using DifferenceType = ArrayType::difference_type;
   using Iterator = ArrayType::iterator;
   using ConstIterator = ArrayType::const_iterator;
   using ReverseIterator = ArrayType::reverse_iterator;
   using ConstReverseIterator = ArrayType::const_reverse_iterator;
+
+  using ExpectedRType = RefExpected<ValueType, Error>;
+  using ConstExpectedRType = RefExpected<const ValueType, Error>;
 
   /**
    * @brief Default construct an ArrayNodeType
@@ -83,7 +87,7 @@ public:
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
-  [[nodiscard]] auto TryGet(SizeType pos) const -> expected<ValueType, Error> {
+  [[nodiscard]] auto TryGet(SizeType pos) const -> ConstExpectedRType {
     if (ValidIndex(pos)) {
       BEGIN_SUPPRESS_ARRAY_BOUNDS
       return {m_underlying[pos]};
@@ -93,7 +97,9 @@ public:
   }
 
   /**
-   * @brief Access the specified element with bounds checking
+   * @brief Access the specified element, if the element
+   * does not exist, creates all elements up to and including the new index
+   * initialized to ValueNodeType{NullType}
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
@@ -108,6 +114,24 @@ public:
    * @return copy of the element at pos or Error
    */
   [[nodiscard]] auto Get(SizeType pos) const -> const ValueType& {
+    return m_underlying[pos];
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto At(SizeType pos) -> ValueType& {
+    return m_underlying[pos];
+  }
+
+  /**
+   * @brief Access the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return copy of the element at pos or Error
+   */
+  [[nodiscard]] auto At(SizeType pos) const -> const ValueType& {
     return m_underlying[pos];
   }
 
@@ -158,10 +182,11 @@ public:
   }
 
   /**
-   * @brief Get the element at the front of this ArrayNodeType
-   * @return the element at the front of this ArrayNodeType
+   * @brief Get the element at the front of this ArrayNodeType with bounds
+   * checking
+   * @return the element at the front of this ArrayNodeType or OutOfRange
    */
-  [[nodiscard]] auto Front() const -> expected<ValueType, Error> {
+  [[nodiscard]] auto TryFront() const -> ConstExpectedRType {
     if (Empty()) {
       return make_unexpected(Error{.category = Error::Category::OutOfRange});
     }
@@ -169,15 +194,74 @@ public:
   }
 
   /**
-   * @brief Get the element at the Back of this ArrayNodeType
-   * @return the element at the Back of this ArrayNodeType
+   * @brief Get the element at the back of this ArrayNodeType with bounds
+   * checking
+   * @return the element at the back of this ArrayNodeType or OutOfRange
    */
-  [[nodiscard]] auto Back() const -> expected<ValueType, Error> {
+  [[nodiscard]] auto TryBack() const -> ConstExpectedRType {
     if (Empty()) {
       return make_unexpected(Error{.category = Error::Category::OutOfRange});
     }
     return m_underlying.back();
   }
+
+
+  /**
+   * @brief Get the element at the front of this ArrayNodeType with bounds
+   * checking
+   * @return the element at the front of this ArrayNodeType or OutOfRange
+   */
+  [[nodiscard]] auto TryFront() -> ExpectedRType {
+    if (Empty()) {
+      return make_unexpected(Error{.category = Error::Category::OutOfRange});
+    }
+    return m_underlying.front();
+  }
+
+  /**
+   * @brief Get the element at the back of this ArrayNodeType with bounds
+   * checking
+   * @return the element at the back of this ArrayNodeType or OutOfRange
+   */
+  [[nodiscard]] auto TryBack() -> ExpectedRType {
+    if (Empty()) {
+      return make_unexpected(Error{.category = Error::Category::OutOfRange});
+    }
+    return m_underlying.back();
+  }
+
+  /**
+   * @brief Get the element at the front of this ArrayNodeType
+   * @return the element at the front of this ArrayNodeType
+   */
+  [[nodiscard]] auto Front() const -> const ValueType& {
+    return m_underlying.front();
+  }
+
+  /**
+   * @brief Get the element at the back of this ArrayNodeType
+   * @return the element at the back of this ArrayNodeType
+   */
+  [[nodiscard]] auto Back() const -> const ValueType& {
+    return m_underlying.back();
+  }
+
+  /**
+   * @brief Get the element at the front of this ArrayNodeType
+   * @return the element at the front of this ArrayNodeType
+   */
+  [[nodiscard]] auto Front() -> ValueType& {
+    return m_underlying.front();
+  }
+
+  /**
+   * @brief Get the element at the back of this ArrayNodeType
+   * @return the element at the back of this ArrayNodeType
+   */
+  [[nodiscard]] auto Back() -> ValueType& {
+    return m_underlying.back();
+  }
+
 
   /**
    * @brief Check if this ArrayNodeType is empty

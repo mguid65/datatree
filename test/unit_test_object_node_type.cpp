@@ -94,17 +94,6 @@ TEST_CASE("Object Node Type TryGet") {
   }
 }
 
-TEST_CASE("Object Node Type TryGet Or") {
-  SECTION("Key Exists") {
-    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
-    REQUIRE(ont1.GetOr("key", mguid::TreeNode{}).has_value());
-  }
-  SECTION("Key Doesn't Exist") {
-    mguid::ObjectNodeType ont1;
-    REQUIRE(ont1.GetOr("key", mguid::TreeNode{}).has_value());
-  }
-}
-
 TEST_CASE("Object Node Type Clear") {
   SECTION("Already Empty") {
     mguid::ObjectNodeType ont1;
