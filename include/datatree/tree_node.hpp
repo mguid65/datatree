@@ -499,7 +499,7 @@ public:
    * @param key_or_idx the key/idx of the TreeNode to erase
    * @return true if element was removed, otherwise false
    */
-  bool Erase(const KeyOrIdxType& key_or_idx);
+  inline bool Erase(const KeyOrIdxType& key_or_idx);
 
 private:
   /**
@@ -860,7 +860,7 @@ inline auto TreeNode::operator[](const KeyOrIdxType& key_or_idx) const
       });
 }
 
-bool TreeNode::Erase(const KeyOrIdxType& key_or_idx) {
+inline bool TreeNode::Erase(const KeyOrIdxType& key_or_idx) {
   return key_or_idx.Visit(
       [&](const StringKeyType& key) -> bool {
         if (!HasObject()) { return false; }
