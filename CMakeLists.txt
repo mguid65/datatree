@@ -22,7 +22,6 @@ if (SANITIZER)
 endif ()
 
 find_package(expected-lite REQUIRED)
-find_package(nlohmann_json REQUIRED)
 
 set(DATATREE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/common.hpp
@@ -42,7 +41,7 @@ set(DATATREE_HEADERS
 add_library(datatree INTERFACE)
 target_include_directories(datatree INTERFACE include)
 target_sources(datatree INTERFACE ${DATATREE_HEADERS})
-target_link_libraries(datatree INTERFACE nonstd::expected-lite nlohmann_json::nlohmann_json)
+target_link_libraries(datatree INTERFACE nonstd::expected-lite)
 set_target_properties(datatree PROPERTIES LINKER_LANGUAGE CXX)
 
 include(CTest)

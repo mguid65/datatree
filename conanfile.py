@@ -28,7 +28,6 @@ class DataTreeConan(ConanFile):
 
     def requirements(self):
         self.requires('expected-lite/0.6.3', transitive_headers=True)
-        self.requires('nlohmann_json/3.11.3', transitive_headers=True)
 
         self.test_requires('catch2/3.5.2')
 
