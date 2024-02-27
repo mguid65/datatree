@@ -23,11 +23,13 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
             conan_profile: default-windows
+            preset_name: conan-default
           - os: ubuntu-latest
             build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
             conan_profile: default-ubuntu
+            preset_name: conan-release
 
     steps:
     - uses: actions/checkout@v3
@@ -49,10 +51,10 @@ jobs:
       run: conan install . -b missing
 
     - name: Configure CMake
-      run: cmake --preset conan-release
+      run: cmake --preset ${{matrix.preset_name}}
 
     - name: Build
-      run: cmake --build --preset conan-release
+      run: cmake --build --preset ${{matrix.preset_name}}
 
     - name: Conan Create
       run: conan create . -b missing
