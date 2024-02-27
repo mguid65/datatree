@@ -117,20 +117,20 @@ TEST_CASE("Tree Node TryGet Type") {
   SECTION("TryGet Object Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.TryGetObject().has_exception<mguid::Error>());
-    REQUIRE(tn2.TryGetObject().has_exception<mguid::Error>());
+    REQUIRE_FALSE(tn1.TryGetObject().has_value());
+    REQUIRE_FALSE(tn2.TryGetObject().has_value());
   }
   SECTION("TryGet Array Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.TryGetArray().has_exception<mguid::Error>());
-    REQUIRE(tn2.TryGetArray().has_exception<mguid::Error>());
+    REQUIRE_FALSE(tn1.TryGetArray().has_value());
+    REQUIRE_FALSE(tn2.TryGetArray().has_value());
   }
   SECTION("TryGet Value Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Array};
-    REQUIRE(tn1.TryGetValue().has_exception<mguid::Error>());
-    REQUIRE(tn2.TryGetValue().has_exception<mguid::Error>());
+    REQUIRE_FALSE(tn1.TryGetValue().has_value());
+    REQUIRE_FALSE(tn2.TryGetValue().has_value());
   }
 }
 

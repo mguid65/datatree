@@ -15,7 +15,7 @@
 #include <ranges>
 #include <string>
 
-#include <nonstd/expected.hpp>
+#include <tl/expected.hpp>
 
 namespace mguid {
 
@@ -84,8 +84,8 @@ Overload(TNonFinalCallables...) -> Overload<TNonFinalCallables...>;
 /**
  * @brief Doing this to get expected-lite things
  */
-using nonstd::expected;
-using nonstd::make_unexpected;
+using tl::expected;
+using tl::make_unexpected;
 
 /**
  * @brief Extension for expected that hides the usage of a reference wrapper for
@@ -95,7 +95,7 @@ using nonstd::make_unexpected;
  */
 template <typename TExpectedType, typename TErrorType>
 struct RefExpected
-    : private nonstd::expected<std::reference_wrapper<TExpectedType>,
+    : private expected<std::reference_wrapper<TExpectedType>,
                                TErrorType> {
   using BaseType = expected<std::reference_wrapper<TExpectedType>, TErrorType>;
   using ValueType = TExpectedType;
@@ -105,7 +105,6 @@ struct RefExpected
   using BaseType::operator bool;
   using BaseType::emplace;
   using BaseType::error;
-  using BaseType::has_exception;
   using BaseType::has_value;
   using BaseType::swap;
 

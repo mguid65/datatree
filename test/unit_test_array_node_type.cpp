@@ -49,7 +49,7 @@ TEST_CASE("Array Node Type Try Get") {
   SECTION("Get Invalid Index Empty") {
     mguid::ArrayNodeType ant1;
     auto result = ant1.TryGet(0);
-    REQUIRE(result.has_exception<mguid::Error>());
+    REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
   SECTION("Get Not Empty") {
@@ -67,7 +67,7 @@ TEST_CASE("Array Node Type Try Get") {
   SECTION("Get Invalid Index Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
     auto result = ant1.TryGet(4);
-    REQUIRE(result.has_exception<mguid::Error>());
+    REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
 }
@@ -76,16 +76,16 @@ TEST_CASE("Array Node Type Try Set") {
   SECTION("Set Valid Index") {
     auto test_id = mguid::TreeNode{};
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
-    REQUIRE_FALSE(ant1.TrySet(0, test_id).has_exception<mguid::Error>());
-    REQUIRE_FALSE(ant1.TrySet(1, test_id).has_exception<mguid::Error>());
-    REQUIRE_FALSE(ant1.TrySet(2, test_id).has_exception<mguid::Error>());
-    REQUIRE_FALSE(ant1.TrySet(3, test_id).has_exception<mguid::Error>());
+    REQUIRE(ant1.TrySet(0, test_id).has_value());
+    REQUIRE(ant1.TrySet(1, test_id).has_value());
+    REQUIRE(ant1.TrySet(2, test_id).has_value());
+    REQUIRE(ant1.TrySet(3, test_id).has_value());
   }
   SECTION("Set Invalid Index") {
     mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
                               mguid::TreeNode{}, mguid::TreeNode{}};
     auto result = ant1.TrySet(4, mguid::TreeNode{});
-    REQUIRE(result.has_exception<mguid::Error>());
+    REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
   }
 }
@@ -101,7 +101,7 @@ TEST_CASE("Array Node Type TryFront") {
   }
   SECTION("TryFront Empty") {
     mguid::ArrayNodeType ant1;
-    REQUIRE(ant1.TryFront().has_exception<mguid::Error>());
+    REQUIRE_FALSE(ant1.TryFront().has_value());
   }
 }
 
@@ -115,7 +115,7 @@ TEST_CASE("Array Node Type TryBack") {
   }
   SECTION("TryBack Empty") {
     mguid::ArrayNodeType ant1;
-    REQUIRE(ant1.TryBack().has_exception<mguid::Error>());
+    REQUIRE_FALSE(ant1.TryBack().has_value());
   }
 }
 
