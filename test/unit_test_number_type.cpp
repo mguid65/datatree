@@ -547,9 +547,127 @@ TEST_CASE("Number Type Comparison") {
 
 TEST_CASE("Number Type Visit") {
   SECTION("Visit") {
-
+    {
+      mguid::NumberType nt1{std::int8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{float{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{double{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
   }
   SECTION("Visit Const") {
-
+    {
+      const mguid::NumberType nt1{std::int8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{float{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{double{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
   }
 }
