@@ -42,8 +42,7 @@ jobs:
       run: conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
 
     - name: Rename Conan Profile
-      shell: bash
-      run: mv ${conan config home}/profiles/${{matrix.conan_profile}} ${conan config home}/profiles/default
+      run: mv $(conan config home)/profiles/${{matrix.conan_profile}} $(conan config home)/profiles/default
 
     - name: Run Conan
       run: conan install . -b missing
