@@ -237,6 +237,7 @@ public:
         return std::invoke(overload_set, m_union.none);
       }
     }
+    return std::invoke(overload_set, NullType{});
   }
 
   /**
@@ -262,6 +263,7 @@ public:
         return std::invoke(overload_set, m_union.none);
       }
     }
+    return std::invoke(overload_set, NullType{});
   }
 
   /**
