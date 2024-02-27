@@ -68,7 +68,7 @@ class NumberType {
 public:
   // The ordering of these enums matter
   // It affects the three-way comparison
-  enum class TypeTag { None, Int, UInt, Double };
+  enum class TypeTag : std::uint8_t { Int, UInt, Double };
 
   /**
    * @brief Default construct a number with no value
@@ -86,14 +86,6 @@ public:
   constexpr NumberType& operator=(NumberType&&) noexcept = default;
 
   /**
-   * @brief Nullptr constructor overload
-   *
-   * This does the same thing as the default constructor but
-   * it may help readability in usage scenarios by being explicit.
-   */
-  constexpr explicit NumberType(std::nullptr_t) noexcept {}
-
-  /**
    * @brief Construct a NumberType from a value
    * @tparam TValueType type of value constrained by AllowedNumericType
    * @param val numeric value
@@ -101,14 +93,6 @@ public:
   template <detail::AllowedNumericType TValueType>
   constexpr explicit NumberType(TValueType&& val) noexcept {
     this->operator=(val);
-  }
-
-  /**
-   * @brief Does this number have a value
-   * @return True if it has a value, otherwise false
-   */
-  [[nodiscard]] constexpr auto HasValue() const noexcept -> bool {
-    return m_tag != TypeTag::None;
   }
 
   /**
@@ -210,18 +194,32 @@ public:
    * @brief Reset the state of this number container
    */
   constexpr void Reset() noexcept {
-    m_tag = TypeTag::None;
-    m_union.none = NullType{};
+    m_tag = TypeTag::Int;
+    m_union.i_value = IntegerType{0};
   }
 
   /**
    * @brief Visit a tree node with a visitor overload set
+   *
+   * if an `auto&&` overload is provided, then it will be preferred.
+   * Use `auto` as a catch all overload
+   *
    * @tparam TCallables set of non final callable types
    * @param callables set of non final callables
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  decltype(auto) Visit(TCallables&&... callables) {
+  decltype(auto) Visit(TCallables&&... callables)
+    requires(std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 IntegerType&> &&
+             std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 UnsignedIntegerType&> &&
+             std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 DoubleType&>)
+  {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     switch (m_tag) {
       case TypeTag::Int: {
@@ -233,21 +231,32 @@ public:
       case TypeTag::Double: {
         return std::invoke(overload_set, m_union.f_value);
       }
-      case TypeTag::None: {
-        return std::invoke(overload_set, m_union.none);
-      }
     }
-    return std::invoke(overload_set, NullType{});
+    Unreachable();
   }
 
   /**
    * @brief Visit a tree node with a visitor overload set
+   *
+   * if an `auto&&` overload is provided, then it will be preferred.
+   * Use `auto` as a catch all overload
+   *
    * @tparam TCallables set of non final callable types
    * @param callables set of non final callables
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  decltype(auto) Visit(TCallables&&... callables) const {
+  decltype(auto) Visit(TCallables&&... callables) const
+    requires(std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 const IntegerType&> &&
+             std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 const UnsignedIntegerType&> &&
+             std::is_invocable_v<decltype(Overload{
+                                     std::forward<TCallables>(callables)...}),
+                                 const DoubleType&>)
+  {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     switch (m_tag) {
       case TypeTag::Int: {
@@ -259,11 +268,8 @@ public:
       case TypeTag::Double: {
         return std::invoke(overload_set, m_union.f_value);
       }
-      case TypeTag::None: {
-        return std::invoke(overload_set, m_union.none);
-      }
     }
-    return std::invoke(overload_set, NullType{});
+    Unreachable();
   }
 
   /**
@@ -273,11 +279,9 @@ public:
    */
   [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const
       -> std::partial_ordering {
-    if (m_tag == TypeTag::None && m_tag == other.m_tag) {
-      return std::strong_ordering::equal;
-    }
     if (m_tag != other.m_tag) {
-      return static_cast<int>(m_tag) <=> static_cast<int>(other.m_tag);
+      return static_cast<std::uint8_t>(m_tag) <=>
+             static_cast<std::uint8_t>(other.m_tag);
     }
     switch (m_tag) {
       case TypeTag::Double:
@@ -298,7 +302,6 @@ public:
    */
   [[nodiscard]] constexpr auto operator==(const NumberType& other) const
       -> bool {
-    if (m_tag == TypeTag::None && m_tag == other.m_tag) { return true; }
     if (m_tag != other.m_tag) { return false; }
     switch (m_tag) {
       case TypeTag::Double:
@@ -308,19 +311,23 @@ public:
       case TypeTag::Int:
         return m_union.i_value == other.m_union.i_value;
       default:
+        // This is what happens if the user does bad things and somehow sets a
+        // tag value outside the range of the enum although, they would have to
+        // do something bad like
+        //
+        //  char bytes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0};
+        //  reinterpret_cast<mguid::NumberType*>(&bytes);
         return false;
     }
   }
 
 private:
-  TypeTag m_tag{TypeTag::None};
   union {
-    // Default value and initialized for constexpr contexts
-    NullType none{};
-    DoubleType f_value;
-    IntegerType i_value;
+    IntegerType i_value{0};
     UnsignedIntegerType u_value;
+    DoubleType f_value;
   } m_union;
+  TypeTag m_tag{TypeTag::Int};
 };
 
 }  // namespace mguid
