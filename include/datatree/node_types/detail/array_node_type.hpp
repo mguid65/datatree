@@ -100,33 +100,12 @@ public:
   }
 
   /**
-   * @brief Access the specified element, if the element
-   * does not exist, creates all elements up to and including the new index
-   * initialized to ValueNodeType{NullType}
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  [[nodiscard]] auto Get(SizeType pos) -> ValueType& {
-    if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
-    return m_underlying[pos];
-  }
-
-  /**
-   * @brief Access the specified element with bounds checking
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  [[nodiscard]] auto Get(SizeType pos) const -> const ValueType& {
-    return m_underlying[pos];
-  }
-
-  /**
    * @brief Access the specified element with bounds checking
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
   [[nodiscard]] auto At(SizeType pos) -> ValueType& {
-    return m_underlying[pos];
+    return m_underlying.at(pos);
   }
 
   /**
@@ -135,7 +114,7 @@ public:
    * @return copy of the element at pos or Error
    */
   [[nodiscard]] auto At(SizeType pos) const -> const ValueType& {
-    return m_underlying[pos];
+    return m_underlying.at(pos);
   }
 
   /**
