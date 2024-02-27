@@ -62,9 +62,6 @@ jobs:
         # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
-    #   If the Autobuild fails above, remove it and uncomment the following three lines.
-    #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
-
     - name: Install Conan
       id: conan
       uses: turtlebrowser/get-conan@main
@@ -75,7 +72,11 @@ jobs:
       run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Conan Profile Install
-      run: conan config install ${{github.workspace}}/.github/conan/default -tf=profiles
+      run: conan config install ${{github.workspace}}/.github/conan/${{matrix.conan_profile}} -tf=profiles
+
+    - name: Rename Conan Profile
+      shell: bash
+      run: mv $(conan config home)/profiles/${{matrix.conan_profile}} $(conan config home)/profiles/default
 
     - name: Run Conan
       run: conan install . -b missing
