@@ -16,13 +16,13 @@ TEST_CASE("Tree Node Construction/Assignment") {
     REQUIRE(std::is_copy_constructible_v<mguid::TreeNode>);
   }
   SECTION("Move Constructor") {
-    REQUIRE(std::is_move_constructible_v<mguid::TreeNode>);
+    REQUIRE(std::is_nothrow_move_constructible_v<mguid::TreeNode>);
   }
   SECTION("Copy Assignment") {
     REQUIRE(std::is_copy_assignable_v<mguid::TreeNode>);
   }
   SECTION("Move Assignment") {
-    REQUIRE(std::is_move_assignable_v<mguid::TreeNode>);
+    REQUIRE(std::is_nothrow_move_assignable_v<mguid::TreeNode>);
   }
   SECTION("From Object") {
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ObjectNodeType>);
@@ -101,36 +101,36 @@ TEST_CASE("Tree Node Has Type") {
   }
 }
 
-TEST_CASE("Tree Node Get Type") {
-  SECTION("Get Object") {
+TEST_CASE("Tree Node TryGet Type") {
+  SECTION("TryGet Object") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
-    REQUIRE(tn1.GetObject().has_value());
+    REQUIRE(tn1.TryGetObject().has_value());
   }
-  SECTION("Get Array") {
+  SECTION("TryGet Array") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
-    REQUIRE(tn1.GetArray().has_value());
+    REQUIRE(tn1.TryGetArray().has_value());
   }
-  SECTION("Get Value") {
+  SECTION("TryGet Value") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.GetValue().has_value());
+    REQUIRE(tn1.TryGetValue().has_value());
   }
-  SECTION("Get Object Bad Access") {
+  SECTION("TryGet Object Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.GetObject().has_exception<mguid::Error>());
-    REQUIRE(tn2.GetObject().has_exception<mguid::Error>());
+    REQUIRE(tn1.TryGetObject().has_exception<mguid::Error>());
+    REQUIRE(tn2.TryGetObject().has_exception<mguid::Error>());
   }
-  SECTION("Get Array Bad Access") {
+  SECTION("TryGet Array Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.GetArray().has_exception<mguid::Error>());
-    REQUIRE(tn2.GetArray().has_exception<mguid::Error>());
+    REQUIRE(tn1.TryGetArray().has_exception<mguid::Error>());
+    REQUIRE(tn2.TryGetArray().has_exception<mguid::Error>());
   }
-  SECTION("Get Value Bad Access") {
+  SECTION("TryGet Value Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Array};
-    REQUIRE(tn1.GetValue().has_exception<mguid::Error>());
-    REQUIRE(tn2.GetValue().has_exception<mguid::Error>());
+    REQUIRE(tn1.TryGetValue().has_exception<mguid::Error>());
+    REQUIRE(tn2.TryGetValue().has_exception<mguid::Error>());
   }
 }
 
@@ -138,17 +138,17 @@ TEST_CASE("Tree Node Set") {
   SECTION("Set Object") {
     mguid::TreeNode tn1;
     tn1.Set(mguid::ObjectNodeType{});
-    REQUIRE(tn1.GetObject().has_value());
+    REQUIRE(tn1.TryGetObject().has_value());
   }
   SECTION("Set Array") {
     mguid::TreeNode tn1;
     tn1.Set(mguid::ArrayNodeType{});
-    REQUIRE(tn1.GetArray().has_value());
+    REQUIRE(tn1.TryGetArray().has_value());
   }
   SECTION("Set Value") {
     mguid::TreeNode tn1;
     tn1.Set(mguid::ValueNodeType{});
-    REQUIRE(tn1.GetValue().has_value());
+    REQUIRE(tn1.TryGetValue().has_value());
   }
 }
 

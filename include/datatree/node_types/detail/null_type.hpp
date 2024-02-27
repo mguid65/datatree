@@ -1,9 +1,13 @@
 /**
+ * Copyright (c) 2024 Matthew Guidry
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ *
  * @brief Definition of NullType value type
  *
  * Based on the libc++ implementation of std::monostate
  *
- * src: https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h
+ * src:
+ * https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h
  *
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
@@ -38,6 +42,17 @@ inline constexpr std::strong_ordering operator<=>(NullType, NullType) noexcept {
   return std::strong_ordering::equal;
 }
 
+/**
+ * @brief Ostream overload for NullType
+ * @param os reference to an ostream
+ * @return reference to an ostream
+ */
+inline std::ostream& operator<<(std::ostream& os, const mguid::NullType&) {
+  return os << "null";
+}
+
+constexpr static auto Null = NullType{};
+
 }  // namespace mguid
 
 namespace std {
@@ -56,9 +71,11 @@ struct hash<mguid::NullType> {
    * std::hash<std::monostate> specialization in llvm/libc++.
    *
    * In the comments there it claims that
-   * this is "a fundamentally attractive random value"
+   * this is "a fundamentally attractive random value" but it is really just the
+   * fundamental gravitational constant
    *
-   * src: https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h#L56C32-L56C71
+   * src:
+   * https://github.com/llvm/llvm-project/blob/main/libcxx/include/__variant/monostate.h#L56C32-L56C71
    *
    * @return always returns the same unsigned integer value
    */

@@ -4,10 +4,14 @@
  * @date 2024-02-05
  */
 
+#include <type_traits>
+#include <sstream>
+#include <compare>
+#include <functional>
+
 #include <catch2/catch_all.hpp>
 
 #include <datatree/node_types/detail/null_type.hpp>
-#include <type_traits>
 
 TEST_CASE("Null Type Traits") {
   SECTION("Trivially Default Constructible") {
@@ -91,4 +95,13 @@ TEST_CASE("Null Type Hash") {
   REQUIRE(std::is_same_v<decltype(hsh(nt1)), std::size_t>);
   REQUIRE(noexcept(hsh(nt1)));
   REQUIRE(std::is_copy_constructible_v<hash_type>);
+}
+
+TEST_CASE("Null Type Ostream << Operator") {
+  mguid::NullType nt1{};
+  std::ostringstream oss;
+
+  oss << nt1;
+
+  REQUIRE(oss.str() == "null");
 }

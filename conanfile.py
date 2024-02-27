@@ -7,7 +7,7 @@ from conan.tools.build import can_run
 
 class DataTreeConan(ConanFile):
     name = 'datatree'
-    version = '0.0.1'
+    version = '0.0.2'
 
     license = 'MIT'
     author = 'Matthew Guidry'
@@ -28,7 +28,7 @@ class DataTreeConan(ConanFile):
 
     def requirements(self):
         self.requires('expected-lite/0.6.3', transitive_headers=True)
-        self.requires('stduuid/1.2.3', transitive_headers=True)
+
         self.test_requires('catch2/3.5.2')
 
     def test(self):

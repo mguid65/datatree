@@ -35,8 +35,8 @@ cmake --build --preset conan-debug
 - [x] Value node type
 - [x] Object node type
 - [x] Array node type
-- [ ] Tree Node
-- [ ] Data tree
+- [x] Tree Node
+- [x] Data tree
 
 ### Note
 

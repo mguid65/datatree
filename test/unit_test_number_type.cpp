@@ -353,8 +353,8 @@ TEST_CASE("Number Type Value") {
   }
 }
 
-TEST_CASE("Number Type Get Value") {
-  SECTION("Get Valid") {
+TEST_CASE("Number Type TryGet Value") {
+  SECTION("TryGet Valid") {
     {
       mguid::NumberType nt1{std::int8_t{}};
       REQUIRE(nt1.GetInt().has_value());
@@ -396,7 +396,7 @@ TEST_CASE("Number Type Get Value") {
       REQUIRE(nt1.GetDouble().has_value());
     }
   }
-  SECTION("Get Invalid") {
+  SECTION("TryGet Invalid") {
     {
       mguid::NumberType nt1;
       REQUIRE_FALSE(nt1.GetInt().has_value());
@@ -445,7 +445,7 @@ TEST_CASE("Number Type Tag") {
     mguid::NumberType nt1{nullptr};
     REQUIRE(nt1.GetTypeTag() == mguid::NumberType::TypeTag::None);
   }
-  SECTION("Get Valid") {
+  SECTION("TryGet Valid") {
     {
       mguid::NumberType nt1{std::int8_t{}};
       REQUIRE(nt1.GetTypeTag() == mguid::NumberType::TypeTag::Int);
@@ -542,5 +542,132 @@ TEST_CASE("Number Type Comparison") {
     REQUIRE(mguid::NumberType(1u) > mguid::NumberType());
     REQUIRE(mguid::NumberType(1.0) > mguid::NumberType());
     REQUIRE(mguid::NumberType(1.0) > mguid::NumberType(1));
+  }
+}
+
+TEST_CASE("Number Type Visit") {
+  SECTION("Visit") {
+    {
+      mguid::NumberType nt1{std::int8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::int64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{std::uint64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{float{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      mguid::NumberType nt1{double{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+  }
+  SECTION("Visit Const") {
+    {
+      const mguid::NumberType nt1{std::int8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::int64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::IntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint8_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint16_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint32_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{std::uint64_t{}};
+      REQUIRE(nt1.Visit([](const mguid::UnsignedIntegerType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{float{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
+    {
+      const mguid::NumberType nt1{double{}};
+      REQUIRE(nt1.Visit([](const mguid::DoubleType&){
+        return true;
+      }, [](auto){ return false;}));
+    }
   }
 }

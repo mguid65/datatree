@@ -1,4 +1,7 @@
 /**
+ * Copyright (c) 2024 Matthew Guidry
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ *
  * @brief Declarations for value node type
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
@@ -10,6 +13,7 @@
 #include <utility>
 #include <variant>
 
+#include "datatree/common.hpp"
 #include "datatree/node_types/detail/value_types.hpp"
 
 namespace mguid {
@@ -107,7 +111,8 @@ public:
    * @brief Try to get a NullType value from this value node type
    * @return Expected with a NullType value or an Error
    */
-  [[nodiscard]] auto GetNull() const noexcept -> expected<NullType, Error> {
+  [[nodiscard]] auto TryGetNull() const noexcept
+      -> RefExpected<const NullType, Error> {
     if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) {
       return *val;
     }
@@ -117,7 +122,8 @@ public:
    * @brief Try to get a StringType value from this value node type
    * @return Expected with a StringType value or an Error
    */
-  [[nodiscard]] auto GetString() const -> expected<StringType, Error> {
+  [[nodiscard]] auto TryGetString() const noexcept
+      -> RefExpected<const StringType, Error> {
     if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
       return *val;
     }
@@ -127,7 +133,8 @@ public:
    * @brief Try to get a NumberType value from this value node type
    * @return Expected with a NumberType value or an Error
    */
-  [[nodiscard]] auto GetNumber() const noexcept -> expected<NumberType, Error> {
+  [[nodiscard]] auto TryGetNumber() const noexcept
+      -> RefExpected<const NumberType, Error> {
     if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) {
       return *val;
     }
@@ -137,168 +144,114 @@ public:
    * @brief Try to get a BoolType value from this value node type
    * @return Expected with a BoolType value or an Error
    */
-  [[nodiscard]] auto GetBool() const noexcept -> expected<BoolType, Error> {
+  [[nodiscard]] auto TryGetBool() const noexcept
+      -> RefExpected<const BoolType, Error> {
     if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) {
       return *val;
     }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
+  /**
+   * @brief Try to get a NullType value from this value node type
+   * @return Expected with a NullType value or an Error
+   */
+  [[nodiscard]] auto TryGetNull() noexcept -> RefExpected<NullType, Error> {
+    if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) {
+      return *val;
+    }
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
+  }
+  /**
+   * @brief Try to get a StringType value from this value node type
+   * @return Expected with a StringType value or an Error
+   */
+  [[nodiscard]] auto TryGetString() noexcept -> RefExpected<StringType, Error> {
+    if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
+      return *val;
+    }
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
+  }
+  /**
+   * @brief Try to get a NumberType value from this value node type
+   * @return Expected with a NumberType value or an Error
+   */
+  [[nodiscard]] auto TryGetNumber() noexcept -> RefExpected<NumberType, Error> {
+    if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) {
+      return *val;
+    }
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
+  }
+  /**
+   * @brief Try to get a BoolType value from this value node type
+   * @return Expected with a BoolType value or an Error
+   */
+  [[nodiscard]] auto TryGetBool() noexcept -> RefExpected<BoolType, Error> {
+    if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) {
+      return *val;
+    }
+    return make_unexpected(Error{.category = Error::Category::BadAccess});
+  }
+
+  /**
+   * @brief Get a NullType value from this value node type
+   * @return  a NullType value
+   */
+  [[nodiscard]] auto GetNull() const -> const NullType& {
+    return std::get<NullType>(m_variant_value);
+  }
+  /**
+   * @brief Get a StringType value from this value node type
+   * @return  a StringType value
+   */
+  [[nodiscard]] auto GetString() const -> const StringType& {
+    return std::get<StringType>(m_variant_value);
+  }
+  /**
+   * @brief Get a NumberType value from this value node type
+   * @return  a NumberType value
+   */
+  [[nodiscard]] auto GetNumber() const -> const NumberType& {
+    return std::get<NumberType>(m_variant_value);
+  }
+  /**
+   * @brief Get a BoolType value from this value node type
+   * @return  a BoolType value
+   */
+  [[nodiscard]] auto GetBool() const -> const BoolType& {
+    return std::get<BoolType>(m_variant_value);
+  }
+
+  /**
+   * @brief Get a NullType value from this value node type
+   * @return  a NullType value
+   */
+  [[nodiscard]] auto GetNull() -> NullType& {
+    return std::get<NullType>(m_variant_value);
+  }
+  /**
+   * @brief Get a StringType value from this value node type
+   * @return  a StringType value
+   */
+  [[nodiscard]] auto GetString() -> StringType& {
+    return std::get<StringType>(m_variant_value);
+  }
+  /**
+   * @brief Get a NumberType value from this value node type
+   * @return  a NumberType value
+   */
+  [[nodiscard]] auto GetNumber() -> NumberType& {
+    return std::get<NumberType>(m_variant_value);
+  }
+  /**
+   * @brief Get a BoolType value from this value node type
+   * @return  a BoolType value
+   */
+  [[nodiscard]] auto GetBool() -> BoolType& {
+    return std::get<BoolType>(m_variant_value);
+  }
+
   // VERY DRY SECTION, TRUST ME
-
-  /**
-   * @brief Try to get a NullType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * NullType
-   * @return Expected with a NullType value or an Error
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetNullOr(
-      TDefault&& default_value) const& -> expected<NullType, Error> {
-    auto* val = std::get_if<NullType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<NullType>(std::forward<TDefault>(default_value));
-  }
-
-  /**
-   * @brief Try to get a NullType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * NullType
-   * @return Expected with a NullType value or an Error
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetNullOr(
-      TDefault&& default_value) && -> expected<NullType, Error> {
-    auto* val = std::get_if<NullType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<NullType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a StringType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * StringType
-   * @return Expected with a StringType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetStringOr(
-      TDefault&& default_value) const& -> expected<StringType, Error> {
-    auto* val = std::get_if<StringType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<StringType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a StringType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * StringType
-   * @return Expected with a StringType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetStringOr(
-      TDefault&& default_value) && -> expected<StringType, Error> {
-    auto* val = std::get_if<StringType>(&m_variant_value);
-    return val != nullptr
-               ? std::move(*val)
-               : static_cast<StringType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a NumberType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * NumberType
-   * @return Expected with a NumberType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetNumberOr(
-      TDefault&& default_value) const& -> expected<NumberType, Error> {
-    auto* val = std::get_if<NumberType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<NumberType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a NumberType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * NumberType
-   * @return Expected with a NumberType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetNumberOr(
-      TDefault&& default_value) && -> expected<NumberType, Error> {
-    auto* val = std::get_if<NumberType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<NumberType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a BoolType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * BoolType
-   * @return Expected with a BoolType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetBoolOr(
-      TDefault&& default_value) const& -> expected<BoolType, Error> {
-    auto* val = std::get_if<BoolType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<BoolType>(std::forward<TDefault>(default_value));
-  }
-  /**
-   * @brief Try to get a BoolType value from this value node type, otherwise,
-   * return the provided default
-   *
-   * For consistency with get<Type>, these functions will also return expected,
-   * even though they will never return the Error
-   *
-   * @param default_value value to return in case this value doesn't hold a
-   * BoolType
-   * @return Expected with a BoolType value
-   */
-  template <typename TDefault>
-  [[nodiscard]] auto GetBoolOr(
-      TDefault&& default_value) && -> expected<BoolType, Error> {
-    auto* val = std::get_if<BoolType>(&m_variant_value);
-    return val != nullptr
-               ? *val
-               : static_cast<BoolType>(std::forward<TDefault>(default_value));
-  }
 
   /**
    * @brief If the value held by this ValueNodeType is NullType then call the
@@ -1042,6 +995,30 @@ public:
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) { return std::move(*this); }
     return std::invoke(std::forward<TElseFunc>(func));
+  }
+
+  /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_variant_value);
+  }
+
+  /**
+   * @brief Visit a value node type with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  auto Visit(TCallables&&... callables) const {
+    auto overload_set = Overload{std::forward<TCallables>(callables)...};
+    return std::visit(overload_set, m_variant_value);
   }
 
   /**

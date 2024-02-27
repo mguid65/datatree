@@ -1,5 +1,5 @@
 set(UNIT_TEST_SRC
-        unit_test_datatree.cpp
+        unit_test_data_tree.cpp
         unit_test_tree_node.cpp
         unit_test_object_node_type.cpp
         unit_test_array_node_type.cpp
