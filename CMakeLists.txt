@@ -17,7 +17,7 @@ if (COVERAGE)
     enable_coverage()
 endif ()
 
-if (SANITIZER)
+if (SANITIZE)
     enable_sanitizer()
 endif ()
 

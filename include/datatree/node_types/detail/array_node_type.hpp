@@ -153,10 +153,35 @@ public:
    * @param pos position of the element to return
    * @return the specified element with bounds checking
    */
+  void Set(SizeType pos, ValueType&& value) {
+    if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
+    m_underlying[pos] = std::move(value);
+  }
+
+  /**
+   * @brief Set the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return the specified element with bounds checking
+   */
   auto TrySet(SizeType pos, const ValueType& value) -> expected<void, Error> {
     if (ValidIndex(pos)) {
       BEGIN_SUPPRESS_ARRAY_BOUNDS
       m_underlying[pos] = value;
+      END_SUPPRESS_ARRAY_BOUNDS
+      return {};
+    }
+    return make_unexpected(Error{.category = Error::Category::OutOfRange});
+  }
+
+  /**
+   * @brief Set the specified element with bounds checking
+   * @param pos position of the element to return
+   * @return the specified element with bounds checking
+   */
+  auto TrySet(SizeType pos, ValueType&& value) -> expected<void, Error> {
+    if (ValidIndex(pos)) {
+      BEGIN_SUPPRESS_ARRAY_BOUNDS
+      m_underlying[pos] = std::move(value);
       END_SUPPRESS_ARRAY_BOUNDS
       return {};
     }
@@ -186,7 +211,6 @@ public:
     }
     return m_underlying.back();
   }
-
 
   /**
    * @brief Get the element at the front of this ArrayNodeType with bounds
@@ -232,18 +256,13 @@ public:
    * @brief Get the element at the front of this ArrayNodeType
    * @return the element at the front of this ArrayNodeType
    */
-  [[nodiscard]] auto Front() -> ValueType& {
-    return m_underlying.front();
-  }
+  [[nodiscard]] auto Front() -> ValueType& { return m_underlying.front(); }
 
   /**
    * @brief Get the element at the back of this ArrayNodeType
    * @return the element at the back of this ArrayNodeType
    */
-  [[nodiscard]] auto Back() -> ValueType& {
-    return m_underlying.back();
-  }
-
+  [[nodiscard]] auto Back() -> ValueType& { return m_underlying.back(); }
 
   /**
    * @brief Check if this ArrayNodeType is empty
