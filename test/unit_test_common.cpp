@@ -172,10 +172,38 @@ TEST_CASE("Prettify Json") {
       "    }\n"
       "  }\n"
       "}");
-  REQUIRE(mguid::PrettifyJson("{}") == "{\n"
+  REQUIRE(mguid::PrettifyJson("{}") ==
+          "{\n"
           "  \n"
           "}");
-  REQUIRE(mguid::PrettifyJson("[]") == "[\n"
+  REQUIRE(mguid::PrettifyJson("[]") ==
+          "[\n"
           "  \n"
           "]");
+}
+
+TEST_CASE("Ref Expected") {
+  int i{4};
+  int j{2};
+  auto result_1 = [&i]() -> mguid::RefExpected<int, std::string> {
+    return i;
+  }();
+  REQUIRE(result_1.has_value());
+  REQUIRE(result_1.value() == 4);
+  REQUIRE(*result_1.operator->() == 4);
+  REQUIRE(*result_1 == 4);
+  REQUIRE(&result_1.value() == &i);
+  auto result_2 = [&j]() -> mguid::RefExpected<int, std::string> {
+    return j;
+  }();
+  REQUIRE(result_2.has_value());
+  REQUIRE(result_2.value() == 2);
+  REQUIRE(*result_2.operator->() == 2);
+  REQUIRE(*result_2 == 2);
+  REQUIRE(&result_2.value() == &j);
+  auto result_3 = []() -> mguid::RefExpected<int, std::string> {
+    return mguid::make_unexpected("unexpected");
+  }();
+  REQUIRE_FALSE(result_3.has_value());
+  REQUIRE(result_3.error() == "unexpected");
 }
