@@ -70,7 +70,7 @@ auto main() -> int {
 
   std::cout << "DT1 Num Direct Children: " << dt1.GetObject().Size()
             << std::endl;
-  std::cout << "DT1[\"first\"][\"second\"] Num Direct Children: "
+  std::cout << R"(DT1["first"]["second"] Num Direct Children: )"
             << dt1["first"]["second"].GetObject().Size() << std::endl;
 
   // Set path to another tree

@@ -178,8 +178,12 @@ TEST_CASE("Array Node Type Try Set") {
     REQUIRE(ant1.TrySet(0, test_node).has_value());
     REQUIRE(ant1.TrySet(1, test_node).has_value());
     REQUIRE(ant1.TrySet(2, test_node).has_value());
-    // Clang-Tidy thinks there is a use-after-move here
-    REQUIRE(ant1.TrySet(3, std::move(test_node)).has_value());
+    REQUIRE(ant1.TrySet(3, test_node).has_value());
+  }
+  SECTION("Set Valid Index Move") {
+    auto test_node = mguid::TreeNode{};
+    mguid::ArrayNodeType ant1{{}, {}, {}, {}};
+    REQUIRE(ant1.TrySet(0, std::move(test_node)).has_value());
   }
   SECTION("Set Invalid Index") {
     mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
@@ -197,8 +201,13 @@ TEST_CASE("Array Node Type Set") {
     ant1.Set(0, test_node);
     ant1.Set(1, test_node);
     ant1.Set(2, test_node);
-    // The last one is a move
-    ant1.Set(3, std::move(test_node));
+    ant1.Set(3, test_node);
+    REQUIRE(ant1.Size() == 4);
+  }
+  SECTION("Set Valid Index Move") {
+    auto test_node = mguid::TreeNode{};
+    mguid::ArrayNodeType ant1{{}, {}, {}, {}};
+    ant1.Set(0, std::move(test_node));
     REQUIRE(ant1.Size() == 4);
   }
   SECTION("Set Non-Existent Index") {
