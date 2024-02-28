@@ -37,7 +37,9 @@ cmake --build --preset conan-debug
 - [x] Array node type
 - [x] Tree Node
 - [x] Data tree
+- [ ] Data tree visitor and recursive visitor
+- [ ] Serialization/Deserialization
 
-### Note
+### Experimental
 
-I won't update the library version until I have an MVP of all existing stub classes; a usable data tree.
+- [ ] Templated Value Type Maybe?

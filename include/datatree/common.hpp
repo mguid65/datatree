@@ -10,10 +10,10 @@
 #ifndef DATATREE_COMMON_HPP
 #define DATATREE_COMMON_HPP
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
 #include <variant>
-#include <algorithm>
 
 #include <tl/expected.hpp>
 
@@ -95,8 +95,7 @@ using tl::make_unexpected;
  */
 template <typename TExpectedType, typename TErrorType>
 struct RefExpected
-    : private expected<std::reference_wrapper<TExpectedType>,
-                               TErrorType> {
+    : private expected<std::reference_wrapper<TExpectedType>, TErrorType> {
   using BaseType = expected<std::reference_wrapper<TExpectedType>, TErrorType>;
   using ValueType = TExpectedType;
 
@@ -214,12 +213,12 @@ struct KeyOrIdxType : std::variant<StringKeyType, IntegerKeyType> {
   KeyOrIdxType& operator=(const KeyOrIdxType&) = default;
   KeyOrIdxType& operator=(KeyOrIdxType&&) = default;
 
-  KeyOrIdxType(const std::string& key) : BaseType{key} { }
+  KeyOrIdxType(const std::string& key) : BaseType{key} {}
   KeyOrIdxType(std::string&& key) : BaseType{std::move(key)} {}
 
-  KeyOrIdxType(const char* key) : BaseType{key} { }
+  KeyOrIdxType(const char* key) : BaseType{key} {}
 
-  KeyOrIdxType(const std::size_t& idx) : BaseType{idx} { }
+  KeyOrIdxType(const std::size_t& idx) : BaseType{idx} {}
   KeyOrIdxType(std::size_t&& idx) : BaseType{idx} {}
 
   /**
@@ -253,7 +252,9 @@ namespace key_literals {
  * @param idx an index
  * @return a KeyType created from an index
  */
-inline KeyOrIdxType operator""_k(unsigned long long idx) { return KeyOrIdxType{idx}; }
+inline KeyOrIdxType operator""_k(unsigned long long idx) {
+  return KeyOrIdxType{idx};
+}
 
 /**
  * @brief Helper for string literal KeyType UDL
@@ -361,15 +362,11 @@ template <std::size_t NCount, IntegerIndexable TContainer, typename TFunc>
 constexpr void For(TContainer&& container, TFunc&& func) noexcept(
     std::is_nothrow_invocable_v<TFunc,
                                 decltype(std::declval<TContainer>()[0])>) {
-  constexpr auto ForImpl =
-      []<std::size_t... NIdxs>(
-          std::add_lvalue_reference_t<std::remove_reference_t<TContainer>>
-              container_inner,
-          std::add_lvalue_reference_t<std::remove_reference_t<TFunc>>
-              func_inner,
-          std::index_sequence<NIdxs...>) {
-        (std::invoke(func_inner, container_inner[NIdxs]), ...);
-      };
+  auto ForImpl = []<std::size_t... NIdxs>(TContainer&& container_inner,
+                                          TFunc&& func_inner,
+                                          std::index_sequence<NIdxs...>) {
+    (std::invoke(func_inner, container_inner[NIdxs]), ...);
+  };
   ForImpl(std::forward<TContainer>(container), std::forward<TFunc>(func),
           std::make_index_sequence<NCount>{});
 }
@@ -392,7 +389,7 @@ std::ostream& operator<<(std::ostream& os, const Path<NLength>& path) {
                         }},
                KeyOrIdxType{arg});
   });
-  return os << std::endl;
+  return os;
 }
 
 /**
