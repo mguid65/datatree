@@ -11,10 +11,9 @@
 #define DATATREE_COMMON_HPP
 
 #include <cstdint>
-#include <mutex>
-#include <ranges>
 #include <string>
 #include <variant>
+#include <algorithm>
 
 #include <tl/expected.hpp>
 
@@ -268,7 +267,7 @@ struct KeyTypeStringLiteralHelper {
    * @param str a string literal
    */
   constexpr KeyTypeStringLiteralHelper(const char (&str)[NSize]) {
-    std::ranges::copy(str, data);
+    std::copy(std::begin(str), std::end(str), std::begin(data));
   }
 };
 
