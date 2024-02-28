@@ -91,8 +91,20 @@ public:
    * @return the associated node id if the key it exists; otherwise BadAccess
    * error
    */
-  [[nodiscard]] auto Get(const KeyType& key) const
-      -> ConstExpectedRType {
+  [[nodiscard]] auto TryGet(const KeyType& key) const -> ConstExpectedRType {
+    if (auto iter = m_children.find(key); iter != m_children.end()) {
+      return iter->second;
+    }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  }
+
+  /**
+   * @brief Try to get a copy of the node id with the specified key
+   * @param key the key of the node id to find
+   * @return the associated node id if the key it exists; otherwise BadAccess
+   * error
+   */
+  [[nodiscard]] auto TryGet(const KeyType& key) -> ExpectedRType {
     if (auto iter = m_children.find(key); iter != m_children.end()) {
       return iter->second;
     }
