@@ -100,6 +100,14 @@ public:
   explicit inline TreeNode(ValueNodeType&& node_data);
 
   /**
+   * @brief Construct from a value that satisfies ValidValueNodeTypeValueType
+   * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
+   * @param value value to use to construct inner value node
+   */
+  template <ValidValueNodeTypeValueType TValueType>
+  explicit TreeNode(TValueType&& value);
+
+  /**
    * @brief Copy assign a TreeNode from an ObjectNodeType
    * @param node_data an ObjectNodeType
    * @return reference to this TreeNode
@@ -147,8 +155,7 @@ public:
    * @return reference to this TreeNode
    */
   template <ValidValueNodeTypeValueType TValueType>
-  TreeNode& operator=(TValueType&& value) noexcept(
-      !SatisfiesStringType<TValueType>);
+  TreeNode& operator=(TValueType&& value);
 
   /**
    * @brief Construct a TreeNode with the proper alternative given the tag
@@ -225,6 +232,14 @@ public:
   [[nodiscard]] auto TryGet() const -> RefExpected<const TRequestedType, Error>;
 
   /**
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held, otherwise Error
+   */
+  template <typename TRequestedType>
+  [[nodiscard]] auto TryGet() -> RefExpected<TRequestedType, Error>;
+
+  /**
    * @brief Try to get an ObjectNodeType from this node
    * @return ObjectNodeType if holding an ObjectNodeType, otherwise Error
    */
@@ -244,14 +259,6 @@ public:
    */
   [[nodiscard]] inline auto TryGetValue() const
       -> RefExpected<const ValueNodeType, Error>;
-
-  /**
-   * @brief Try to get the requested type from this TreeNode
-   * @tparam TRequestedType the type requested
-   * @return The requested type if it is the type being held, otherwise Error
-   */
-  template <typename TRequestedType>
-  [[nodiscard]] auto TryGet() -> RefExpected<TRequestedType, Error>;
 
   /**
    * @brief Try to get an ObjectNodeType from this node
@@ -289,104 +296,6 @@ public:
   [[nodiscard]] auto Get() -> TRequestedType&;
 
   /**
-   * @brief Get Null value from this TreeNode
-   * @return Null value from this TreeNode
-   */
-  [[nodiscard]] auto GetNull() const -> const NullType&;
-
-  /**
-   * @brief Get Bool value from this TreeNode
-   * @return Bool value from this TreeNode
-   */
-  [[nodiscard]] auto GetBool() const -> const BoolType&;
-
-  /**
-   * @brief Get Number value from this TreeNode
-   * @return Number value from this TreeNode
-   */
-  [[nodiscard]] auto GetNumber() const -> const NumberType&;
-
-  /**
-   * @brief Get String value from this TreeNode
-   * @return String value from this TreeNode
-   */
-  [[nodiscard]] auto GetString() const -> const std::string&;
-
-  /**
-   * @brief Get Null value from this TreeNode
-   * @return Null value from this TreeNode
-   */
-  [[nodiscard]] auto GetNull() -> NullType&;
-
-  /**
-   * @brief Get Bool value from this TreeNode
-   * @return Bool value from this TreeNode
-   */
-  [[nodiscard]] auto GetBool() -> BoolType&;
-
-  /**
-   * @brief Get Number value from this TreeNode
-   * @return Number value from this TreeNode
-   */
-  [[nodiscard]] auto GetNumber() -> NumberType&;
-
-  /**
-   * @brief Get String value from this TreeNode
-   * @return String value from this TreeNode
-   */
-  [[nodiscard]] auto GetString() -> std::string&;
-
-  /**
-   * @brief Try to get NullType value from this TreeNode
-   * @return NullType value from this TreeNode
-   */
-  [[nodiscard]] auto TryGetNull() const -> RefExpected<const NullType, Error>;
-
-  /**
-   * @brief Try to get boolean value from this node
-   * @return boolean value from this node
-   */
-  [[nodiscard]] auto TryGetBool() const -> RefExpected<const BoolType, Error>;
-
-  /**
-   * @brief Try to get integer value from this node
-   * @return integer value from this node
-   */
-  [[nodiscard]] auto TryGetNumber() const
-      -> RefExpected<const NumberType, Error>;
-
-  /**
-   * @brief Try to get string value from this node
-   * @return string value from this node
-   */
-  [[nodiscard]] auto TryGetString() const
-      -> RefExpected<const StringType, Error>;
-
-  /**
-   * @brief Try to get Null value from this TreeNode
-   * @return Null value from this TreeNode
-   */
-  [[nodiscard]] auto TryGetNull() -> RefExpected<NullType, Error>;
-
-  /**
-   * @brief Try to get Bool value from this TreeNode
-   * @return Bool value from this TreeNode
-   */
-  [[nodiscard]] auto TryGetBool() -> RefExpected<BoolType, Error>;
-
-  /**
-   * @brief Try to get Number value from this TreeNode
-   * @return Number value from this TreeNode
-   */
-  [[nodiscard]] auto TryGetNumber() -> RefExpected<NumberType, Error>;
-
-  /**
-   * @brief Try to get String value from this TreeNode
-   * @return String value from this TreeNode
-   */
-  [[nodiscard]] auto TryGetString() -> RefExpected<StringType, Error>;
-
-  /**
    * @brief Get an ObjectNodeType from this node
    * @return reference to ObjectNodeType
    */
@@ -421,6 +330,106 @@ public:
    * @return reference to ValueNodeType
    */
   [[nodiscard]] inline auto GetValue() -> ValueNodeType&;
+
+  /**
+   * @brief Get Null value from this TreeNode
+   * @return Null value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetNull() const -> const NullType&;
+
+  /**
+   * @brief Get Bool value from this TreeNode
+   * @return Bool value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetBool() const -> const BoolType&;
+
+  /**
+   * @brief Get Number value from this TreeNode
+   * @return Number value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetNumber() const -> const NumberType&;
+
+  /**
+   * @brief Get String value from this TreeNode
+   * @return String value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetString() const -> const std::string&;
+
+  /**
+   * @brief Get Null value from this TreeNode
+   * @return Null value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetNull() -> NullType&;
+
+  /**
+   * @brief Get Bool value from this TreeNode
+   * @return Bool value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetBool() -> BoolType&;
+
+  /**
+   * @brief Get Number value from this TreeNode
+   * @return Number value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetNumber() -> NumberType&;
+
+  /**
+   * @brief Get String value from this TreeNode
+   * @return String value from this TreeNode
+   */
+  [[nodiscard]] inline auto GetString() -> std::string&;
+
+  /**
+   * @brief Try to get NullType value from this TreeNode
+   * @return NullType value from this TreeNode
+   */
+  [[nodiscard]] inline auto TryGetNull() const
+      -> RefExpected<const NullType, Error>;
+
+  /**
+   * @brief Try to get boolean value from this node
+   * @return boolean value from this node
+   */
+  [[nodiscard]] inline auto TryGetBool() const
+      -> RefExpected<const BoolType, Error>;
+
+  /**
+   * @brief Try to get integer value from this node
+   * @return integer value from this node
+   */
+  [[nodiscard]] inline auto TryGetNumber() const
+      -> RefExpected<const NumberType, Error>;
+
+  /**
+   * @brief Try to get string value from this node
+   * @return string value from this node
+   */
+  [[nodiscard]] inline auto TryGetString() const
+      -> RefExpected<const StringType, Error>;
+
+  /**
+   * @brief Try to get Null value from this TreeNode
+   * @return Null value from this TreeNode
+   */
+  [[nodiscard]] inline auto TryGetNull() -> RefExpected<NullType, Error>;
+
+  /**
+   * @brief Try to get Bool value from this TreeNode
+   * @return Bool value from this TreeNode
+   */
+  [[nodiscard]] inline auto TryGetBool() -> RefExpected<BoolType, Error>;
+
+  /**
+   * @brief Try to get Number value from this TreeNode
+   * @return Number value from this TreeNode
+   */
+  [[nodiscard]] inline auto TryGetNumber() -> RefExpected<NumberType, Error>;
+
+  /**
+   * @brief Try to get String value from this TreeNode
+   * @return String value from this TreeNode
+   */
+  [[nodiscard]] inline auto TryGetString() -> RefExpected<StringType, Error>;
 
   /**
    * @brief Set this TreeNode to an TNodeType
@@ -536,8 +545,12 @@ concept ValidNodeType =
     std::same_as<std::remove_cvref_t<TNodeType>, ValueNodeType>;
 
 template <ValidValueNodeTypeValueType TValueType>
-TreeNode& TreeNode::operator=(TValueType&& value) noexcept(
-    !SatisfiesStringType<TValueType>) {
+TreeNode::TreeNode(TValueType&& value)
+    : m_data_impl{std::make_unique<NodeType>(
+          ValueNodeType{std::forward<TValueType>(value)})} {}
+
+template <ValidValueNodeTypeValueType TValueType>
+TreeNode& TreeNode::operator=(TValueType&& value) {
   if (!HasValue()) { Reset<NodeTypeTag::Value>(); }
   GetValue() = value;
   return *this;
