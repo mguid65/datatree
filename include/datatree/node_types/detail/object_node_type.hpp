@@ -513,7 +513,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto operator[](const KeyType& key) -> MappedType& {
+  auto operator[](const KeyType& key) -> MappedType& {
     return m_children[key];
   }
 
@@ -523,7 +523,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto operator[](KeyType&& key) -> MappedType& {
+  auto operator[](KeyType&& key) -> MappedType& {
     return m_children[std::move(key)];
   }
 

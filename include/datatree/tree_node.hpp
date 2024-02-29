@@ -484,7 +484,7 @@ public:
    * @param key_or_idx the key of the TreeNode to find
    * @return A reference to the requested element
    */
-  [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx)
+  inline auto operator[](const KeyOrIdxType& key_or_idx)
       -> TreeNode&;
 
   /**

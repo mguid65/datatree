@@ -216,10 +216,10 @@ struct KeyOrIdxType : std::variant<StringKeyType, IntegerKeyType> {
   KeyOrIdxType(const std::string& key) : BaseType{key} {}
   KeyOrIdxType(std::string&& key) : BaseType{std::move(key)} {}
 
-  KeyOrIdxType(const char* key) : BaseType{key} {}
+  template <std::size_t NSize>
+  KeyOrIdxType(const char (&key)[NSize]) : BaseType{std::string(key)} {}
 
   KeyOrIdxType(const std::size_t& idx) : BaseType{idx} {}
-  KeyOrIdxType(std::size_t&& idx) : BaseType{idx} {}
 
   /**
    * @brief Visit a value node type with a visitor overload set

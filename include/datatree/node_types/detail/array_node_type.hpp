@@ -124,7 +124,7 @@ public:
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
-  [[nodiscard]] auto operator[](SizeType pos) -> ValueType& {
+  auto operator[](SizeType pos) -> ValueType& {
     if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
     return m_underlying[pos];
   }
