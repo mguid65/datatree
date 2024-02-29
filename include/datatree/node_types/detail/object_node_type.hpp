@@ -91,8 +91,20 @@ public:
    * @return the associated node id if the key it exists; otherwise BadAccess
    * error
    */
-  [[nodiscard]] auto Get(const KeyType& key) const
-      -> ConstExpectedRType {
+  [[nodiscard]] auto TryGet(const KeyType& key) const -> ConstExpectedRType {
+    if (auto iter = m_children.find(key); iter != m_children.end()) {
+      return iter->second;
+    }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  }
+
+  /**
+   * @brief Try to get a copy of the node id with the specified key
+   * @param key the key of the node id to find
+   * @return the associated node id if the key it exists; otherwise BadAccess
+   * error
+   */
+  [[nodiscard]] auto TryGet(const KeyType& key) -> ExpectedRType {
     if (auto iter = m_children.find(key); iter != m_children.end()) {
       return iter->second;
     }
@@ -501,7 +513,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto operator[](const KeyType& key) -> MappedType& {
+  auto operator[](const KeyType& key) -> MappedType& {
     return m_children[key];
   }
 
@@ -511,7 +523,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto operator[](KeyType&& key) -> MappedType& {
+  auto operator[](KeyType&& key) -> MappedType& {
     return m_children[std::move(key)];
   }
 

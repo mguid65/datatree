@@ -8,6 +8,7 @@ set(UNIT_TEST_SRC
         unit_test_number_type.cpp
         unit_test_value_types.cpp
         unit_test_error_type.cpp
+        unit_test_common.cpp
 )
 
 add_executable(unit_tests)

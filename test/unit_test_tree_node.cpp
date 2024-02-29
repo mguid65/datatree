@@ -24,14 +24,54 @@ TEST_CASE("Tree Node Construction/Assignment") {
   SECTION("Move Assignment") {
     REQUIRE(std::is_nothrow_move_assignable_v<mguid::TreeNode>);
   }
-  SECTION("From Object") {
+  SECTION("Constructible From Object") {
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ObjectNodeType&>);
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ObjectNodeType>);
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ObjectNodeType&&>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ObjectNodeType>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ObjectNodeType&>);
   }
-  SECTION("From Array") {
+  SECTION("Constructible From Array") {
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ArrayNodeType&>);
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ArrayNodeType>);
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ArrayNodeType&&>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ArrayNodeType>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ArrayNodeType&>);
   }
-  SECTION("From Value") {
+  SECTION("Constructible From Value") {
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ValueNodeType&>);
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ValueNodeType>);
+    REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::ValueNodeType&&>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ValueNodeType>);
+    REQUIRE(
+        std::is_constructible_v<mguid::TreeNode, const mguid::ValueNodeType&>);
+  }
+  SECTION("Assignable From Object") {
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ObjectNodeType&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ObjectNodeType>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ObjectNodeType&&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, const mguid::ObjectNodeType>);
+    REQUIRE(
+        std::is_assignable_v<mguid::TreeNode, const mguid::ObjectNodeType&>);
+  }
+  SECTION("Assignable From Array") {
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ArrayNodeType&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ArrayNodeType>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ArrayNodeType&&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, const mguid::ArrayNodeType>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, const mguid::ArrayNodeType&>);
+  }
+  SECTION("Assignable From Value") {
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ValueNodeType&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ValueNodeType>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::ValueNodeType&&>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, const mguid::ValueNodeType>);
+    REQUIRE(std::is_assignable_v<mguid::TreeNode, const mguid::ValueNodeType&>);
   }
   SECTION("From Tag") {
     REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::NodeTypeTag>);
@@ -40,6 +80,220 @@ TEST_CASE("Tree Node Construction/Assignment") {
     [[maybe_unused]] mguid::TreeNode tn3{mguid::NodeTypeTag::Value};
     SUCCEED("Constructed From Tag");
   }
+  SECTION("Construction From Value") {
+    {
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::NullType>);
+      mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.HasNull());
+    }
+    {
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::BoolType>);
+      mguid::TreeNode tn1{true};
+      REQUIRE(tn1.HasBool());
+      mguid::TreeNode vnt2{false};
+      REQUIRE(tn1.HasBool());
+    }
+    {
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, mguid::NumberType>);
+      {
+        mguid::TreeNode tn1{mguid::NumberType{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::uint8_t>);
+      {
+        mguid::TreeNode tn1{std::uint8_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::uint16_t>);
+      {
+        mguid::TreeNode tn1{std::uint16_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::uint32_t>);
+      {
+        mguid::TreeNode tn1{std::uint32_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::uint64_t>);
+      {
+        mguid::TreeNode tn1{std::uint64_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::int8_t>);
+      {
+        mguid::TreeNode tn1{std::int8_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::int16_t>);
+      {
+        mguid::TreeNode tn1{std::int16_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::int32_t>);
+      {
+        mguid::TreeNode tn1{std::int32_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::int64_t>);
+      {
+        mguid::TreeNode tn1{std::int64_t{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, float>);
+      {
+        mguid::TreeNode tn1{float{}};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, double>);
+      {
+        mguid::TreeNode tn1{double{}};
+        REQUIRE(tn1.HasNumber());
+      }
+    }
+    {
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, std::string>);
+      {
+        mguid::TreeNode tn1{std::string{}};
+        REQUIRE(tn1.HasString());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, const char*>);
+      {
+        mguid::TreeNode tn1{""};
+        REQUIRE(tn1.HasString());
+      }
+      REQUIRE(std::is_constructible_v<mguid::TreeNode, char[]>);
+      {
+        char c_array[] = "";
+        mguid::TreeNode tn1{c_array};
+        REQUIRE(tn1.HasString());
+      }
+    }
+  }
+  SECTION("Assignment From Value") {
+    {
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::NullType>);
+      mguid::TreeNode tn1;
+      tn1 = mguid::NullType{};
+      REQUIRE(tn1.HasNull());
+    }
+    {
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::BoolType>);
+      mguid::TreeNode tn1;
+      tn1 = true;
+      REQUIRE(tn1.HasBool());
+      mguid::TreeNode vnt2;
+      vnt2 = false;
+      REQUIRE(vnt2.HasBool());
+    }
+    {
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, mguid::NumberType>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = mguid::NumberType{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::uint8_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::uint8_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::uint16_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::uint16_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::uint32_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::uint32_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::uint64_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::uint64_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::int8_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::int8_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::int16_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::int16_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::int32_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::int32_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::int64_t>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::int64_t{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, float>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = float{};
+        REQUIRE(tn1.HasNumber());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, double>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = double{};
+        REQUIRE(tn1.HasNumber());
+      }
+    }
+    {
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, std::string>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = std::string{};
+        REQUIRE(tn1.HasString());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, const char*>);
+      {
+        mguid::TreeNode tn1;
+        tn1 = "";
+        REQUIRE(tn1.HasString());
+      }
+      REQUIRE(std::is_assignable_v<mguid::TreeNode, char[]>);
+      {
+        char c_array[] = "";
+        mguid::TreeNode tn1;
+        tn1 = c_array;
+        REQUIRE(tn1.HasString());
+      }
+    }
+  }
+}
+
+TEST_CASE("Tree Node Tag") {
+  mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+  REQUIRE(tn1.Tag() == mguid::NodeTypeTag::Object);
+
+  mguid::TreeNode tn2{mguid::NodeTypeTag::Array};
+  REQUIRE(tn2.Tag() == mguid::NodeTypeTag::Array);
+
+  mguid::TreeNode tn3{mguid::NodeTypeTag::Value};
+  REQUIRE(tn3.Tag() == mguid::NodeTypeTag::Value);
+
+  // Constructing with a tag outside the valid enum range will give you a
+  // node with Object type
+  mguid::TreeNode tn4{static_cast<mguid::NodeTypeTag>(3)};
+  REQUIRE(tn4.Tag() == mguid::NodeTypeTag::Object);
+
+  mguid::TreeNode tn5{static_cast<mguid::NodeTypeTag>(32)};
+  REQUIRE(tn5.Tag() == mguid::NodeTypeTag::Object);
 }
 
 TEST_CASE("Tree Node Has Type") {
@@ -101,36 +355,580 @@ TEST_CASE("Tree Node Has Type") {
   }
 }
 
-TEST_CASE("Tree Node TryGet Type") {
-  SECTION("TryGet Object") {
+TEST_CASE("Tree Node Has Value Type") {
+  SECTION("Constructed With Null") {
+    {
+      mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.HasNull());
+    }
+    {
+      const mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.HasNull());
+    }
+  }
+  SECTION("Constructed With Integer") {
+    {
+      mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+  }
+  SECTION("Constructed With Unsigned Integer") {
+    {
+      mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+  }
+  SECTION("Constructed With Float") {
+    {
+      mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+    {
+      const mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.HasNumber());
+    }
+  }
+  SECTION("Constructed With Bool") {
+    {
+      mguid::TreeNode tn1{true};
+      REQUIRE(tn1.HasBool());
+    }
+    {
+      const mguid::TreeNode tn1{true};
+      REQUIRE(tn1.HasBool());
+    }
+    {
+      mguid::TreeNode tn1{false};
+      REQUIRE(tn1.HasBool());
+    }
+    {
+      const mguid::TreeNode tn1{false};
+      REQUIRE(tn1.HasBool());
+    }
+  }
+  SECTION("Constructed With String") {
+    {
+      mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.HasString());
+    }
+    {
+      const mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.HasString());
+    }
+    {
+      mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.HasString());
+    }
+    {
+      const mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.HasString());
+    }
+    {
+      char test[] = "test";
+      mguid::TreeNode tn1{test};
+      REQUIRE(tn1.HasString());
+    }
+    {
+      char test[] = "test";
+      const mguid::TreeNode tn1{test};
+      REQUIRE(tn1.HasString());
+    }
+  }
+}
+
+TEST_CASE("Tree Node Try Get Type") {
+  SECTION("Try Get Object") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     REQUIRE(tn1.TryGetObject().has_value());
+    REQUIRE(tn1.TryGet<mguid::ObjectNodeType>().has_value());
   }
-  SECTION("TryGet Array") {
+  SECTION("Try Get Object Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+    REQUIRE(tn1.TryGetObject().has_value());
+    REQUIRE(tn1.TryGet<mguid::ObjectNodeType>().has_value());
+  }
+  SECTION("Try Get Array") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
     REQUIRE(tn1.TryGetArray().has_value());
+    REQUIRE(tn1.TryGet<mguid::ArrayNodeType>().has_value());
   }
-  SECTION("TryGet Value") {
+  SECTION("Try Get Array Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+    REQUIRE(tn1.TryGetArray().has_value());
+    REQUIRE(tn1.TryGet<mguid::ArrayNodeType>().has_value());
+  }
+  SECTION("Try Get Value") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
     REQUIRE(tn1.TryGetValue().has_value());
+    REQUIRE(tn1.TryGet<mguid::ValueNodeType>().has_value());
   }
-  SECTION("TryGet Object Bad Access") {
+  SECTION("Try Get Value Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+    REQUIRE(tn1.TryGetValue().has_value());
+    REQUIRE(tn1.TryGet<mguid::ValueNodeType>().has_value());
+  }
+  SECTION("Try Get Object Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
     REQUIRE_FALSE(tn1.TryGetObject().has_value());
     REQUIRE_FALSE(tn2.TryGetObject().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ObjectNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ObjectNodeType>().has_value());
   }
-  SECTION("TryGet Array Bad Access") {
+  SECTION("Try Get Object Bad Access Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+    const mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
+    REQUIRE_FALSE(tn1.TryGetObject().has_value());
+    REQUIRE_FALSE(tn2.TryGetObject().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ObjectNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ObjectNodeType>().has_value());
+  }
+  SECTION("Try Get Array Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
     REQUIRE_FALSE(tn1.TryGetArray().has_value());
     REQUIRE_FALSE(tn2.TryGetArray().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ArrayNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ArrayNodeType>().has_value());
   }
-  SECTION("TryGet Value Bad Access") {
+  SECTION("Try Get Array Bad Access Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+    const mguid::TreeNode tn2{mguid::NodeTypeTag::Value};
+    REQUIRE_FALSE(tn1.TryGetArray().has_value());
+    REQUIRE_FALSE(tn2.TryGetArray().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ArrayNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ArrayNodeType>().has_value());
+  }
+  SECTION("Try Get Value Bad Access") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
     mguid::TreeNode tn2{mguid::NodeTypeTag::Array};
     REQUIRE_FALSE(tn1.TryGetValue().has_value());
     REQUIRE_FALSE(tn2.TryGetValue().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ValueNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ValueNodeType>().has_value());
+  }
+  SECTION("Try Get Value Bad Access Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+    const mguid::TreeNode tn2{mguid::NodeTypeTag::Array};
+    REQUIRE_FALSE(tn1.TryGetValue().has_value());
+    REQUIRE_FALSE(tn2.TryGetValue().has_value());
+    REQUIRE_FALSE(tn1.TryGet<mguid::ValueNodeType>().has_value());
+    REQUIRE_FALSE(tn2.TryGet<mguid::ValueNodeType>().has_value());
+  }
+}
+
+TEST_CASE("Tree Node Try Get Value Type") {
+  SECTION("Constructed With Null") {
+    {
+      mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.TryGetNull().value() == mguid::NullType{});
+    }
+    {
+      const mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.TryGetNull().value() == mguid::NullType{});
+    }
+  }
+  SECTION("Constructed With Integer") {
+    {
+      mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetInt().value() ==
+              mguid::IntegerType{1});
+    }
+  }
+  SECTION("Constructed With Unsigned Integer") {
+    {
+      mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+  }
+  SECTION("Constructed With Float") {
+    {
+      mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetDouble().value() ==
+              mguid::DoubleType{1});
+    }
+    {
+      const mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetDouble().value() ==
+              mguid::DoubleType{1});
+    }
+    {
+      mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetDouble().value() ==
+              mguid::DoubleType{1});
+    }
+    {
+      const mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.TryGetNumber().value().GetDouble().value() ==
+              mguid::DoubleType{1});
+    }
+  }
+  SECTION("Constructed With Bool") {
+    {
+      mguid::TreeNode tn1{true};
+      REQUIRE(tn1.TryGetBool().value());
+    }
+    {
+      const mguid::TreeNode tn1{true};
+      REQUIRE(tn1.TryGetBool().value());
+    }
+    {
+      mguid::TreeNode tn1{false};
+      REQUIRE_FALSE(tn1.TryGetBool().value());
+    }
+    {
+      const mguid::TreeNode tn1{false};
+      REQUIRE_FALSE(tn1.TryGetBool().value());
+    }
+  }
+  SECTION("Constructed With String") {
+    {
+      mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+    {
+      const mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+    {
+      mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+    {
+      const mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+    {
+      char test[] = "test";
+      mguid::TreeNode tn1{test};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+    {
+      char test[] = "test";
+      const mguid::TreeNode tn1{test};
+      REQUIRE(tn1.TryGetString().value() == "test");
+    }
+  }
+}
+
+TEST_CASE("Tree Node Get Value Type") {
+  SECTION("Constructed With Null") {
+    {
+      mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.GetNull() == mguid::NullType{});
+    }
+    {
+      const mguid::TreeNode tn1{mguid::NullType{}};
+      REQUIRE(tn1.GetNull() == mguid::NullType{});
+    }
+  }
+  SECTION("Constructed With Integer") {
+    {
+      mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int8_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int16_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int32_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::int64_t{1}};
+      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+    }
+  }
+  SECTION("Constructed With Unsigned Integer") {
+    {
+      mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint8_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint16_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint32_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+    {
+      const mguid::TreeNode tn1{std::uint64_t{1}};
+      REQUIRE(tn1.GetNumber().GetUInt().value() ==
+              mguid::UnsignedIntegerType{1});
+    }
+  }
+  SECTION("Constructed With Float") {
+    {
+      mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+    }
+    {
+      const mguid::TreeNode tn1{float{1}};
+      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+    }
+    {
+      mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+    }
+    {
+      const mguid::TreeNode tn1{double{1}};
+      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+    }
+  }
+  SECTION("Constructed With Bool") {
+    {
+      mguid::TreeNode tn1{true};
+      REQUIRE(tn1.GetBool());
+    }
+    {
+      const mguid::TreeNode tn1{true};
+      REQUIRE(tn1.GetBool());
+    }
+    {
+      mguid::TreeNode tn1{false};
+      REQUIRE_FALSE(tn1.GetBool());
+    }
+    {
+      const mguid::TreeNode tn1{false};
+      REQUIRE_FALSE(tn1.GetBool());
+    }
+  }
+  SECTION("Constructed With String") {
+    {
+      mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.GetString() == "test");
+    }
+    {
+      const mguid::TreeNode tn1{std::string{"test"}};
+      REQUIRE(tn1.GetString() == "test");
+    }
+    {
+      mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.GetString() == "test");
+    }
+    {
+      const mguid::TreeNode tn1{"test"};
+      REQUIRE(tn1.GetString() == "test");
+    }
+    {
+      char test[] = "test";
+      mguid::TreeNode tn1{test};
+      REQUIRE(tn1.GetString() == "test");
+    }
+    {
+      char test[] = "test";
+      const mguid::TreeNode tn1{test};
+      REQUIRE(tn1.GetString() == "test");
+    }
+  }
+}
+
+TEST_CASE("Tree Node Get Type") {
+  SECTION("Get Object") {
+    mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+    REQUIRE(tn1.GetObject() == mguid::ObjectNodeType());
+    REQUIRE(tn1.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+  }
+  SECTION("Get Object Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+    REQUIRE(tn1.GetObject() == mguid::ObjectNodeType());
+    REQUIRE(tn1.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+  }
+  SECTION("Get Array") {
+    mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+    REQUIRE(tn1.GetArray() == mguid::ArrayNodeType());
+    REQUIRE(tn1.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+  }
+  SECTION("Get Array Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+    REQUIRE(tn1.GetArray() == mguid::ArrayNodeType());
+    REQUIRE(tn1.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+  }
+  SECTION("Get Value") {
+    mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+    REQUIRE(tn1.GetValue() == mguid::ValueNodeType());
+    REQUIRE(tn1.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
+  }
+  SECTION("Get Value Const") {
+    const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+    REQUIRE(tn1.GetValue() == mguid::ValueNodeType());
+    REQUIRE(tn1.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
   }
 }
 
@@ -198,86 +996,252 @@ TEST_CASE("Tree Node Visit") {
 
       REQUIRE(result == 0);
     }
-    SECTION("One Templated Overload Return") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
-      int result = tn1.Visit([]<typename T>(T&&) {
-        using Underlying = std::remove_cvref_t<T>;
-        if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
-          return 0;
-        } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
-          return 1;
-        } else {
-          return 2;
-        }
-      });
-      REQUIRE(result == 0);
+    SECTION("Visit Object Const") {
+      SECTION("Three Overloads Return") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+        int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
+                               [](const mguid::ArrayNodeType&) { return 1; },
+                               [](const mguid::ValueNodeType&) { return 2; });
+        REQUIRE(result == 0);
+      }
+      SECTION("Three Overloads Assign Reference Capture") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+
+        int result;
+        tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
+                  [&result](const mguid::ArrayNodeType&) { result = 1; },
+                  [&result](const mguid::ValueNodeType&) { result = 2; });
+
+        REQUIRE(result == 0);
+      }
+      SECTION("One Templated Overload Return") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 0);
+      }
+      SECTION("One Templated Overload Return Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 0);
+      }
+    }
+    SECTION("Visit Array") {
+      SECTION("Three Overloads Return") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+        int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
+                               [](const mguid::ArrayNodeType&) { return 1; },
+                               [](const mguid::ValueNodeType&) { return 2; });
+        REQUIRE(result == 1);
+      }
+      SECTION("Three Overloads Return Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+        int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
+                               [](const mguid::ArrayNodeType&) { return 1; },
+                               [](const mguid::ValueNodeType&) { return 2; });
+        REQUIRE(result == 1);
+      }
+      SECTION("Three Overloads Assign Reference Capture") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+
+        int result;
+        tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
+                  [&result](const mguid::ArrayNodeType&) { result = 1; },
+                  [&result](const mguid::ValueNodeType&) { result = 2; });
+
+        REQUIRE(result == 1);
+      }
+      SECTION("Three Overloads Assign Reference Capture Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+
+        int result;
+        tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
+                  [&result](const mguid::ArrayNodeType&) { result = 1; },
+                  [&result](const mguid::ValueNodeType&) { result = 2; });
+
+        REQUIRE(result == 1);
+      }
+      SECTION("One Templated Overload Return") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 1);
+      }
+      SECTION("One Templated Overload Return Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 1);
+      }
+    }
+    SECTION("Visit Value") {
+      SECTION("Three Overloads Return") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+        int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
+                               [](const mguid::ArrayNodeType&) { return 1; },
+                               [](const mguid::ValueNodeType&) { return 2; });
+        REQUIRE(result == 2);
+      }
+      SECTION("Three Overloads Return Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+        int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
+                               [](const mguid::ArrayNodeType&) { return 1; },
+                               [](const mguid::ValueNodeType&) { return 2; });
+        REQUIRE(result == 2);
+      }
+      SECTION("Three Overloads Assign Reference Capture") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+
+        int result;
+        tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
+                  [&result](const mguid::ArrayNodeType&) { result = 1; },
+                  [&result](const mguid::ValueNodeType&) { result = 2; });
+
+        REQUIRE(result == 2);
+      }
+      SECTION("Three Overloads Assign Reference Capture Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+
+        int result;
+        tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
+                  [&result](const mguid::ArrayNodeType&) { result = 1; },
+                  [&result](const mguid::ValueNodeType&) { result = 2; });
+
+        REQUIRE(result == 2);
+      }
+      SECTION("One Templated Overload Return") {
+        mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 2);
+      }
+      SECTION("One Templated Overload Return Const") {
+        const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
+        int result = tn1.Visit([]<typename T>(T&&) {
+          using Underlying = std::remove_cvref_t<T>;
+          if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
+            return 0;
+          } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
+            return 1;
+          } else {
+            return 2;
+          }
+        });
+        REQUIRE(result == 2);
+      }
     }
   }
-  SECTION("Visit Array") {
-    SECTION("Three Overloads Return") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
-      int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
-                             [](const mguid::ArrayNodeType&) { return 1; },
-                             [](const mguid::ValueNodeType&) { return 2; });
-      REQUIRE(result == 1);
-    }
-    SECTION("Three Overloads Assign Reference Capture") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
+}
 
-      int result;
-      tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
-                [&result](const mguid::ArrayNodeType&) { result = 1; },
-                [&result](const mguid::ValueNodeType&) { result = 2; });
+TEST_CASE("Tree Node Operator []") {
+  SECTION("Key Exists") {
+    mguid::TreeNode ont1{mguid::ObjectNodeType{{"key", mguid::TreeNode{}}}};
+    REQUIRE(ont1["key"].HasObject());
+    const std::string key{"key"};
+    REQUIRE(ont1[key].HasObject());
+  }
+  SECTION("Key Exists Const") {
+    const mguid::TreeNode ont1{mguid::ObjectNodeType{{"key", mguid::TreeNode{}}}};
+    REQUIRE(ont1["key"].HasObject());
+    const std::string key{"key"};
+    REQUIRE(ont1[key].HasObject());
+  }
+  SECTION("Key Doesn't Exist") {
+    mguid::TreeNode ont1;
+    REQUIRE(ont1.GetObject().Empty());
+    REQUIRE(ont1["key1"].HasObject());
+    REQUIRE(ont1.GetObject().Size() == 1);
+    const std::string key2{"key2"};
+    REQUIRE(ont1[key2].HasObject());
+    REQUIRE(ont1.GetObject().Size() == 2);
+  }
+  SECTION("Get Non-Existent Index Empty") {
+    mguid::TreeNode ant1{mguid::ArrayNodeType{}};
+    REQUIRE(ant1.GetArray().Empty());
+    const auto& result = ant1.GetArray()[0];
+    REQUIRE(ant1.GetArray().Size() == 1);
+    REQUIRE(result.HasValue());
+  }
+  SECTION("Get Not Empty") {
+    {
+      mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
 
-      REQUIRE(result == 1);
+      REQUIRE(ant1.GetArray().Size() == 4);
+
+      const auto& result1 = ant1[0];
+      const auto& result2 = ant1[1];
+      const auto& result3 = ant1[2];
+      const auto& result4 = ant1[3];
+      REQUIRE(ant1.GetArray().Size() == 4);
+
+      REQUIRE(result1.HasObject());
+      REQUIRE(result2.HasObject());
+      REQUIRE(result3.HasObject());
+      REQUIRE(result4.HasObject());
     }
-    SECTION("One Templated Overload Return") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
-      int result = tn1.Visit([]<typename T>(T&&) {
-        using Underlying = std::remove_cvref_t<T>;
-        if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
-          return 0;
-        } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
-          return 1;
-        } else {
-          return 2;
-        }
-      });
-      REQUIRE(result == 1);
+    {
+      const mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
+      REQUIRE(ant1.GetArray().Size() == 4);
+
+      const auto& result1 = ant1[0];
+      const auto& result2 = ant1[1];
+      const auto& result3 = ant1[2];
+      const auto& result4 = ant1[3];
+      REQUIRE(ant1.GetArray().Size() == 4);
+
+      REQUIRE(result1.HasObject());
+      REQUIRE(result2.HasObject());
+      REQUIRE(result3.HasObject());
+      REQUIRE(result4.HasObject());
     }
   }
-  SECTION("Visit Value") {
-    SECTION("Three Overloads Return") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-      int result = tn1.Visit([](const mguid::ObjectNodeType&) { return 0; },
-                             [](const mguid::ArrayNodeType&) { return 1; },
-                             [](const mguid::ValueNodeType&) { return 2; });
-      REQUIRE(result == 2);
-    }
-    SECTION("Three Overloads Assign Reference Capture") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-
-      int result;
-      tn1.Visit([&result](const mguid::ObjectNodeType&) { result = 0; },
-                [&result](const mguid::ArrayNodeType&) { result = 1; },
-                [&result](const mguid::ValueNodeType&) { result = 2; });
-
-      REQUIRE(result == 2);
-    }
-    SECTION("One Templated Overload Return") {
-      mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-      int result = tn1.Visit([]<typename T>(T&&) {
-        using Underlying = std::remove_cvref_t<T>;
-        if constexpr (std::same_as<Underlying, mguid::ObjectNodeType>) {
-          return 0;
-        } else if constexpr (std::same_as<Underlying, mguid::ArrayNodeType>) {
-          return 1;
-        } else {
-          return 2;
-        }
-      });
-      REQUIRE(result == 2);
-    }
+  SECTION("Get Non-Existent Index Index Not Empty") {
+    mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
+    REQUIRE(ant1.GetArray().Size() == 4);
+    const auto& result = ant1[4];
+    REQUIRE(ant1.GetArray().Size() == 5);
+    REQUIRE(result.HasValue());
   }
 }
 
@@ -313,7 +1277,7 @@ TEST_CASE("Tree Node Comparison") {
     REQUIRE(mguid::TreeNode(mguid::ArrayNodeType({{}, {}})) ==
             mguid::TreeNode(mguid::ArrayNodeType({{}, {}})));
   }
-  SECTION("Inquality") {
+  SECTION("Inequality") {
     REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})) !=
             mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})));
     REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{})) !=
@@ -323,8 +1287,9 @@ TEST_CASE("Tree Node Comparison") {
     REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::NumberType{})) !=
             mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{})));
 
-    REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"test"})) !=
-            mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"nottest"})));
+    REQUIRE(
+        mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"test"})) !=
+        mguid::TreeNode(mguid::ValueNodeType(mguid::StringType{"nottest"})));
     REQUIRE(mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{true})) !=
             mguid::TreeNode(mguid::ValueNodeType(mguid::BoolType{false})));
     // NullType is always equal to itself since it only has 1 value
@@ -343,13 +1308,39 @@ TEST_CASE("Tree Node Comparison") {
     REQUIRE(mguid::TreeNode(mguid::ArrayNodeType({{}, {}})) !=
             mguid::TreeNode(mguid::ArrayNodeType({{}, {}, {}})));
 
-    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) != mguid::TreeNode(mguid::ObjectNodeType()));
-    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) != mguid::TreeNode(mguid::ValueNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) !=
+            mguid::TreeNode(mguid::ObjectNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ArrayNodeType()) !=
+            mguid::TreeNode(mguid::ValueNodeType()));
 
-    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) != mguid::TreeNode(mguid::ArrayNodeType()));
-    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) != mguid::TreeNode(mguid::ValueNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) !=
+            mguid::TreeNode(mguid::ArrayNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ObjectNodeType()) !=
+            mguid::TreeNode(mguid::ValueNodeType()));
 
-    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) != mguid::TreeNode(mguid::ArrayNodeType()));
-    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) != mguid::TreeNode(mguid::ObjectNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) !=
+            mguid::TreeNode(mguid::ArrayNodeType()));
+    REQUIRE(mguid::TreeNode(mguid::ValueNodeType()) !=
+            mguid::TreeNode(mguid::ObjectNodeType()));
   }
+}
+
+TEST_CASE("Tree Node Erase") {
+  mguid::TreeNode tn1;
+  tn1["object"]["first"];
+  tn1["object"]["second"];
+  tn1["object"]["third"];
+  tn1["array"][9];
+
+  REQUIRE(tn1.GetObject().Size() == 2);
+
+  auto& obj = tn1["object"];
+  REQUIRE(obj.GetObject().Size() == 3);
+  obj.Erase("second");
+  REQUIRE(obj.GetObject().Size() == 2);
+
+  auto& arr = tn1["array"];
+  REQUIRE(arr.GetArray().Size() == 10);
+  arr.Erase(5);
+  REQUIRE(arr.GetArray().Size() == 9);
 }

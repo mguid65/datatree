@@ -81,18 +81,87 @@ TEST_CASE("Object Node Constructor") {
   }
 }
 
-TEST_CASE("Object Node Type TryGet") {
+TEST_CASE("Object Node Type Get") {
   SECTION("Key Exists") {
     mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
-    REQUIRE(ont1.Get("key").has_value());
+    REQUIRE(ont1.TryGet("key").has_value());
+  }
+  SECTION("Key Exists Const") {
+    const mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1.TryGet("key").has_value());
   }
   SECTION("Key Doesn't Exist") {
     mguid::ObjectNodeType ont1;
-    auto result = ont1.Get("key");
+    auto result = ont1.TryGet("key");
+    REQUIRE_FALSE(result.has_value());
+    REQUIRE(result.error().category == mguid::Error::Category::KeyError);
+  }
+  SECTION("Key Doesn't Exist Const") {
+    const mguid::ObjectNodeType ont1;
+    auto result = ont1.TryGet("key");
     REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::KeyError);
   }
 }
+
+TEST_CASE("Object Node Type At") {
+  SECTION("Key Exists") {
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1.At("key").HasObject());
+  }
+  SECTION("Key Exists Const") {
+    const mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1.At("key").HasObject());
+  }
+  SECTION("Key Doesn't Exist") {
+    mguid::ObjectNodeType ont1;
+    REQUIRE_THROWS(ont1.At("key"));
+  }
+  SECTION("Key Doesn't Exist Const") {
+    const mguid::ObjectNodeType ont1;
+    REQUIRE_THROWS(ont1.At("key"));
+  }
+}
+
+
+TEST_CASE("Object Node Type Operator []") {
+  SECTION("Key Exists") {
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1["key"].HasObject());
+    const std::string key{"key"};
+    REQUIRE(ont1[key].HasObject());
+  }
+  SECTION("Key Exists Const") {
+    const mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    REQUIRE(ont1["key"].HasObject());
+    const std::string key{"key"};
+    REQUIRE(ont1[key].HasObject());
+  }
+  SECTION("Key Doesn't Exist") {
+    mguid::ObjectNodeType ont1;
+    REQUIRE(ont1.Empty());
+    REQUIRE(ont1["key1"].HasObject());
+    REQUIRE(ont1.Size() == 1);
+    const std::string key2{"key2"};
+    REQUIRE(ont1[key2].HasObject());
+    REQUIRE(ont1.Size() == 2);
+  }
+  SECTION("Key Exists Move Key") {
+    mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
+    std::string key{"key"};
+    // NOLINTNEXTLINE(bugprone-use-after-move,hicpp-invalid-access-moved)
+    REQUIRE(ont1[std::move(key)].HasObject());
+  }
+  SECTION("Key Doesn't Exist Move Key") {
+    mguid::ObjectNodeType ont1;
+    std::string key{"key"};
+    REQUIRE(ont1.Empty());
+    // NOLINTNEXTLINE(bugprone-use-after-move,hicpp-invalid-access-moved)
+    REQUIRE(ont1[std::move(key)].HasObject());
+    REQUIRE(ont1.Size() == 1);
+  }
+}
+
 
 TEST_CASE("Object Node Type Clear") {
   SECTION("Already Empty") {
@@ -266,7 +335,7 @@ TEST_CASE("Object Node Insert Or Assign") {
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Insert const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -277,7 +346,7 @@ TEST_CASE("Object Node Insert Or Assign") {
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Insert const & Key, && Value") {
     mguid::ObjectNodeType ont1;
@@ -290,7 +359,7 @@ TEST_CASE("Object Node Insert Or Assign") {
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
   SECTION("Insert const & Key, && Value Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -303,7 +372,7 @@ TEST_CASE("Object Node Insert Or Assign") {
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
 }
 
@@ -315,7 +384,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Insert const & Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -324,7 +393,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Insert const & Key, && Value") {
     mguid::ObjectNodeType ont1;
@@ -336,7 +405,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
   SECTION("Insert const & Key, && Value Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -348,7 +417,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
 }
 
@@ -362,7 +431,7 @@ TEST_CASE("Object Node Type Emplace") {
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Emplace Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -373,7 +442,7 @@ TEST_CASE("Object Node Type Emplace") {
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
 }
 
@@ -385,7 +454,7 @@ TEST_CASE("Object Node Type Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Emplace Key Already Exists") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -394,7 +463,7 @@ TEST_CASE("Object Node Type Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
 }
 
@@ -409,7 +478,7 @@ TEST_CASE("Object Node Type Try Emplace") {
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Try Emplace Key Already Exists const & Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -421,7 +490,7 @@ TEST_CASE("Object Node Type Try Emplace") {
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
   SECTION("Try Emplace && Key") {
     mguid::ObjectNodeType ont1;
@@ -434,7 +503,7 @@ TEST_CASE("Object Node Type Try Emplace") {
     REQUIRE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
   SECTION("Try Emplace Key Already Exists && Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -446,7 +515,7 @@ TEST_CASE("Object Node Type Try Emplace") {
     REQUIRE_FALSE(inserted);
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
 }
 
@@ -459,7 +528,7 @@ TEST_CASE("Object Node Type Try Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == node);
+    REQUIRE(ont1.TryGet("key").value() == node);
   }
   SECTION("Try Emplace Hint Key Already Exists const & Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -469,7 +538,7 @@ TEST_CASE("Object Node Type Try Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
   SECTION("Try Emplace Hint && Key") {
     mguid::ObjectNodeType ont1;
@@ -480,7 +549,7 @@ TEST_CASE("Object Node Type Try Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value() == expected);
+    REQUIRE(ont1.TryGet("key").value() == expected);
   }
   SECTION("Try Emplace Hint Key Already Exists && Key") {
     mguid::ObjectNodeType ont1{{"key", {}}};
@@ -490,7 +559,7 @@ TEST_CASE("Object Node Type Try Emplace Hint") {
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
-    REQUIRE(ont1.Get("key").value().HasObject());
+    REQUIRE(ont1.TryGet("key").value().HasObject());
   }
 }
 
