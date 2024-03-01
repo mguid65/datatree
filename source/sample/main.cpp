@@ -58,6 +58,14 @@ auto main() -> int {
   dt1["first"]["second"]["object"] = mguid::ObjectNodeType{};
   dt1["first"]["second"]["value"] = mguid::ValueNodeType{};
 
+  dt1.Unsafe([]([[maybe_unused]] auto&& unsafe) {
+
+  });
+
+  dt1.Unsafe([]([[maybe_unused]] const auto&& unsafe) {
+
+  });
+
   // Value types
   dt1["first"]["second"]["number_value_signed"] = 1;
   dt1["first"]["second"]["number_value_unsigned"] = 1u;

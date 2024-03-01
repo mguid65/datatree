@@ -34,6 +34,23 @@ using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
  * Value
  */
 class TreeNode {
+  template <bool TConst = false>
+  class UnsafeProxy {
+  public:
+    UnsafeProxy(const UnsafeProxy&) = delete;
+    UnsafeProxy& operator=(const UnsafeProxy&) = delete;
+    UnsafeProxy(UnsafeProxy&&) = delete;
+    UnsafeProxy& operator=(UnsafeProxy&&) = delete;
+
+  private:
+    explicit UnsafeProxy(
+        std::conditional_t<TConst, const TreeNode&, TreeNode&> ref)
+        : m_node_ref{ref} {}
+
+    friend TreeNode;
+    std::conditional_t<TConst, const TreeNode&, TreeNode&> m_node_ref;
+  };
+
 public:
   /**
    * @brief Default construct a TreeNode
@@ -281,6 +298,9 @@ public:
 
   /**
    * @brief Try to get the requested type from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @tparam TRequestedType the type requested
    * @return The requested type if it is the type being held or exception
    */
@@ -289,6 +309,9 @@ public:
 
   /**
    * @brief Try to get the requested type from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @tparam TRequestedType the type requested
    * @return The requested type if it is the type being held or exception
    */
@@ -297,84 +320,126 @@ public:
 
   /**
    * @brief Get an ObjectNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ObjectNodeType
    */
   [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType&;
 
   /**
    * @brief Get an ObjectNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ObjectNodeType
    */
   [[nodiscard]] inline auto GetObject() -> ObjectNodeType&;
 
   /**
    * @brief Get an ArrayNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ArrayNodeType
    */
   [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType&;
 
   /**
    * @brief Get an ArrayNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ArrayNodeType
    */
   [[nodiscard]] inline auto GetArray() -> ArrayNodeType&;
 
   /**
    * @brief Get an ValueNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ValueNodeType
    */
   [[nodiscard]] inline auto GetValue() const -> const ValueNodeType&;
 
   /**
    * @brief Get an ValueNodeType from this node
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return reference to ValueNodeType
    */
   [[nodiscard]] inline auto GetValue() -> ValueNodeType&;
 
   /**
    * @brief Get Null value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Null value from this TreeNode
    */
   [[nodiscard]] inline auto GetNull() const -> const NullType&;
 
   /**
    * @brief Get Bool value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Bool value from this TreeNode
    */
   [[nodiscard]] inline auto GetBool() const -> const BoolType&;
 
   /**
    * @brief Get Number value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Number value from this TreeNode
    */
   [[nodiscard]] inline auto GetNumber() const -> const NumberType&;
 
   /**
    * @brief Get String value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return String value from this TreeNode
    */
   [[nodiscard]] inline auto GetString() const -> const std::string&;
 
   /**
    * @brief Get Null value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Null value from this TreeNode
    */
   [[nodiscard]] inline auto GetNull() -> NullType&;
 
   /**
    * @brief Get Bool value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Bool value from this TreeNode
    */
   [[nodiscard]] inline auto GetBool() -> BoolType&;
 
   /**
    * @brief Get Number value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return Number value from this TreeNode
    */
   [[nodiscard]] inline auto GetNumber() -> NumberType&;
 
   /**
    * @brief Get String value from this TreeNode
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @return String value from this TreeNode
    */
   [[nodiscard]] inline auto GetString() -> std::string&;
@@ -484,12 +549,14 @@ public:
    * @param key_or_idx the key of the TreeNode to find
    * @return A reference to the requested element
    */
-  inline auto operator[](const KeyOrIdxType& key_or_idx)
-      -> TreeNode&;
+  inline auto operator[](const KeyOrIdxType& key_or_idx) -> TreeNode&;
 
   /**
    * @brief Get a reference to the TreeNode that is mapped to the key/idx
    * equivalent to `key_or_idx`
+   *
+   * TODO: Move to UnsafeProxy
+   *
    * @param key_or_idx the key/idx of the TreeNode to find
    * @return A reference to the requested element
    */
@@ -509,6 +576,24 @@ public:
    * @return true if element was removed, otherwise false
    */
   inline bool Erase(const KeyOrIdxType& key_or_idx);
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_r_v<void, TFunc, UnsafeProxy<true>>)
+  void Unsafe(TFunc&& func);
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_r_v<void, TFunc, UnsafeProxy<true>>)
+  void Unsafe(TFunc&& func) const;
 
 private:
   /**
@@ -631,6 +716,18 @@ template <NodeTypeTag TTag>
   } else {
     return ObjectNodeType{};
   }
+}
+
+template <typename TFunc>
+  requires(std::is_invocable_r_v<void, TFunc, TreeNode::UnsafeProxy<true>>)
+void TreeNode::Unsafe(TFunc&& func) {
+  std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
+}
+
+template <typename TFunc>
+  requires(std::is_invocable_r_v<void, TFunc, TreeNode::UnsafeProxy<true>>)
+void TreeNode::Unsafe(TFunc&& func) const {
+  std::invoke(std::forward<TFunc>(func), UnsafeProxy<true>{*this});
 }
 
 inline TreeNode::TreeNode()
