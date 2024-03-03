@@ -1,10 +1,33 @@
 /**
- * Copyright (c) 2024 Matthew Guidry
- * Distributed under the MIT License (http://opensource.org/licenses/MIT)
- *
- * @brief Declarations for treenode
+ * @brief Declarations for TreeNode
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
+ *
+ * @cond IGNORE_LICENSE
+ *
+ * MIT License
+ *
+ * Copyright (c) 2024 Matthew Guidry
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @endcond
  */
 
 #ifndef DATATREE_TREE_NODE_HPP
@@ -34,13 +57,120 @@ using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
  * Value
  */
 class TreeNode {
+  /**
+   * @brief
+   * @tparam TConst
+   */
   template <bool TConst = false>
   class UnsafeProxy {
   public:
+    /**
+     * @brief Delete Move/Copy Constructors/Assignment Operators
+     */
     UnsafeProxy(const UnsafeProxy&) = delete;
     UnsafeProxy& operator=(const UnsafeProxy&) = delete;
     UnsafeProxy(UnsafeProxy&&) = delete;
     UnsafeProxy& operator=(UnsafeProxy&&) = delete;
+
+    /**
+     * @brief Try to get the requested type from this Unsafe Proxy TreeNode
+     * @tparam TRequestedType the type requested
+     * @return The requested type if it is the type being held or exception
+     */
+    template <typename TRequestedType>
+    [[nodiscard]] auto Get() const -> const TRequestedType&;
+
+    /**
+     * @brief Try to get the requested type from this TreeNode
+     * @tparam TRequestedType the type requested
+     * @return The requested type if it is the type being held or exception
+     */
+    template <typename TRequestedType>
+    [[nodiscard]] auto Get() -> TRequestedType&;
+
+    /**
+     * @brief Get an ObjectNodeType from this node
+     * @return reference to ObjectNodeType
+     */
+    [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType&;
+
+    /**
+     * @brief Get an ObjectNodeType from this node
+     * @return reference to ObjectNodeType
+     */
+    [[nodiscard]] inline auto GetObject() -> ObjectNodeType&;
+
+    /**
+     * @brief Get an ArrayNodeType from this node
+     * @return reference to ArrayNodeType
+     */
+    [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType&;
+
+    /**
+     * @brief Get an ArrayNodeType from this node
+     * @return reference to ArrayNodeType
+     */
+    [[nodiscard]] inline auto GetArray() -> ArrayNodeType&;
+
+    /**
+     * @brief Get an ValueNodeType from this node
+     * @return reference to ValueNodeType
+     */
+    [[nodiscard]] inline auto GetValue() const -> const ValueNodeType&;
+
+    /**
+     * @brief Get an ValueNodeType from this node
+     * @return reference to ValueNodeType
+     */
+    [[nodiscard]] inline auto GetValue() -> ValueNodeType&;
+
+    /**
+     * @brief Get Null value from this TreeNode
+     * @return Null value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetNull() const -> const NullType&;
+
+    /**
+     * @brief Get Bool value from this TreeNode
+     * @return Bool value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetBool() const -> const BoolType&;
+
+    /**
+     * @brief Get Number value from this TreeNode
+     * @return Number value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetNumber() const -> const NumberType&;
+
+    /**
+     * @brief Get String value from this TreeNode
+     * @return String value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetString() const -> const std::string&;
+
+    /**
+     * @brief Get Null value from this TreeNode
+     * @return Null value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetNull() -> NullType&;
+
+    /**
+     * @brief Get Bool value from this TreeNode
+     * @return Bool value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetBool() -> BoolType&;
+
+    /**
+     * @brief Get Number value from this TreeNode
+     * @return Number value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetNumber() -> NumberType&;
+
+    /**
+     * @brief Get String value from this TreeNode
+     * @return String value from this TreeNode
+     */
+    [[nodiscard]] inline auto GetString() -> std::string&;
 
   private:
     explicit UnsafeProxy(
