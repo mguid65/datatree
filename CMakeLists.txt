@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(datatree VERSION 0.0.2 LANGUAGES CXX C)
+project(data_tree VERSION 0.0.2 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,35 +23,34 @@ endif ()
 
 find_package(tl-expected REQUIRED)
 
-set(DATATREE_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/common.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/data_tree.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/tree_node.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/error/error_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/array_node_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/value_node_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/object_node_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/node_types.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/null_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/number_type.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/datatree/node_types/detail/value_types.hpp
+set(DATA_TREE_HEADERS
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/common/common.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/data_tree.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/tree_node/tree_node.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/error/error_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/array_node_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/value_node_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/object_node_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/node_types.inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/value_types/null_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/value_types/number_type.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/data_tree/node_types/detail/value_types/value_types.hpp
 )
 
-
-add_library(datatree INTERFACE)
-target_include_directories(datatree INTERFACE include)
-target_sources(datatree INTERFACE ${DATATREE_HEADERS})
-target_link_libraries(datatree INTERFACE tl::expected)
-set_target_properties(datatree PROPERTIES LINKER_LANGUAGE CXX)
+add_library(data_tree INTERFACE)
+target_include_directories(data_tree INTERFACE include)
+target_sources(data_tree INTERFACE ${DATA_TREE_HEADERS})
+target_link_libraries(data_tree INTERFACE tl::expected)
+set_target_properties(data_tree PROPERTIES LINKER_LANGUAGE CXX)
 
 include(CTest)
 
 install(DIRECTORY include/ DESTINATION include)
-install(TARGETS datatree DESTINATION lib)
+install(TARGETS data_tree DESTINATION lib)
 
 add_executable(sample)
 target_sources(sample PRIVATE source/sample/main.cpp)
-target_link_libraries(sample PRIVATE datatree)
+target_link_libraries(sample PRIVATE data_tree)
 
 enable_testing()
 

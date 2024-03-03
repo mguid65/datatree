@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "datatree/data_tree.hpp"
+#include "data_tree/data_tree.hpp"
 
 TEST_CASE("DataTree Is TreeNode") {
   STATIC_REQUIRE(std::is_same_v<mguid::DataTree, mguid::TreeNode>);

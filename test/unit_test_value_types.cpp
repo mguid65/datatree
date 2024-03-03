@@ -9,7 +9,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/detail/value_types.hpp>
+#include "data_tree/node_types/detail/value_types/value_types.hpp"
 
 TEST_CASE("Value Type Concepts") {
   SECTION("Null Type") {

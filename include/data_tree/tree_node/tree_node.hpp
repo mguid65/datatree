@@ -38,9 +38,9 @@
 #include <type_traits>
 #include <variant>
 
-#include "datatree/common.hpp"
-#include "datatree/error/error_type.hpp"
-#include "datatree/node_types/detail/value_types.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/error/error_type.hpp"
+#include "data_tree/node_types/detail/value_types/value_types.hpp"
 
 namespace mguid {
 
@@ -749,7 +749,7 @@ private:
 
 }  // namespace mguid
 
-#include "datatree/node_types/node_types.inl"
+#include "data_tree/node_types/node_types.inc"
 
 namespace mguid {
 

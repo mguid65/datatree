@@ -38,9 +38,8 @@
 #include <cstdint>
 #include <utility>
 
-#include "datatree/common.hpp"
-#include "datatree/error/error_type.hpp"
-#include "datatree/node_types/detail/null_type.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/error/error_type.hpp"
 
 namespace mguid {
 

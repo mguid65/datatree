@@ -10,7 +10,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/detail/number_type.hpp>
+#include "data_tree/node_types/detail/value_types/number_type.hpp"
 
 TEST_CASE("Number Type Constructor") {
   SECTION("Default Construction") {

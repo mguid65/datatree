@@ -6,13 +6,13 @@ from conan.tools.files import copy
 from conan.tools.build import can_run
 
 class DataTreeConan(ConanFile):
-    name = 'datatree'
+    name = 'data_tree'
     version = '0.0.2'
 
     license = 'MIT'
     author = 'Matthew Guidry'
     url = 'https://github.com/mguid65/datatree'
-    description = 'Datatree'
+    description = 'N-ary tree of primitive data types'
     topics = 'tree', 'JSON'
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'CMakeDeps', 'CMakeToolchain'
@@ -49,4 +49,4 @@ class DataTreeConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ['datatree']
+        self.cpp_info.libs = ['data_tree']

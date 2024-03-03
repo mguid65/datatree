@@ -37,9 +37,9 @@
 #include <compare>
 #include <vector>
 
-#include "datatree/common.hpp"
-#include "datatree/error/error_type.hpp"
-#include "datatree/node_types/detail/value_node_type.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/error/error_type.hpp"
+#include "data_tree/node_types/detail/value_node_type.hpp"
 
 #ifdef __GNUC__
 #define BEGIN_SUPPRESS_ARRAY_BOUNDS \

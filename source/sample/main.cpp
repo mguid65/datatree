@@ -7,7 +7,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "datatree/data_tree.hpp"
+#include "data_tree/data_tree.hpp"
 
 auto main() -> int {
   static constexpr auto time_it = [](auto name, auto func,
@@ -52,8 +52,8 @@ auto main() -> int {
       samples);
 
   mguid::DataTree dt1;
-  // Node types
 
+  // Node types
   dt1["first"]["second"]["array"] = mguid::ArrayNodeType{};
   dt1["first"]["second"]["object"] = mguid::ObjectNodeType{};
   dt1["first"]["second"]["value"] = mguid::ValueNodeType{};

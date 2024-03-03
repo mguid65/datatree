@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/tree_node.hpp>
+#include "data_tree/tree_node/tree_node.hpp"
 
 using TestMapType = std::unordered_map<std::string, mguid::TreeNode>;
 

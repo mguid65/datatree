@@ -37,8 +37,8 @@
 #include <utility>
 #include <variant>
 
-#include "datatree/common.hpp"
-#include "datatree/node_types/detail/value_types.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/node_types/detail/value_types/value_types.hpp"
 
 namespace mguid {
 

@@ -30,11 +30,11 @@
  * @endcond
  */
 
-#ifndef DATATREE_NODE_TYPES_INL
-#define DATATREE_NODE_TYPES_INL
+#ifndef DATATREE_NODE_TYPES_INC
+#define DATATREE_NODE_TYPES_INC
 
-#include "datatree/node_types/detail/array_node_type.hpp"
-#include "datatree/node_types/detail/object_node_type.hpp"
-#include "datatree/node_types/detail/value_node_type.hpp"
+#include "data_tree/node_types/detail/array_node_type.hpp"
+#include "data_tree/node_types/detail/object_node_type.hpp"
+#include "data_tree/node_types/detail/value_node_type.hpp"
 
-#endif  // DATATREE_NODE_TYPES_INL
+#endif  // DATATREE_NODE_TYPES_INC

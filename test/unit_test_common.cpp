@@ -12,7 +12,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/common.hpp>
+#include "data_tree/common/common.hpp"
 
 TEST_CASE("Pick First Convertible To") {
   STATIC_REQUIRE(

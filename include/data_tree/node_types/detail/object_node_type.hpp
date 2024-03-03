@@ -46,8 +46,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "datatree/common.hpp"
-#include "datatree/error/error_type.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/error/error_type.hpp"
 
 namespace mguid {
 

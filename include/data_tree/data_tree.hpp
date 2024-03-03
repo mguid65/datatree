@@ -33,12 +33,8 @@
 #ifndef DATATREE_DATATREE_HPP
 #define DATATREE_DATATREE_HPP
 
-#include <array>
-#include <iostream>
-#include <sstream>
-
-#include "datatree/common.hpp"
-#include "datatree/tree_node.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/tree_node/tree_node.hpp"
 
 namespace mguid {
 

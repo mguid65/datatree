@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/error/error_type.hpp>
+#include <data_tree/error/error_type.hpp>
 
 TEST_CASE("Error Type Construction") {
   SECTION("Aggregate Initialization") {

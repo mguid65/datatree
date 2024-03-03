@@ -37,8 +37,8 @@
 #include <type_traits>
 #include <variant>
 
-#include "datatree/node_types/detail/null_type.hpp"
-#include "datatree/node_types/detail/number_type.hpp"
+#include "null_type.hpp"
+#include "number_type.hpp"
 
 namespace mguid {
 
