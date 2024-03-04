@@ -62,118 +62,232 @@ class TreeNode {
    * @tparam TConst
    */
   template <bool TConst = false>
-  class UnsafeProxy {
+  class UnsafeProxyType {
   public:
     /**
      * @brief Delete Move/Copy Constructors/Assignment Operators
      */
-    UnsafeProxy(const UnsafeProxy&) = delete;
-    UnsafeProxy& operator=(const UnsafeProxy&) = delete;
-    UnsafeProxy(UnsafeProxy&&) = delete;
-    UnsafeProxy& operator=(UnsafeProxy&&) = delete;
+    UnsafeProxyType(const UnsafeProxyType&) = delete;
+    UnsafeProxyType& operator=(const UnsafeProxyType&) = delete;
+    UnsafeProxyType(UnsafeProxyType&&) = delete;
+    UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
 
     /**
      * @brief Try to get the requested type from this Unsafe Proxy TreeNode
+     *
+     * Assumes that the TreeNode has the TRequestedType
+     *
      * @tparam TRequestedType the type requested
      * @return The requested type if it is the type being held or exception
      */
     template <typename TRequestedType>
-    [[nodiscard]] auto Get() const -> const TRequestedType&;
+    [[nodiscard]] auto Get() const -> const TRequestedType& {
+      return std::get<TRequestedType>(*m_node_ref.m_data_impl);
+    }
 
     /**
      * @brief Try to get the requested type from this TreeNode
+     *
+     * Assumes that the TreeNode has the TRequestedType
+     *
      * @tparam TRequestedType the type requested
      * @return The requested type if it is the type being held or exception
      */
     template <typename TRequestedType>
-    [[nodiscard]] auto Get() -> TRequestedType&;
+    [[nodiscard]] auto Get() -> TRequestedType& {
+      return std::get<TRequestedType>(*m_node_ref.m_data_impl);
+    }
 
     /**
      * @brief Get an ObjectNodeType from this node
+     *
+     * Assumes that the TreeNode has an ObjectNodeType
+     *
      * @return reference to ObjectNodeType
      */
-    [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType&;
+    [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType& {
+      return Get<ObjectNodeType>();
+    }
 
     /**
      * @brief Get an ObjectNodeType from this node
+     *
+     * Assumes that the TreeNode has an ObjectNodeType
+     *
      * @return reference to ObjectNodeType
      */
-    [[nodiscard]] inline auto GetObject() -> ObjectNodeType&;
+    [[nodiscard]] inline auto GetObject() -> ObjectNodeType& {
+      return Get<ObjectNodeType>();
+    }
 
     /**
      * @brief Get an ArrayNodeType from this node
+     *
+     * Assumes that the TreeNode has an ArrayNodeType
+     *
      * @return reference to ArrayNodeType
      */
-    [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType&;
+    [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType& {
+      return Get<ArrayNodeType>();
+    }
 
     /**
      * @brief Get an ArrayNodeType from this node
+     *
+     * Assumes that the TreeNode has an ArrayNodeType
+     *
      * @return reference to ArrayNodeType
      */
-    [[nodiscard]] inline auto GetArray() -> ArrayNodeType&;
+    [[nodiscard]] inline auto GetArray() -> ArrayNodeType& {
+      return Get<ArrayNodeType>();
+    }
 
     /**
      * @brief Get an ValueNodeType from this node
      * @return reference to ValueNodeType
      */
-    [[nodiscard]] inline auto GetValue() const -> const ValueNodeType&;
+    [[nodiscard]] inline auto GetValue() const -> const ValueNodeType& {
+      return Get<ValueNodeType>();
+    }
 
     /**
      * @brief Get an ValueNodeType from this node
+     *
+     * Assumes that the TreeNode has an ValueNodeType
+     *
      * @return reference to ValueNodeType
      */
-    [[nodiscard]] inline auto GetValue() -> ValueNodeType&;
+    [[nodiscard]] inline auto GetValue() -> ValueNodeType& {
+      return Get<ValueNodeType>();
+    }
 
     /**
      * @brief Get Null value from this TreeNode
+     *
+     * Assumes that the TreeNode has an ValueNodeType
+     *
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNull() const -> const NullType&;
+    [[nodiscard]] inline auto GetNull() const -> const NullType& {
+      return GetValue().GetNull();
+    }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] inline auto GetBool() const -> const BoolType&;
+    [[nodiscard]] inline auto GetBool() const -> const BoolType& {
+      return GetValue().GetBool();
+    }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNumber() const -> const NumberType&;
+    [[nodiscard]] inline auto GetNumber() const -> const NumberType& {
+      return GetValue().GetNumber();
+    }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] inline auto GetString() const -> const std::string&;
+    [[nodiscard]] inline auto GetString() const -> const std::string& {
+      return GetValue().GetString();
+    }
 
     /**
      * @brief Get Null value from this TreeNode
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNull() -> NullType&;
+    [[nodiscard]] inline auto GetNull() -> NullType& {
+      return GetValue().GetNull();
+    }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] inline auto GetBool() -> BoolType&;
+    [[nodiscard]] inline auto GetBool() -> BoolType& {
+      return GetValue().GetBool();
+    }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNumber() -> NumberType&;
+    [[nodiscard]] inline auto GetNumber() -> NumberType& {
+      return GetValue().GetNumber();
+    }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] inline auto GetString() -> std::string&;
+    [[nodiscard]] inline auto GetString() -> std::string& {
+      return GetValue().GetString();
+    }
+
+    /**
+     * @brief Get a reference to the TreeNode that is mapped to the key/idx
+     * equivalent to `key_or_idx`
+     *
+     * Assumes that this object is the proper type and the key/index exists
+     *
+     * @param key_or_idx the key/idx of the TreeNode to find
+     * @return A reference to the requested element
+     */
+    [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx) const
+        -> const UnsafeProxyType<true> {
+      return UnsafeProxyType<true>{key_or_idx.Visit(
+          [&](const StringKeyType& key) -> const TreeNode& {
+            return std::as_const(
+                       std::get<ObjectNodeType>(*m_node_ref.m_data_impl))
+                .At(key);
+          },
+          [&](const IntegerKeyType& idx) -> const TreeNode& {
+            return std::as_const(
+                       std::get<ArrayNodeType>(*m_node_ref.m_data_impl))
+                .At(idx);
+          })};
+    }
+
+    /**
+     * @brief Get a reference to the TreeNode that is mapped to the key/idx
+     * equivalent to `key_or_idx`
+     *
+     * Assumes that this object is the proper type and the key/index exists
+     *
+     * @param key_or_idx the key/idx of the TreeNode to find
+     * @return A reference to the requested element
+     */
+    [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx)
+        -> UnsafeProxyType<false> {
+      return UnsafeProxyType<false>{key_or_idx.Visit(
+          [&](const StringKeyType& key) -> const TreeNode& {
+            return std::get<ObjectNodeType>(*m_node_ref.m_data_impl).At(key);
+          },
+          [&](const IntegerKeyType& idx) -> const TreeNode& {
+            return std::get<ArrayNodeType>(*m_node_ref.m_data_impl).At(idx);
+          })};
+    }
+
+    /**
+     * @brief Get a reference to the held TreeNode
+     * @return a reference to the held TreeNode
+     */
+    [[nodiscard]] inline auto Safe() -> TreeNode& { return m_node_ref; }
+
+    /**
+     * @brief Get a reference to the held TreeNode
+     * @return a reference to the held TreeNode
+     */
+    [[nodiscard]] inline auto Safe() const -> const TreeNode& {
+      return m_node_ref;
+    }
 
   private:
-    explicit UnsafeProxy(
+    explicit UnsafeProxyType(
         std::conditional_t<TConst, const TreeNode&, TreeNode&> ref)
         : m_node_ref{ref} {}
 
@@ -182,6 +296,9 @@ class TreeNode {
   };
 
 public:
+  using ConstUnsafeProxy = const UnsafeProxyType<true>;
+  using UnsafeProxy = UnsafeProxyType<false>;
+
   /**
    * @brief Default construct a TreeNode
    */
@@ -427,154 +544,6 @@ public:
   [[nodiscard]] inline auto TryGetValue() -> RefExpected<ValueNodeType, Error>;
 
   /**
-   * @brief Try to get the requested type from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @tparam TRequestedType the type requested
-   * @return The requested type if it is the type being held or exception
-   */
-  template <typename TRequestedType>
-  [[nodiscard]] auto Get() const -> const TRequestedType&;
-
-  /**
-   * @brief Try to get the requested type from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @tparam TRequestedType the type requested
-   * @return The requested type if it is the type being held or exception
-   */
-  template <typename TRequestedType>
-  [[nodiscard]] auto Get() -> TRequestedType&;
-
-  /**
-   * @brief Get an ObjectNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ObjectNodeType
-   */
-  [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType&;
-
-  /**
-   * @brief Get an ObjectNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ObjectNodeType
-   */
-  [[nodiscard]] inline auto GetObject() -> ObjectNodeType&;
-
-  /**
-   * @brief Get an ArrayNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ArrayNodeType
-   */
-  [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType&;
-
-  /**
-   * @brief Get an ArrayNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ArrayNodeType
-   */
-  [[nodiscard]] inline auto GetArray() -> ArrayNodeType&;
-
-  /**
-   * @brief Get an ValueNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ValueNodeType
-   */
-  [[nodiscard]] inline auto GetValue() const -> const ValueNodeType&;
-
-  /**
-   * @brief Get an ValueNodeType from this node
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return reference to ValueNodeType
-   */
-  [[nodiscard]] inline auto GetValue() -> ValueNodeType&;
-
-  /**
-   * @brief Get Null value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Null value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetNull() const -> const NullType&;
-
-  /**
-   * @brief Get Bool value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Bool value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetBool() const -> const BoolType&;
-
-  /**
-   * @brief Get Number value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Number value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetNumber() const -> const NumberType&;
-
-  /**
-   * @brief Get String value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return String value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetString() const -> const std::string&;
-
-  /**
-   * @brief Get Null value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Null value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetNull() -> NullType&;
-
-  /**
-   * @brief Get Bool value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Bool value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetBool() -> BoolType&;
-
-  /**
-   * @brief Get Number value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return Number value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetNumber() -> NumberType&;
-
-  /**
-   * @brief Get String value from this TreeNode
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @return String value from this TreeNode
-   */
-  [[nodiscard]] inline auto GetString() -> std::string&;
-
-  /**
    * @brief Try to get NullType value from this TreeNode
    * @return NullType value from this TreeNode
    */
@@ -682,18 +651,6 @@ public:
   inline auto operator[](const KeyOrIdxType& key_or_idx) -> TreeNode&;
 
   /**
-   * @brief Get a reference to the TreeNode that is mapped to the key/idx
-   * equivalent to `key_or_idx`
-   *
-   * TODO: Move to UnsafeProxy
-   *
-   * @param key_or_idx the key/idx of the TreeNode to find
-   * @return A reference to the requested element
-   */
-  [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx) const
-      -> const TreeNode&;
-
-  /**
    * @brief Equality compare this TreeNode to another
    * @return true if they are equal, otherwise false
    */
@@ -713,8 +670,9 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_r_v<void, TFunc, UnsafeProxy<true>>)
-  void Unsafe(TFunc&& func);
+    requires(std::is_invocable_v<TFunc, UnsafeProxy, TreeNode&> ||
+             std::is_invocable_v<TFunc, UnsafeProxy>)
+  decltype(auto) Unsafe(TFunc&& func);
 
   /**
    * @brief Use the unsafe API within a lambda function
@@ -722,8 +680,9 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_r_v<void, TFunc, UnsafeProxy<true>>)
-  void Unsafe(TFunc&& func) const;
+    requires(std::is_invocable_v<TFunc, ConstUnsafeProxy, const TreeNode&> ||
+             std::is_invocable_v<TFunc, ConstUnsafeProxy>)
+  decltype(auto) ConstUnsafe(TFunc&& func) const;
 
 private:
   /**
@@ -767,7 +726,9 @@ TreeNode::TreeNode(TValueType&& value)
 template <ValidValueNodeTypeValueType TValueType>
 TreeNode& TreeNode::operator=(TValueType&& value) {
   if (!HasValue()) { Reset<NodeTypeTag::Value>(); }
-  GetValue() = value;
+  Unsafe([&value](auto&& unsafe) {
+    unsafe.GetValue() = std::forward<TValueType>(value);
+  });
   return *this;
 }
 
@@ -792,16 +753,6 @@ auto TreeNode::TryGet() -> RefExpected<TRequestedType, Error> {
     return *result;
   }
   return make_unexpected(Error{.category = Error::Category::BadAccess});
-}
-
-template <typename TRequestedType>
-auto TreeNode::Get() const -> const TRequestedType& {
-  return std::get<TRequestedType>(*m_data_impl);
-}
-
-template <typename TRequestedType>
-auto TreeNode::Get() -> TRequestedType& {
-  return std::get<TRequestedType>(*m_data_impl);
 }
 
 template <typename TNodeType>
@@ -849,15 +800,47 @@ template <NodeTypeTag TTag>
 }
 
 template <typename TFunc>
-  requires(std::is_invocable_r_v<void, TFunc, TreeNode::UnsafeProxy<true>>)
-void TreeNode::Unsafe(TFunc&& func) {
-  std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
+  requires(std::is_invocable_v<TFunc, TreeNode::UnsafeProxy, TreeNode&> ||
+           std::is_invocable_v<TFunc, TreeNode::UnsafeProxy>)
+decltype(auto) TreeNode::Unsafe(TFunc&& func) {
+  if constexpr (std::is_invocable_r_v<void, TFunc, UnsafeProxy, TreeNode&>) {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::UnsafeProxy, TreeNode&>>) {
+      std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
+    } else {
+      return std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
+    }
+  } else {
+    if constexpr (std::is_void_v<
+                      std::invoke_result_t<TFunc, TreeNode::UnsafeProxy>>) {
+      std::forward<TFunc>(func)(UnsafeProxy{*this});
+    } else {
+      return std::forward<TFunc>(func)(UnsafeProxy{*this});
+    }
+  }
 }
 
 template <typename TFunc>
-  requires(std::is_invocable_r_v<void, TFunc, TreeNode::UnsafeProxy<true>>)
-void TreeNode::Unsafe(TFunc&& func) const {
-  std::invoke(std::forward<TFunc>(func), UnsafeProxy<true>{*this});
+  requires(
+      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy, const TreeNode&> ||
+      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy>)
+decltype(auto) TreeNode::ConstUnsafe(TFunc&& func) const {
+  if constexpr (std::is_invocable_r_v<void, TFunc, ConstUnsafeProxy,
+                                      const TreeNode&>) {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::ConstUnsafeProxy, TreeNode&>>) {
+      std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
+    } else {
+      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
+    }
+  } else {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::ConstUnsafeProxy>>) {
+      std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
+    } else {
+      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
+    }
+  }
 }
 
 inline TreeNode::TreeNode()
@@ -865,6 +848,7 @@ inline TreeNode::TreeNode()
 
 inline TreeNode::TreeNode(const TreeNode& other)
     : m_data_impl{std::make_unique<NodeType>(*other.m_data_impl)} {}
+
 inline TreeNode& TreeNode::operator=(const TreeNode& other) {
   if (&other != this) {
     m_data_impl = std::make_unique<NodeType>(*other.m_data_impl);
@@ -944,16 +928,24 @@ inline auto TreeNode::HasValue() const noexcept -> bool {
 }
 
 inline auto TreeNode::HasNull() const noexcept -> bool {
-  return HasValue() && GetValue().HasNull();
+  return HasValue() && ConstUnsafe([](const auto&& unsafe) {
+           return unsafe.GetValue().HasNull();
+         });
 }
 inline auto TreeNode::HasBool() const noexcept -> bool {
-  return HasValue() && GetValue().HasBool();
+  return HasValue() && ConstUnsafe([](const auto&& unsafe) {
+           return unsafe.GetValue().HasBool();
+         });
 }
 inline auto TreeNode::HasNumber() const noexcept -> bool {
-  return HasValue() && GetValue().HasNumber();
+  return HasValue() && ConstUnsafe([](const auto&& unsafe) {
+           return unsafe.GetValue().HasNumber();
+         });
 }
 inline auto TreeNode::HasString() const noexcept -> bool {
-  return HasValue() && GetValue().HasString();
+  return HasValue() && ConstUnsafe([](const auto&& unsafe) {
+           return unsafe.GetValue().HasString();
+         });
 }
 
 inline auto TreeNode::TryGetObject() const
@@ -979,97 +971,60 @@ inline auto TreeNode::TryGetValue() -> RefExpected<ValueNodeType, Error> {
   return TryGet<ValueNodeType>();
 }
 
-inline auto TreeNode::GetNull() const -> const NullType& {
-  return GetValue().GetNull();
-}
-inline auto TreeNode::GetBool() const -> const BoolType& {
-  return GetValue().GetBool();
-}
-inline auto TreeNode::GetNumber() const -> const NumberType& {
-  return GetValue().GetNumber();
-}
-inline auto TreeNode::GetString() const -> const std::string& {
-  return GetValue().GetString();
-}
-
-inline auto TreeNode::GetNull() -> NullType& { return GetValue().GetNull(); }
-inline auto TreeNode::GetBool() -> BoolType& { return GetValue().GetBool(); }
-inline auto TreeNode::GetNumber() -> NumberType& {
-  return GetValue().GetNumber();
-}
-inline auto TreeNode::GetString() -> std::string& {
-  return GetValue().GetString();
-}
-
 inline auto TreeNode::TryGetNull() const -> RefExpected<const NullType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetNull();
+  return ConstUnsafe(
+      [](const auto&& unsafe) { return unsafe.GetValue().TryGetNull(); });
 }
 inline auto TreeNode::TryGetBool() const -> RefExpected<const BoolType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetBool();
+  return ConstUnsafe(
+      [](const auto&& unsafe) { return unsafe.GetValue().TryGetBool(); });
 }
 inline auto TreeNode::TryGetNumber() const
     -> RefExpected<const NumberType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetNumber();
+  return ConstUnsafe(
+      [](const auto&& unsafe) { return unsafe.GetValue().TryGetNumber(); });
 }
 inline auto TreeNode::TryGetString() const
     -> RefExpected<const StringType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetString();
+  return ConstUnsafe(
+      [](const auto&& unsafe) { return unsafe.GetValue().TryGetString(); });
 }
 
 inline auto TreeNode::TryGetNull() -> RefExpected<NullType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetNull();
+  return Unsafe([](auto&& unsafe) { return unsafe.GetValue().TryGetNull(); });
 }
 inline auto TreeNode::TryGetBool() -> RefExpected<BoolType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetBool();
+  return Unsafe([](auto&& unsafe) { return unsafe.GetValue().TryGetBool(); });
 }
 inline auto TreeNode::TryGetNumber() -> RefExpected<NumberType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetNumber();
+  return Unsafe([](auto&& unsafe) { return unsafe.GetValue().TryGetNumber(); });
 }
 inline auto TreeNode::TryGetString() -> RefExpected<StringType, Error> {
   if (!HasValue()) {
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-  return GetValue().TryGetString();
-}
-
-inline auto TreeNode::GetObject() const -> const ObjectNodeType& {
-  return Get<ObjectNodeType>();
-}
-inline auto TreeNode::GetObject() -> ObjectNodeType& {
-  return Get<ObjectNodeType>();
-}
-inline auto TreeNode::GetArray() const -> const ArrayNodeType& {
-  return Get<ArrayNodeType>();
-}
-inline auto TreeNode::GetArray() -> ArrayNodeType& {
-  return Get<ArrayNodeType>();
-}
-inline auto TreeNode::GetValue() const -> const ValueNodeType& {
-  return Get<ValueNodeType>();
-}
-inline auto TreeNode::GetValue() -> ValueNodeType& {
-  return Get<ValueNodeType>();
+  return Unsafe([](auto&& unsafe) { return unsafe.GetValue().TryGetString(); });
 }
 
 inline void TreeNode::Reset(NodeTypeTag tag) { *m_data_impl = FromTag(tag); }
@@ -1083,20 +1038,6 @@ inline auto TreeNode::operator[](const KeyOrIdxType& key_or_idx) -> TreeNode& {
       [&](const IntegerKeyType& idx) -> TreeNode& {
         if (!HasArray()) { *m_data_impl = ArrayNodeType{}; }
         return std::get<ArrayNodeType>(*m_data_impl)[idx];
-      });
-}
-
-inline auto TreeNode::operator[](const KeyOrIdxType& key_or_idx) const
-    -> const TreeNode& {
-  static constexpr auto as_const = [](const auto& item) -> const auto& {
-    return item;
-  };
-  return key_or_idx.Visit(
-      [&](const StringKeyType& key) -> const TreeNode& {
-        return as_const(std::get<ObjectNodeType>(*m_data_impl)).At(key);
-      },
-      [&](const IntegerKeyType& idx) -> const TreeNode& {
-        return as_const(std::get<ArrayNodeType>(*m_data_impl)).At(idx);
       });
 }
 

@@ -26,20 +26,26 @@ auto main() -> int {
   dt1["first"]["second"]["string_literal_value"] = "Hello, World!";
   dt1["first"]["second"]["string_value"] = std::string("42");
 
-  std::cout << "DT1 Num Direct Children: " << dt1.GetObject().Size()
-            << std::endl;
-  std::cout << R"(DT1["first"]["second"] Num Direct Children: )"
-            << dt1["first"]["second"].GetObject().Size() << std::endl;
+  dt1.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT1 Num Direct Children: " << unsafe.GetObject().Size()
+              << std::endl;
+    std::cout << R"(DT1["first"]["second"] Num Direct Children: )"
+              << unsafe["first"]["second"].GetObject().Size() << std::endl;
+  });
 
   // Set path to another tree
   mguid::DataTree dt2;
   dt2["some_key"] = dt1;
 
-  std::cout << "DT2 Num Direct Children: " << dt2.GetObject().Size()
-            << std::endl;
+  dt2.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT2 Num Direct Children: " << unsafe.GetObject().Size()
+              << std::endl;
+  });
 
   dt2.Erase("some_key");
 
-  std::cout << "DT2 Num Direct Children After Erase: " << dt2.GetObject().Size()
-            << std::endl;
+  dt2.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT2 Num Direct Children After Erase: "
+              << unsafe.GetObject().Size() << std::endl;
+  });
 }
