@@ -718,6 +718,51 @@ concept ValidNodeType =
     std::same_as<std::remove_cvref_t<TNodeType>, ArrayNodeType> ||
     std::same_as<std::remove_cvref_t<TNodeType>, ValueNodeType>;
 
+
+template <typename TFunc>
+  requires(std::is_invocable_v<TFunc, TreeNode::UnsafeProxy, TreeNode&> ||
+           std::is_invocable_v<TFunc, TreeNode::UnsafeProxy>)
+decltype(auto) TreeNode::Unsafe(TFunc&& func) {
+  if constexpr (std::is_invocable_r_v<void, TFunc, UnsafeProxy, TreeNode&>) {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::UnsafeProxy, TreeNode&>>) {
+      std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
+    } else {
+      return std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
+    }
+  } else {
+    if constexpr (std::is_void_v<
+                      std::invoke_result_t<TFunc, TreeNode::UnsafeProxy>>) {
+      std::forward<TFunc>(func)(UnsafeProxy{*this});
+    } else {
+      return std::forward<TFunc>(func)(UnsafeProxy{*this});
+    }
+  }
+}
+
+template <typename TFunc>
+  requires(
+      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy, const TreeNode&> ||
+      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy>)
+decltype(auto) TreeNode::ConstUnsafe(TFunc&& func) const {
+  if constexpr (std::is_invocable_r_v<void, TFunc, ConstUnsafeProxy,
+                                      const TreeNode&>) {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::ConstUnsafeProxy, TreeNode&>>) {
+      std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
+    } else {
+      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
+    }
+  } else {
+    if constexpr (std::is_void_v<std::invoke_result_t<
+                      TFunc, TreeNode::ConstUnsafeProxy>>) {
+      std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
+    } else {
+      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
+    }
+  }
+}
+
 template <ValidValueNodeTypeValueType TValueType>
 TreeNode::TreeNode(TValueType&& value)
     : m_data_impl{std::make_unique<NodeType>(
@@ -796,50 +841,6 @@ template <NodeTypeTag TTag>
     return ValueNodeType{};
   } else {
     return ObjectNodeType{};
-  }
-}
-
-template <typename TFunc>
-  requires(std::is_invocable_v<TFunc, TreeNode::UnsafeProxy, TreeNode&> ||
-           std::is_invocable_v<TFunc, TreeNode::UnsafeProxy>)
-decltype(auto) TreeNode::Unsafe(TFunc&& func) {
-  if constexpr (std::is_invocable_r_v<void, TFunc, UnsafeProxy, TreeNode&>) {
-    if constexpr (std::is_void_v<std::invoke_result_t<
-                      TFunc, TreeNode::UnsafeProxy, TreeNode&>>) {
-      std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
-    } else {
-      return std::forward<TFunc>(func)(UnsafeProxy{*this}, *this);
-    }
-  } else {
-    if constexpr (std::is_void_v<
-                      std::invoke_result_t<TFunc, TreeNode::UnsafeProxy>>) {
-      std::forward<TFunc>(func)(UnsafeProxy{*this});
-    } else {
-      return std::forward<TFunc>(func)(UnsafeProxy{*this});
-    }
-  }
-}
-
-template <typename TFunc>
-  requires(
-      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy, const TreeNode&> ||
-      std::is_invocable_v<TFunc, TreeNode::ConstUnsafeProxy>)
-decltype(auto) TreeNode::ConstUnsafe(TFunc&& func) const {
-  if constexpr (std::is_invocable_r_v<void, TFunc, ConstUnsafeProxy,
-                                      const TreeNode&>) {
-    if constexpr (std::is_void_v<std::invoke_result_t<
-                      TFunc, TreeNode::ConstUnsafeProxy, TreeNode&>>) {
-      std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
-    } else {
-      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this}, *this);
-    }
-  } else {
-    if constexpr (std::is_void_v<std::invoke_result_t<
-                      TFunc, TreeNode::ConstUnsafeProxy>>) {
-      std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
-    } else {
-      return std::forward<TFunc>(func)(ConstUnsafeProxy{*this});
-    }
   }
 }
 
