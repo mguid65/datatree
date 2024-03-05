@@ -68,7 +68,7 @@ auto main() -> int {
   dt1["first"]["second"]["string_literal_value"] = "Hello, World!";
   dt1["first"]["second"]["string_value"] = std::string("42");
 
-  dt1.ConstUnsafe([](const auto&& unsafe) {
+  dt1.ConstUnsafe([](const auto& unsafe) {
     std::cout << "DT1 Num Direct Children: " << unsafe.GetObject().Size()
               << std::endl;
     std::cout << R"(DT1["first"]["second"] Num Direct Children: )"
