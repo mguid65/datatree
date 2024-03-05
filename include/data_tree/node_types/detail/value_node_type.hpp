@@ -46,7 +46,45 @@ namespace mguid {
  * @brief A class to represent a node that stores a value
  */
 class ValueNodeType {
+  /**
+   * @brief Proxy class that provides access to unsafe ValueNodeType functionality
+   * @tparam TConst whether we are holding a const or non-const reference
+   */
+  template <bool TConst = false>
+  class UnsafeProxyType {
+  public:
+    /**
+     * @brief Delete Move/Copy Constructors/Assignment Operators
+     */
+    UnsafeProxyType(const UnsafeProxyType&) = delete;
+    UnsafeProxyType& operator=(const UnsafeProxyType&) = delete;
+    UnsafeProxyType(UnsafeProxyType&&) = delete;
+    UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
+
+    /**
+     * @brief Get a reference to the held ValueNodeType
+     * @return a reference to the held ValueNodeType
+     */
+    [[nodiscard]] auto Safe() -> ValueNodeType& { return m_node_ref; }
+
+    /**
+     * @brief Get a reference to the held ValueNodeType
+     * @return a reference to the held ValueNodeType
+     */
+    [[nodiscard]] auto Safe() const -> const ValueNodeType& { return m_node_ref; }
+
+  private:
+    explicit UnsafeProxyType(std::conditional_t<TConst, const ValueNodeType&, ValueNodeType&> ref)
+        : m_node_ref{ref} {}
+
+    friend ValueNodeType;
+    std::conditional_t<TConst, const ValueNodeType&, ValueNodeType&> m_node_ref;
+  };
+
 public:
+  using ConstUnsafeProxy = const UnsafeProxyType<true>;
+  using UnsafeProxy = UnsafeProxyType<false>;
+
   /**
    * @brief Default construct a ValueNode with value Null
    */
@@ -948,6 +986,89 @@ public:
    * @return comparison category
    */
   [[nodiscard]] constexpr auto operator<=>(const ValueNodeType&) const = default;
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>()),
+                                 ValueNodeType&> &&
+             !std::is_same_v<
+                 std::decay_t<std::invoke_result_t<
+                     TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>()), ValueNodeType&>>,
+                 ValueNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>()),
+                              ValueNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ValueNodeType::UnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>())>>,
+                             ValueNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ValueNodeType::UnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ValueNodeType::UnsafeProxy{*this});
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>()),
+                                 const ValueNodeType&> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>()),
+                                 const ValueNodeType&>>,
+                             ValueNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>()),
+                              const ValueNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ValueNodeType::ConstUnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>())> &&
+        !std::is_same_v<std::decay_t<std::invoke_result_t<
+                            TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>())>>,
+                        ValueNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ValueNodeType::ConstUnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ValueNodeType::ConstUnsafeProxy{*this});
+  }
 
 private:
   VariantValueType m_variant_value{NullType{}};

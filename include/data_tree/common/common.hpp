@@ -432,14 +432,6 @@ template <typename TValueType, typename TRange>
 concept RangeOf =
     std::ranges::range<TRange> && std::same_as<std::ranges::range_value_t<TRange>, TValueType>;
 
-/**
- * @brief Check if a function has a void invoke result
- * @tparam TFunc some function type
- * @tparam TArgs function argument types
- */
-template <typename TFunc, typename... TArgs>
-inline constexpr bool VoidResultV = std::is_void_v<std::invoke_result_t<TFunc, TArgs...>>;
-
 }  // namespace mguid
 
 #endif  // DATATREE_COMMON_HPP

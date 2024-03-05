@@ -43,8 +43,7 @@
 
 #ifdef __GNUC__
 #define BEGIN_SUPPRESS_ARRAY_BOUNDS \
-  _Pragma("GCC diagnostic push")    \
-      _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define END_SUPPRESS_ARRAY_BOUNDS _Pragma("GCC diagnostic pop")
 #else
 #define BEGIN_SUPPRESS_ARRAY_BOUNDS
@@ -72,6 +71,46 @@ public:
   using ExpectedRType = RefExpected<ValueType, Error>;
   using ConstExpectedRType = RefExpected<const ValueType, Error>;
 
+private:
+  /**
+   * @brief Proxy class that provides access to unsafe ArrayNodeType functionality
+   * @tparam TConst whether we are holding a const or non-const reference
+   */
+  template <bool TConst = false>
+  class UnsafeProxyType {
+  public:
+    /**
+     * @brief Delete Move/Copy Constructors/Assignment Operators
+     */
+    UnsafeProxyType(const UnsafeProxyType&) = delete;
+    UnsafeProxyType& operator=(const UnsafeProxyType&) = delete;
+    UnsafeProxyType(UnsafeProxyType&&) = delete;
+    UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
+
+    /**
+     * @brief Get a reference to the held ArrayNodeType
+     * @return a reference to the held ArrayNodeType
+     */
+    [[nodiscard]] auto Safe() -> ArrayNodeType& { return m_node_ref; }
+
+    /**
+     * @brief Get a reference to the held ArrayNodeType
+     * @return a reference to the held ArrayNodeType
+     */
+    [[nodiscard]] auto Safe() const -> const ArrayNodeType& { return m_node_ref; }
+
+  private:
+    explicit UnsafeProxyType(std::conditional_t<TConst, const ArrayNodeType&, ArrayNodeType&> ref)
+        : m_node_ref{ref} {}
+
+    friend ArrayNodeType;
+    std::conditional_t<TConst, const ArrayNodeType&, ArrayNodeType&> m_node_ref;
+  };
+
+public:
+  using ConstUnsafeProxy = const UnsafeProxyType<true>;
+  using UnsafeProxy = UnsafeProxyType<false>;
+
   /**
    * @brief Default construct an ArrayNodeType
    */
@@ -95,8 +134,7 @@ public:
    * @brief Construct from an initializer list of uuids
    * @param init_list an initializer list of uuids
    */
-  ArrayNodeType(std::initializer_list<TreeNode> init_list)
-      : m_underlying(init_list) {}
+  ArrayNodeType(std::initializer_list<TreeNode> init_list) : m_underlying(init_list) {}
 
   /**
    * @brief Assign an initializer list of uuids to this
@@ -127,18 +165,14 @@ public:
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
-  [[nodiscard]] auto At(SizeType pos) -> ValueType& {
-    return m_underlying.at(pos);
-  }
+  [[nodiscard]] auto At(SizeType pos) -> ValueType& { return m_underlying.at(pos); }
 
   /**
    * @brief Access the specified element with bounds checking
    * @param pos position of the element to return
    * @return copy of the element at pos or Error
    */
-  [[nodiscard]] auto At(SizeType pos) const -> const ValueType& {
-    return m_underlying.at(pos);
-  }
+  [[nodiscard]] auto At(SizeType pos) const -> const ValueType& { return m_underlying.at(pos); }
 
   /**
    * @brief Access the specified element, if the element does not exist, creates
@@ -217,9 +251,7 @@ public:
    * @return the element at the front of this ArrayNodeType or OutOfRange
    */
   [[nodiscard]] auto TryFront() const -> ConstExpectedRType {
-    if (Empty()) {
-      return make_unexpected(Error{.category = Error::Category::OutOfRange});
-    }
+    if (Empty()) { return make_unexpected(Error{.category = Error::Category::OutOfRange}); }
     return m_underlying.front();
   }
 
@@ -229,9 +261,7 @@ public:
    * @return the element at the back of this ArrayNodeType or OutOfRange
    */
   [[nodiscard]] auto TryBack() const -> ConstExpectedRType {
-    if (Empty()) {
-      return make_unexpected(Error{.category = Error::Category::OutOfRange});
-    }
+    if (Empty()) { return make_unexpected(Error{.category = Error::Category::OutOfRange}); }
     return m_underlying.back();
   }
 
@@ -241,9 +271,7 @@ public:
    * @return the element at the front of this ArrayNodeType or OutOfRange
    */
   [[nodiscard]] auto TryFront() -> ExpectedRType {
-    if (Empty()) {
-      return make_unexpected(Error{.category = Error::Category::OutOfRange});
-    }
+    if (Empty()) { return make_unexpected(Error{.category = Error::Category::OutOfRange}); }
     return m_underlying.front();
   }
 
@@ -253,9 +281,7 @@ public:
    * @return the element at the back of this ArrayNodeType or OutOfRange
    */
   [[nodiscard]] auto TryBack() -> ExpectedRType {
-    if (Empty()) {
-      return make_unexpected(Error{.category = Error::Category::OutOfRange});
-    }
+    if (Empty()) { return make_unexpected(Error{.category = Error::Category::OutOfRange}); }
     return m_underlying.back();
   }
 
@@ -263,17 +289,13 @@ public:
    * @brief Get the element at the front of this ArrayNodeType
    * @return the element at the front of this ArrayNodeType
    */
-  [[nodiscard]] auto Front() const -> const ValueType& {
-    return m_underlying.front();
-  }
+  [[nodiscard]] auto Front() const -> const ValueType& { return m_underlying.front(); }
 
   /**
    * @brief Get the element at the back of this ArrayNodeType
    * @return the element at the back of this ArrayNodeType
    */
-  [[nodiscard]] auto Back() const -> const ValueType& {
-    return m_underlying.back();
-  }
+  [[nodiscard]] auto Back() const -> const ValueType& { return m_underlying.back(); }
 
   /**
    * @brief Get the element at the front of this ArrayNodeType
@@ -291,17 +313,13 @@ public:
    * @brief Check if this ArrayNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const noexcept -> bool {
-    return m_underlying.empty();
-  }
+  [[nodiscard]] auto Empty() const noexcept -> bool { return m_underlying.empty(); }
 
   /**
    * @brief Get the number of elements in this ArrayNodeType
    * @return the number of elements in this ArrayNodeType
    */
-  [[nodiscard]] auto Size() const noexcept -> SizeType {
-    return m_underlying.size();
-  }
+  [[nodiscard]] auto Size() const noexcept -> SizeType { return m_underlying.size(); }
 
   /**
    * @brief Resizes the container to contain count elements
@@ -349,9 +367,7 @@ public:
    * allocated space for.
    * @return Capacity of the currently allocated storage.
    */
-  [[nodiscard]] auto Capacity() const noexcept -> SizeType {
-    return m_underlying.capacity();
-  }
+  [[nodiscard]] auto Capacity() const noexcept -> SizeType { return m_underlying.capacity(); }
 
   /**
    * @brief Requests the removal of unused capacity.
@@ -385,8 +401,7 @@ public:
    * @return Iterator pointing to the first element inserted, or pos if count ==
    * 0.
    */
-  auto Insert(ConstIterator pos, SizeType count, const ValueType& value)
-      -> Iterator {
+  auto Insert(ConstIterator pos, SizeType count, const ValueType& value) -> Iterator {
     return m_underlying.insert(pos, count, value);
   }
 
@@ -411,8 +426,7 @@ public:
    * @return Iterator pointing to the first element inserted, or pos if
    * init_list is empty.
    */
-  auto Insert(ConstIterator pos, std::initializer_list<ValueType> init_list)
-      -> Iterator {
+  auto Insert(ConstIterator pos, std::initializer_list<ValueType> init_list) -> Iterator {
     return m_underlying.insert(pos, init_list);
   }
 
@@ -489,25 +503,19 @@ public:
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto Begin() noexcept -> Iterator {
-    return m_underlying.begin();
-  }
+  [[nodiscard]] auto Begin() noexcept -> Iterator { return m_underlying.begin(); }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
-    return m_underlying.begin();
-  }
+  [[nodiscard]] auto Begin() const noexcept -> ConstIterator { return m_underlying.begin(); }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
-    return m_underlying.cbegin();
-  }
+  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator { return m_underlying.cbegin(); }
 
   /**
    * @brief Returns an iterator to the element following the last element of the
@@ -523,9 +531,7 @@ public:
    * @return an iterator to the element following the last element of the
    * ArrayNodeType.
    */
-  [[nodiscard]] auto End() const noexcept -> ConstIterator {
-    return m_underlying.end();
-  }
+  [[nodiscard]] auto End() const noexcept -> ConstIterator { return m_underlying.end(); }
 
   /**
    * @brief Returns an iterator to the element following the last element of the
@@ -533,9 +539,7 @@ public:
    * @return an iterator to the element following the last element of the
    * ArrayNodeType.
    */
-  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
-    return m_underlying.cend();
-  }
+  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator { return m_underlying.cend(); }
 
   /**
    * @brief Returns a reverse iterator to the first element of the reversed
@@ -545,9 +549,7 @@ public:
    * @return a reverse iterator to the first element of the reversed
    * ArrayNodeType.
    */
-  [[nodiscard]] auto RBegin() noexcept -> ReverseIterator {
-    return m_underlying.rbegin();
-  }
+  [[nodiscard]] auto RBegin() noexcept -> ReverseIterator { return m_underlying.rbegin(); }
 
   /**
    * @brief Returns a reverse iterator to the first element of the reversed
@@ -581,9 +583,7 @@ public:
    * @return a reverse iterator to the element following the last element of the
    * reversed ArrayNodeType.
    */
-  [[nodiscard]] auto REnd() noexcept -> ReverseIterator {
-    return m_underlying.rend();
-  }
+  [[nodiscard]] auto REnd() noexcept -> ReverseIterator { return m_underlying.rend(); }
 
   /**
    * @brief Returns a reverse iterator to the element following the last element
@@ -593,9 +593,7 @@ public:
    * @return a reverse iterator to the element following the last element of the
    * reversed ArrayNodeType.
    */
-  [[nodiscard]] auto REnd() const noexcept -> ConstReverseIterator {
-    return m_underlying.rend();
-  }
+  [[nodiscard]] auto REnd() const noexcept -> ConstReverseIterator { return m_underlying.rend(); }
 
   /**
    * @brief Returns a reverse iterator to the element following the last element
@@ -605,9 +603,7 @@ public:
    * @return a reverse iterator to the element following the last element of the
    * reversed ArrayNodeType.
    */
-  [[nodiscard]] auto CREnd() const noexcept -> ConstReverseIterator {
-    return m_underlying.crend();
-  }
+  [[nodiscard]] auto CREnd() const noexcept -> ConstReverseIterator { return m_underlying.crend(); }
 
   /**
    * @brief Returns an iterator to the first element of the ArrayNodeType.
@@ -625,9 +621,7 @@ public:
    * @brief Returns an iterator to the first element of the ArrayNodeType.
    * @return an iterator to the first element of the ArrayNodeType.
    */
-  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
-    return CBegin();
-  }
+  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator { return CBegin(); }
 
   /**
    * @brief Returns an iterator to the element following the last element of the
@@ -671,9 +665,7 @@ public:
    * @return a reverse iterator to the first element of the reversed
    * ArrayNodeType.
    */
-  [[nodiscard]] auto rbegin() const noexcept -> ConstReverseIterator {
-    return RBegin();
-  }
+  [[nodiscard]] auto rbegin() const noexcept -> ConstReverseIterator { return RBegin(); }
 
   /**
    * @brief Returns a reverse iterator to the first element of the reversed
@@ -683,9 +675,7 @@ public:
    * @return a reverse iterator to the first element of the reversed
    * ArrayNodeType.
    */
-  [[nodiscard]] auto crbegin() const noexcept -> ConstReverseIterator {
-    return CRBegin();
-  }
+  [[nodiscard]] auto crbegin() const noexcept -> ConstReverseIterator { return CRBegin(); }
 
   /**
    * @brief Returns a reverse iterator to the element following the last element
@@ -705,9 +695,7 @@ public:
    * @return a reverse iterator to the element following the last element of the
    * reversed ArrayNodeType.
    */
-  [[nodiscard]] auto rend() const noexcept -> ConstReverseIterator {
-    return REnd();
-  }
+  [[nodiscard]] auto rend() const noexcept -> ConstReverseIterator { return REnd(); }
 
   /**
    * @brief Returns a reverse iterator to the element following the last element
@@ -717,9 +705,7 @@ public:
    * @return a reverse iterator to the element following the last element of the
    * reversed ArrayNodeType.
    */
-  [[nodiscard]] auto crend() const noexcept -> ConstReverseIterator {
-    return CREnd();
-  }
+  [[nodiscard]] auto crend() const noexcept -> ConstReverseIterator { return CREnd(); }
 
   /**
    * @brief Equality compare the contents of two ArrayNodeTypes.
@@ -733,15 +719,96 @@ public:
    */
   [[nodiscard]] auto operator==(const ArrayNodeType&) const -> bool = default;
 
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>()),
+                                 ArrayNodeType&> &&
+             !std::is_same_v<
+                 std::decay_t<std::invoke_result_t<
+                     TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>()), ArrayNodeType&>>,
+                 ArrayNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>()),
+                              ArrayNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ArrayNodeType::UnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>())>>,
+                             ArrayNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ArrayNodeType::UnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ArrayNodeType::UnsafeProxy{*this});
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>()),
+                                 const ArrayNodeType&> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>()),
+                                 const ArrayNodeType&>>,
+                             ArrayNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>()),
+                              const ArrayNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ArrayNodeType::ConstUnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>())> &&
+        !std::is_same_v<std::decay_t<std::invoke_result_t<
+                            TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>())>>,
+                        ArrayNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ArrayNodeType::ConstUnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ArrayNodeType::ConstUnsafeProxy{*this});
+  }
+
 private:
   /**
    * @brief Check if an index is valid
    * @param pos position of index to validate
    * @return true if the index is in bounds; otherwise false
    */
-  [[nodiscard]] bool ValidIndex(SizeType pos) const noexcept {
-    return pos < m_underlying.size();
-  }
+  [[nodiscard]] bool ValidIndex(SizeType pos) const noexcept { return pos < m_underlying.size(); }
 
   ArrayType m_underlying;
 };

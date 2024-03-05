@@ -58,8 +58,8 @@ using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
  */
 class TreeNode {
   /**
-   * @brief
-   * @tparam TConst
+   * @brief Proxy class that provides access to unsafe TreeNode functionality
+   * @tparam TConst whether we are holding a const or non-const reference
    */
   template <bool TConst = false>
   class UnsafeProxyType {
@@ -622,8 +622,12 @@ public:
 
   /**
    * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
    * @tparam TFunc type of function
    * @param func unsafe block function
+   * @return value returned by provided lambda function
    */
   template <typename TFunc>
     requires(
@@ -636,8 +640,12 @@ public:
 
   /**
    * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
    * @tparam TFunc type of function
    * @param func unsafe block function
+   * @return value returned by provided lambda function
    */
   template <typename TFunc>
     requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())> &&
@@ -649,8 +657,12 @@ public:
 
   /**
    * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
    * @tparam TFunc type of function
    * @param func unsafe block function
+   * @return value returned by provided lambda function
    */
   template <typename TFunc>
     requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
@@ -665,8 +677,12 @@ public:
 
   /**
    * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
    * @tparam TFunc type of function
    * @param func unsafe block function
+   * @return value returned by provided lambda function
    */
   template <typename TFunc>
     requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())> &&
@@ -710,7 +726,7 @@ template <typename TFunc>
                            TreeNode::UnsafeProxy>)
 auto TreeNode::Unsafe(TFunc&& func)
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&> {
-  return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this}, *this);
+  return std::invoke(std::forward<TFunc>(func), TreeNode::UnsafeProxy{*this}, *this);
 }
 
 template <typename TFunc>
@@ -720,7 +736,7 @@ template <typename TFunc>
                            TreeNode::UnsafeProxy>)
 auto TreeNode::Unsafe(TFunc&& func)
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())> {
-  return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
+  return std::invoke(std::forward<TFunc>(func), TreeNode::UnsafeProxy{*this});
 }
 
 template <typename TFunc>
@@ -733,7 +749,7 @@ template <typename TFunc>
 auto TreeNode::ConstUnsafe(TFunc&& func) const
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
                             const TreeNode&> {
-  return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this}, *this);
+  return std::invoke(std::forward<TFunc>(func), TreeNode::ConstUnsafeProxy{*this}, *this);
 }
 
 template <typename TFunc>
@@ -743,7 +759,7 @@ template <typename TFunc>
                            TreeNode::ConstUnsafeProxy>)
 auto TreeNode::ConstUnsafe(TFunc&& func) const
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())> {
-  return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this});
+  return std::invoke(std::forward<TFunc>(func), TreeNode::ConstUnsafeProxy{*this});
 }
 
 template <ValidValueNodeTypeValueType TValueType>

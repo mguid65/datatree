@@ -71,6 +71,46 @@ public:
   using ExpectedRType = RefExpected<MappedType, Error>;
   using ConstExpectedRType = RefExpected<const MappedType, Error>;
 
+private:
+  /**
+   * @brief Proxy class that provides access to unsafe ObjectNodeType functionality
+   * @tparam TConst whether we are holding a const or non-const reference
+   */
+  template <bool TConst = false>
+  class UnsafeProxyType {
+  public:
+    /**
+     * @brief Delete Move/Copy Constructors/Assignment Operators
+     */
+    UnsafeProxyType(const UnsafeProxyType&) = delete;
+    UnsafeProxyType& operator=(const UnsafeProxyType&) = delete;
+    UnsafeProxyType(UnsafeProxyType&&) = delete;
+    UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
+
+    /**
+     * @brief Get a reference to the held ObjectNodeType
+     * @return a reference to the held ObjectNodeType
+     */
+    [[nodiscard]] auto Safe() -> ObjectNodeType& { return m_node_ref; }
+
+    /**
+     * @brief Get a reference to the held ObjectNodeType
+     * @return a reference to the held ObjectNodeType
+     */
+    [[nodiscard]] auto Safe() const -> const ObjectNodeType& { return m_node_ref; }
+
+  private:
+    explicit UnsafeProxyType(std::conditional_t<TConst, const ObjectNodeType&, ObjectNodeType&> ref)
+        : m_node_ref{ref} {}
+
+    friend ObjectNodeType;
+    std::conditional_t<TConst, const ObjectNodeType&, ObjectNodeType&> m_node_ref;
+  };
+
+public:
+  using ConstUnsafeProxy = const UnsafeProxyType<true>;
+  using UnsafeProxy = UnsafeProxyType<false>;
+
   /**
    * @brief Default construct an ObjectNodeType
    */
@@ -664,6 +704,90 @@ public:
    * @return true if the contents of the containers are equal, false otherwise.
    */
   [[nodiscard]] auto operator==(const ObjectNodeType& other) const -> bool = default;
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()),
+                            ObjectNodeType&> &&
+        !std::is_same_v<
+            std::decay_t<std::invoke_result_t<
+                TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()), ObjectNodeType&>>,
+            ObjectNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()),
+                              ObjectNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::UnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())>>,
+                             ObjectNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::UnsafeProxy{*this});
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                                 const ObjectNodeType&> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                                 const ObjectNodeType&>>,
+                             ObjectNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                              const ObjectNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::ConstUnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())> &&
+        !std::is_same_v<std::decay_t<std::invoke_result_t<
+                            TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())>>,
+                        ObjectNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::ConstUnsafeProxy{*this});
+  }
 
 private:
   MapType m_children;
