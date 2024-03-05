@@ -105,9 +105,7 @@ class TreeNode {
      *
      * @return reference to ObjectNodeType
      */
-    [[nodiscard]] inline auto GetObject() const -> const ObjectNodeType& {
-      return Get<ObjectNodeType>();
-    }
+    [[nodiscard]] auto GetObject() const -> const ObjectNodeType& { return Get<ObjectNodeType>(); }
 
     /**
      * @brief Get an ObjectNodeType from this node
@@ -116,7 +114,7 @@ class TreeNode {
      *
      * @return reference to ObjectNodeType
      */
-    [[nodiscard]] inline auto GetObject() -> ObjectNodeType& { return Get<ObjectNodeType>(); }
+    [[nodiscard]] auto GetObject() -> ObjectNodeType& { return Get<ObjectNodeType>(); }
 
     /**
      * @brief Get an ArrayNodeType from this node
@@ -125,9 +123,7 @@ class TreeNode {
      *
      * @return reference to ArrayNodeType
      */
-    [[nodiscard]] inline auto GetArray() const -> const ArrayNodeType& {
-      return Get<ArrayNodeType>();
-    }
+    [[nodiscard]] auto GetArray() const -> const ArrayNodeType& { return Get<ArrayNodeType>(); }
 
     /**
      * @brief Get an ArrayNodeType from this node
@@ -136,15 +132,13 @@ class TreeNode {
      *
      * @return reference to ArrayNodeType
      */
-    [[nodiscard]] inline auto GetArray() -> ArrayNodeType& { return Get<ArrayNodeType>(); }
+    [[nodiscard]] auto GetArray() -> ArrayNodeType& { return Get<ArrayNodeType>(); }
 
     /**
      * @brief Get an ValueNodeType from this node
      * @return reference to ValueNodeType
      */
-    [[nodiscard]] inline auto GetValue() const -> const ValueNodeType& {
-      return Get<ValueNodeType>();
-    }
+    [[nodiscard]] auto GetValue() const -> const ValueNodeType& { return Get<ValueNodeType>(); }
 
     /**
      * @brief Get an ValueNodeType from this node
@@ -153,7 +147,7 @@ class TreeNode {
      *
      * @return reference to ValueNodeType
      */
-    [[nodiscard]] inline auto GetValue() -> ValueNodeType& { return Get<ValueNodeType>(); }
+    [[nodiscard]] auto GetValue() -> ValueNodeType& { return Get<ValueNodeType>(); }
 
     /**
      * @brief Get Null value from this TreeNode
@@ -162,53 +156,49 @@ class TreeNode {
      *
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNull() const -> const NullType& { return GetValue().GetNull(); }
+    [[nodiscard]] auto GetNull() const -> const NullType& { return GetValue().GetNull(); }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] inline auto GetBool() const -> const BoolType& { return GetValue().GetBool(); }
+    [[nodiscard]] auto GetBool() const -> const BoolType& { return GetValue().GetBool(); }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNumber() const -> const NumberType& {
-      return GetValue().GetNumber();
-    }
+    [[nodiscard]] auto GetNumber() const -> const NumberType& { return GetValue().GetNumber(); }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] inline auto GetString() const -> const std::string& {
-      return GetValue().GetString();
-    }
+    [[nodiscard]] auto GetString() const -> const std::string& { return GetValue().GetString(); }
 
     /**
      * @brief Get Null value from this TreeNode
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNull() -> NullType& { return GetValue().GetNull(); }
+    [[nodiscard]] auto GetNull() -> NullType& { return GetValue().GetNull(); }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] inline auto GetBool() -> BoolType& { return GetValue().GetBool(); }
+    [[nodiscard]] auto GetBool() -> BoolType& { return GetValue().GetBool(); }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] inline auto GetNumber() -> NumberType& { return GetValue().GetNumber(); }
+    [[nodiscard]] auto GetNumber() -> NumberType& { return GetValue().GetNumber(); }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] inline auto GetString() -> std::string& { return GetValue().GetString(); }
+    [[nodiscard]] auto GetString() -> std::string& { return GetValue().GetString(); }
 
     /**
      * @brief Get a reference to the TreeNode that is mapped to the key/idx
@@ -219,7 +209,7 @@ class TreeNode {
      * @param key_or_idx the key/idx of the TreeNode to find
      * @return A reference to the requested element
      */
-    [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx) const
+    [[nodiscard]] auto operator[](const KeyOrIdxType& key_or_idx) const
         -> const UnsafeProxyType<true> {
       return UnsafeProxyType<true>{key_or_idx.Visit(
           [&](const StringKeyType& key) -> const TreeNode& {
@@ -239,7 +229,7 @@ class TreeNode {
      * @param key_or_idx the key/idx of the TreeNode to find
      * @return A reference to the requested element
      */
-    [[nodiscard]] inline auto operator[](const KeyOrIdxType& key_or_idx) -> UnsafeProxyType<false> {
+    [[nodiscard]] auto operator[](const KeyOrIdxType& key_or_idx) -> UnsafeProxyType<false> {
       return UnsafeProxyType<false>{key_or_idx.Visit(
           [&](const StringKeyType& key) -> const TreeNode& {
             return std::get<ObjectNodeType>(*m_node_ref.m_data_impl).At(key);
@@ -253,13 +243,13 @@ class TreeNode {
      * @brief Get a reference to the held TreeNode
      * @return a reference to the held TreeNode
      */
-    [[nodiscard]] inline auto Safe() -> TreeNode& { return m_node_ref; }
+    [[nodiscard]] auto Safe() -> TreeNode& { return m_node_ref; }
 
     /**
      * @brief Get a reference to the held TreeNode
      * @return a reference to the held TreeNode
      */
-    [[nodiscard]] inline auto Safe() const -> const TreeNode& { return m_node_ref; }
+    [[nodiscard]] auto Safe() const -> const TreeNode& { return m_node_ref; }
 
   private:
     explicit UnsafeProxyType(std::conditional_t<TConst, const TreeNode&, TreeNode&> ref)
@@ -636,7 +626,11 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>)
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&> &&
+        !std::is_same_v<std::decay_t<std::invoke_result_t<
+                            TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>>,
+                        TreeNode::UnsafeProxy>)
   auto Unsafe(TFunc&& func)
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>;
 
@@ -646,7 +640,10 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>)
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>>,
+                             TreeNode::UnsafeProxy>)
   auto Unsafe(TFunc&& func)
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>;
 
@@ -657,7 +654,11 @@ public:
    */
   template <typename TFunc>
     requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
-                                 const TreeNode&>)
+                                 const TreeNode&> &&
+             !std::is_same_v<
+                 std::decay_t<std::invoke_result_t<
+                     TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()), const TreeNode&>>,
+                 TreeNode::ConstUnsafeProxy>)
   auto ConstUnsafe(TFunc&& func) const
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
                               const TreeNode&>;
@@ -668,7 +669,10 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>)
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>>,
+                             TreeNode::ConstUnsafeProxy>)
   auto ConstUnsafe(TFunc&& func) const
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
@@ -699,56 +703,47 @@ private:
 
 namespace mguid {
 
-template <typename TNodeType>
-concept ValidNodeType = std::same_as<std::remove_cvref_t<TNodeType>, ObjectNodeType> ||
-                        std::same_as<std::remove_cvref_t<TNodeType>, ArrayNodeType> ||
-                        std::same_as<std::remove_cvref_t<TNodeType>, ValueNodeType>;
-
 template <typename TFunc>
-  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>)
+  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&> &&
+           !std::is_same_v<std::decay_t<std::invoke_result_t<
+                               TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>>,
+                           TreeNode::UnsafeProxy>)
 auto TreeNode::Unsafe(TFunc&& func)
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&> {
-  if constexpr (VoidResultV<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>) {
-    std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this}, *this);
-  } else {
-    return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this}, *this);
-  }
+  return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this}, *this);
 }
 
 template <typename TFunc>
-  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>)
+  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())> &&
+           !std::is_same_v<std::decay_t<std::invoke_result_t<
+                               TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>>,
+                           TreeNode::UnsafeProxy>)
 auto TreeNode::Unsafe(TFunc&& func)
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())> {
-  if constexpr (VoidResultV<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>) {
-    std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
-  } else {
-    return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
-  }
+  return std::invoke(std::forward<TFunc>(func), UnsafeProxy{*this});
 }
 
 template <typename TFunc>
   requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
-                               const TreeNode&>)
+                               const TreeNode&> &&
+           !std::is_same_v<
+               std::decay_t<std::invoke_result_t<
+                   TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()), const TreeNode&>>,
+               TreeNode::ConstUnsafeProxy>)
 auto TreeNode::ConstUnsafe(TFunc&& func) const
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
                             const TreeNode&> {
-  if constexpr (VoidResultV<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
-                            const TreeNode&>) {
-    std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this}, *this);
-  } else {
-    return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this}, *this);
-  }
+  return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this}, *this);
 }
 
 template <typename TFunc>
-  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>)
+  requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())> &&
+           !std::is_same_v<std::decay_t<std::invoke_result_t<
+                               TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>>,
+                           TreeNode::ConstUnsafeProxy>)
 auto TreeNode::ConstUnsafe(TFunc&& func) const
     -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())> {
-  if constexpr (VoidResultV<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>) {
-    std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this});
-  } else {
-    return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this});
-  }
+  return std::invoke(std::forward<TFunc>(func), ConstUnsafeProxy{*this});
 }
 
 template <ValidValueNodeTypeValueType TValueType>
