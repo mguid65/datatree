@@ -54,10 +54,9 @@ namespace detail {
  * @tparam TType A type we are attempting to constrain
  */
 template <typename TType>
-concept AllowedNumericType =
-    (!std::same_as<std::remove_cvref_t<TType>, bool> &&
-     (std::integral<std::remove_cvref_t<TType>> ||
-      std::floating_point<std::remove_cvref_t<TType>>));
+concept AllowedNumericType = (!std::same_as<std::remove_cvref_t<TType>, bool> &&
+                              (std::integral<std::remove_cvref_t<TType>> ||
+                               std::floating_point<std::remove_cvref_t<TType>>));
 
 /**
  * @brief A type satisfies this concept if it is a signed integer type but not
@@ -75,10 +74,9 @@ concept SignedIntegerLike = (!std::same_as<std::remove_cvref_t<TType>, bool> &&
  * @tparam TType A type we are attempting to constrain
  */
 template <typename TType>
-concept UnsignedIntegerLike =
-    (!std::same_as<std::remove_cvref_t<TType>, bool> &&
-     (std::integral<std::remove_cvref_t<TType>>)) &&
-    std::is_unsigned_v<std::remove_cvref_t<TType>>;
+concept UnsignedIntegerLike = (!std::same_as<std::remove_cvref_t<TType>, bool> &&
+                               (std::integral<std::remove_cvref_t<TType>>)) &&
+                              std::is_unsigned_v<std::remove_cvref_t<TType>>;
 }  // namespace detail
 
 /**
@@ -129,17 +127,13 @@ public:
    * @brief Is this number holding an integer value
    * @return True if it is an integer, otherwise false
    */
-  [[nodiscard]] constexpr auto IsInt() const noexcept -> bool {
-    return m_tag == TypeTag::Int;
-  }
+  [[nodiscard]] constexpr auto IsInt() const noexcept -> bool { return m_tag == TypeTag::Int; }
 
   /**
    * @brief Is this number holding an unsigned integer value
    * @return True if it is an unsigned integer, otherwise false
    */
-  [[nodiscard]] constexpr auto IsUInt() const noexcept -> bool {
-    return m_tag == TypeTag::UInt;
-  }
+  [[nodiscard]] constexpr auto IsUInt() const noexcept -> bool { return m_tag == TypeTag::UInt; }
 
   /**
    * @brief Try to get a double from this number type
@@ -184,9 +178,7 @@ public:
    * @brief Get the type tag of this number container
    * @return the type tag of this number container
    */
-  [[nodiscard]] constexpr auto GetTypeTag() const noexcept -> TypeTag {
-    return m_tag;
-  }
+  [[nodiscard]] constexpr auto GetTypeTag() const noexcept -> TypeTag { return m_tag; }
 
   /**
    * @brief Set the value of this numeric type
@@ -232,14 +224,11 @@ public:
    */
   template <typename... TCallables>
   decltype(auto) Visit(TCallables&&... callables)
-    requires(std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+    requires(std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  IntegerType&> &&
-             std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+             std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  UnsignedIntegerType&> &&
-             std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+             std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  DoubleType&>)
   {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
@@ -269,14 +258,11 @@ public:
    */
   template <typename... TCallables>
   decltype(auto) Visit(TCallables&&... callables) const
-    requires(std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+    requires(std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  const IntegerType&> &&
-             std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+             std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  const UnsignedIntegerType&> &&
-             std::is_invocable_v<decltype(Overload{
-                                     std::forward<TCallables>(callables)...}),
+             std::is_invocable_v<decltype(Overload{std::forward<TCallables>(callables)...}),
                                  const DoubleType&>)
   {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
@@ -299,11 +285,9 @@ public:
    * @param other another NumberType
    * @return comparison category
    */
-  [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const
-      -> std::partial_ordering {
+  [[nodiscard]] constexpr auto operator<=>(const NumberType& other) const -> std::partial_ordering {
     if (m_tag != other.m_tag) {
-      return static_cast<std::uint8_t>(m_tag) <=>
-             static_cast<std::uint8_t>(other.m_tag);
+      return static_cast<std::uint8_t>(m_tag) <=> static_cast<std::uint8_t>(other.m_tag);
     }
     switch (m_tag) {
       case TypeTag::Double:
@@ -322,8 +306,7 @@ public:
    * @param other Another NumberType to compare
    * @return true if equal, otherwise false
    */
-  [[nodiscard]] constexpr auto operator==(const NumberType& other) const
-      -> bool {
+  [[nodiscard]] constexpr auto operator==(const NumberType& other) const -> bool {
     if (m_tag != other.m_tag) { return false; }
     switch (m_tag) {
       case TypeTag::Double:

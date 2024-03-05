@@ -62,9 +62,8 @@ concept SatisfiesBoolType = std::same_as<std::remove_cvref_t<TType>, bool>;
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept SatisfiesStringType =
-    !std::same_as<std::remove_cvref_t<TType>, nullptr_t> &&
-    std::convertible_to<std::remove_cvref_t<TType>, std::string>;
+concept SatisfiesStringType = !std::same_as<std::remove_cvref_t<TType>, nullptr_t> &&
+                              std::convertible_to<std::remove_cvref_t<TType>, std::string>;
 
 /**
  * @brief A type satisfies this concept if it satisfies AllowedNumericType
@@ -73,8 +72,7 @@ concept SatisfiesStringType =
  */
 template <typename TType>
 concept SatisfiesNumberType =
-    detail::AllowedNumericType<TType> ||
-    std::same_as<std::remove_cvref_t<TType>, NumberType>;
+    detail::AllowedNumericType<TType> || std::same_as<std::remove_cvref_t<TType>, NumberType>;
 
 /**
  * @brief A type satisfies this concept if it is the same as NullType without
@@ -87,8 +85,7 @@ concept SatisfiesNullType = std::same_as<std::remove_cvref_t<TType>, NullType>;
 /**
  * @brief A variant type of allowed value node value types
  */
-using VariantValueType =
-    std::variant<NullType, BoolType, NumberType, StringType>;
+using VariantValueType = std::variant<NullType, BoolType, NumberType, StringType>;
 
 /**
  * @brief A type satisfies this concept if it satisfies one of the value node
@@ -99,9 +96,8 @@ using VariantValueType =
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept ValidValueNodeTypeValueType =
-    SatisfiesBoolType<TType> || SatisfiesStringType<TType> ||
-    SatisfiesNumberType<TType> || SatisfiesNullType<TType>;
+concept ValidValueNodeTypeValueType = SatisfiesBoolType<TType> || SatisfiesStringType<TType> ||
+                                      SatisfiesNumberType<TType> || SatisfiesNullType<TType>;
 
 }  // namespace mguid
 

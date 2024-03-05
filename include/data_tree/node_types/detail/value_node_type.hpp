@@ -71,8 +71,7 @@ public:
    * @param value some value
    */
   template <ValidValueNodeTypeValueType TValueType>
-  explicit ValueNodeType(TValueType&& value) noexcept(
-      !SatisfiesStringType<TValueType>) {
+  explicit ValueNodeType(TValueType&& value) noexcept(!SatisfiesStringType<TValueType>) {
     // This is for the case where the value is a number primitive
     if constexpr (SatisfiesNumberType<TValueType>) {
       m_variant_value = NumberType(std::forward<TValueType>(value));
@@ -88,8 +87,7 @@ public:
    * @return reference to this value node type
    */
   template <ValidValueNodeTypeValueType TValueType>
-  auto operator=(TValueType&& value) noexcept(!SatisfiesStringType<TValueType>)
-      -> ValueNodeType& {
+  auto operator=(TValueType&& value) noexcept(!SatisfiesStringType<TValueType>) -> ValueNodeType& {
     if constexpr (SatisfiesNumberType<TValueType>) {
       m_variant_value = NumberType(std::forward<TValueType>(value));
     } else {
@@ -135,44 +133,32 @@ public:
    * @brief Try to get a NullType value from this value node type
    * @return Expected with a NullType value or an Error
    */
-  [[nodiscard]] auto TryGetNull() const noexcept
-      -> RefExpected<const NullType, Error> {
-    if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+  [[nodiscard]] auto TryGetNull() const noexcept -> RefExpected<const NullType, Error> {
+    if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a StringType value from this value node type
    * @return Expected with a StringType value or an Error
    */
-  [[nodiscard]] auto TryGetString() const noexcept
-      -> RefExpected<const StringType, Error> {
-    if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+  [[nodiscard]] auto TryGetString() const noexcept -> RefExpected<const StringType, Error> {
+    if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a NumberType value from this value node type
    * @return Expected with a NumberType value or an Error
    */
-  [[nodiscard]] auto TryGetNumber() const noexcept
-      -> RefExpected<const NumberType, Error> {
-    if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+  [[nodiscard]] auto TryGetNumber() const noexcept -> RefExpected<const NumberType, Error> {
+    if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
    * @brief Try to get a BoolType value from this value node type
    * @return Expected with a BoolType value or an Error
    */
-  [[nodiscard]] auto TryGetBool() const noexcept
-      -> RefExpected<const BoolType, Error> {
-    if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+  [[nodiscard]] auto TryGetBool() const noexcept -> RefExpected<const BoolType, Error> {
+    if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
@@ -181,9 +167,7 @@ public:
    * @return Expected with a NullType value or an Error
    */
   [[nodiscard]] auto TryGetNull() noexcept -> RefExpected<NullType, Error> {
-    if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+    if (auto* val = std::get_if<NullType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
@@ -191,9 +175,7 @@ public:
    * @return Expected with a StringType value or an Error
    */
   [[nodiscard]] auto TryGetString() noexcept -> RefExpected<StringType, Error> {
-    if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+    if (auto* val = std::get_if<StringType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
@@ -201,9 +183,7 @@ public:
    * @return Expected with a NumberType value or an Error
    */
   [[nodiscard]] auto TryGetNumber() noexcept -> RefExpected<NumberType, Error> {
-    if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+    if (auto* val = std::get_if<NumberType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
   /**
@@ -211,9 +191,7 @@ public:
    * @return Expected with a BoolType value or an Error
    */
   [[nodiscard]] auto TryGetBool() noexcept -> RefExpected<BoolType, Error> {
-    if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) {
-      return *val;
-    }
+    if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
 
@@ -250,30 +228,22 @@ public:
    * @brief Get a NullType value from this value node type
    * @return  a NullType value
    */
-  [[nodiscard]] auto GetNull() -> NullType& {
-    return std::get<NullType>(m_variant_value);
-  }
+  [[nodiscard]] auto GetNull() -> NullType& { return std::get<NullType>(m_variant_value); }
   /**
    * @brief Get a StringType value from this value node type
    * @return  a StringType value
    */
-  [[nodiscard]] auto GetString() -> StringType& {
-    return std::get<StringType>(m_variant_value);
-  }
+  [[nodiscard]] auto GetString() -> StringType& { return std::get<StringType>(m_variant_value); }
   /**
    * @brief Get a NumberType value from this value node type
    * @return  a NumberType value
    */
-  [[nodiscard]] auto GetNumber() -> NumberType& {
-    return std::get<NumberType>(m_variant_value);
-  }
+  [[nodiscard]] auto GetNumber() -> NumberType& { return std::get<NumberType>(m_variant_value); }
   /**
    * @brief Get a BoolType value from this value node type
    * @return  a BoolType value
    */
-  [[nodiscard]] auto GetBool() -> BoolType& {
-    return std::get<BoolType>(m_variant_value);
-  }
+  [[nodiscard]] auto GetBool() -> BoolType& { return std::get<BoolType>(m_variant_value); }
 
   // VERY DRY SECTION, TRUST ME
 
@@ -289,9 +259,7 @@ public:
   template <typename TThenFunc>
   auto IfNullThen(TThenFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, NullType&>>{};
   }
 
@@ -307,11 +275,8 @@ public:
   template <typename TThenFunc>
   auto IfNullThen(TThenFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const NullType&>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const NullType&>>{};
   }
 
   /**
@@ -326,9 +291,7 @@ public:
   template <typename TThenFunc>
   auto IfNullThen(TThenFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, NullType>>{};
   }
 
@@ -344,11 +307,8 @@ public:
   template <typename TThenFunc>
   auto IfNullThen(TThenFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const NullType>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const NullType>>{};
   }
 
   /**
@@ -363,9 +323,7 @@ public:
   template <typename TThenFunc>
   auto IfStringThen(TThenFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, StringType&>>{};
   }
 
@@ -381,11 +339,8 @@ public:
   template <typename TThenFunc>
   auto IfStringThen(TThenFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const StringType&>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const StringType&>>{};
   }
 
   /**
@@ -400,9 +355,7 @@ public:
   template <typename TThenFunc>
   auto IfStringThen(TThenFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), std::move(*val));
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), std::move(*val)); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, StringType>>{};
   }
 
@@ -418,11 +371,8 @@ public:
   template <typename TThenFunc>
   auto IfStringThen(TThenFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const StringType>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const StringType>>{};
   }
 
   /**
@@ -437,9 +387,7 @@ public:
   template <typename TThenFunc>
   auto IfNumberThen(TThenFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, NumberType&>>{};
   }
 
@@ -455,11 +403,8 @@ public:
   template <typename TThenFunc>
   auto IfNumberThen(TThenFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const NumberType&>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const NumberType&>>{};
   }
 
   /**
@@ -474,9 +419,7 @@ public:
   template <typename TThenFunc>
   auto IfNumberThen(TThenFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, NumberType>>{};
   }
 
@@ -492,11 +435,8 @@ public:
   template <typename TThenFunc>
   auto IfNumberThen(TThenFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const NumberType>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const NumberType>>{};
   }
 
   /**
@@ -511,9 +451,7 @@ public:
   template <typename TThenFunc>
   auto IfBoolThen(TThenFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, BoolType&>>{};
   }
 
@@ -529,11 +467,8 @@ public:
   template <typename TThenFunc>
   auto IfBoolThen(TThenFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const BoolType&>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const BoolType&>>{};
   }
 
   /**
@@ -548,9 +483,7 @@ public:
   template <typename TThenFunc>
   auto IfBoolThen(TThenFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
     return std::remove_cvref_t<std::invoke_result_t<TThenFunc, BoolType>>{};
   }
 
@@ -566,11 +499,8 @@ public:
   template <typename TThenFunc>
   auto IfBoolThen(TThenFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
-    if (val != nullptr) {
-      return std::invoke(std::forward<TThenFunc>(func), *val);
-    }
-    return std::remove_cvref_t<
-        std::invoke_result_t<TThenFunc, const BoolType>>{};
+    if (val != nullptr) { return std::invoke(std::forward<TThenFunc>(func), *val); }
+    return std::remove_cvref_t<std::invoke_result_t<TThenFunc, const BoolType>>{};
   }
 
   /**
@@ -586,11 +516,9 @@ public:
   auto IfNullTransform(TTransformFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{
-        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NullType&>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NullType&>>{}};
   }
 
   /**
@@ -606,11 +534,10 @@ public:
   auto IfNullTransform(TTransformFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const NullType&>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const NullType&>>{}};
   }
 
   /**
@@ -626,11 +553,9 @@ public:
   auto IfNullTransform(TTransformFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{
-        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NullType>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NullType>>{}};
   }
 
   /**
@@ -646,11 +571,10 @@ public:
   auto IfNullTransform(TTransformFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const NullType>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const NullType>>{}};
   }
 
   /**
@@ -666,11 +590,9 @@ public:
   auto IfStringTransform(TTransformFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, StringType&>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, StringType&>>{}};
   }
 
   /**
@@ -686,11 +608,10 @@ public:
   auto IfStringTransform(TTransformFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const StringType&>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const StringType&>>{}};
   }
 
   /**
@@ -706,11 +627,9 @@ public:
   auto IfStringTransform(TTransformFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), std::move(*val))};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), std::move(*val))};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, StringType>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, StringType>>{}};
   }
 
   /**
@@ -726,11 +645,10 @@ public:
   auto IfStringTransform(TTransformFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const StringType>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const StringType>>{}};
   }
 
   /**
@@ -746,11 +664,9 @@ public:
   auto IfNumberTransform(TTransformFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, NumberType&>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NumberType&>>{}};
   }
 
   /**
@@ -766,11 +682,10 @@ public:
   auto IfNumberTransform(TTransformFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const NumberType&>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const NumberType&>>{}};
   }
 
   /**
@@ -786,11 +701,9 @@ public:
   auto IfNumberTransform(TTransformFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, NumberType>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, NumberType>>{}};
   }
 
   /**
@@ -806,11 +719,10 @@ public:
   auto IfNumberTransform(TTransformFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const NumberType>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const NumberType>>{}};
   }
 
   /**
@@ -826,11 +738,9 @@ public:
   auto IfBoolTransform(TTransformFunc&& func) & -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{
-        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, BoolType&>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, BoolType&>>{}};
   }
 
   /**
@@ -846,11 +756,10 @@ public:
   auto IfBoolTransform(TTransformFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const BoolType&>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const BoolType&>>{}};
   }
 
   /**
@@ -866,11 +775,9 @@ public:
   auto IfBoolTransform(TTransformFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{
-        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, BoolType>>{}};
+    return ValueNodeType{std::remove_cvref_t<std::invoke_result_t<TTransformFunc, BoolType>>{}};
   }
 
   /**
@@ -886,11 +793,10 @@ public:
   auto IfBoolTransform(TTransformFunc&& func) const&& -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) {
-      return ValueNodeType{
-          std::invoke(std::forward<TTransformFunc>(func), *val)};
+      return ValueNodeType{std::invoke(std::forward<TTransformFunc>(func), *val)};
     }
-    return ValueNodeType{std::remove_cvref_t<
-        std::invoke_result_t<TTransformFunc, const BoolType>>{}};
+    return ValueNodeType{
+        std::remove_cvref_t<std::invoke_result_t<TTransformFunc, const BoolType>>{}};
   }
 
   /**
@@ -901,8 +807,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotNull(TElseFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) { return *this; }
@@ -917,8 +822,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotNull(TElseFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NullType>(&m_variant_value);
     if (val != nullptr) { return std::move(*this); }
@@ -933,8 +837,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotString(TElseFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) { return *this; }
@@ -949,8 +852,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotString(TElseFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<StringType>(&m_variant_value);
     if (val != nullptr) { return std::move(*this); }
@@ -965,8 +867,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotNumber(TElseFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) { return *this; }
@@ -981,8 +882,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotNumber(TElseFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<NumberType>(&m_variant_value);
     if (val != nullptr) { return std::move(*this); }
@@ -997,8 +897,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotBool(TElseFunc&& func) const& -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) { return *this; }
@@ -1013,8 +912,7 @@ public:
    * @return *this, or the result of calling TElseFunc function
    */
   template <typename TElseFunc>
-    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>,
-                          ValueNodeType>
+    requires std::same_as<std::remove_cvref_t<std::invoke_result_t<TElseFunc>>, ValueNodeType>
   auto IfNotBool(TElseFunc&& func) && -> ValueNodeType {
     auto* val = std::get_if<BoolType>(&m_variant_value);
     if (val != nullptr) { return std::move(*this); }
@@ -1049,8 +947,7 @@ public:
    * @brief Compare this ValueNodeType with another ValueNodeType
    * @return comparison category
    */
-  [[nodiscard]] constexpr auto operator<=>(const ValueNodeType&) const =
-      default;
+  [[nodiscard]] constexpr auto operator<=>(const ValueNodeType&) const = default;
 
 private:
   VariantValueType m_variant_value{NullType{}};

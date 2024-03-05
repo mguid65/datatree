@@ -88,8 +88,7 @@ public:
    * @brief Construct an ObjectNodeType from an initializer list of ValueType
    * @param init_list an initializer list of ValueType
    */
-  ObjectNodeType(std::initializer_list<ValueType> init_list)
-      : m_children{init_list} {}
+  ObjectNodeType(std::initializer_list<ValueType> init_list) : m_children{init_list} {}
 
   /**
    * @brief Assign an initializer list of ValueType to this
@@ -105,8 +104,7 @@ public:
    * @brief Construct an ObjectNodeType from an existing map
    * @param init_mapping an initial mapping to initialize this with
    */
-  explicit ObjectNodeType(MapType init_mapping)
-      : m_children{std::move(init_mapping)} {}
+  explicit ObjectNodeType(MapType init_mapping) : m_children{std::move(init_mapping)} {}
 
   /**
    * @brief Try to get a copy of the node id with the specified key
@@ -115,9 +113,7 @@ public:
    * error
    */
   [[nodiscard]] auto TryGet(const KeyType& key) const -> ConstExpectedRType {
-    if (auto iter = m_children.find(key); iter != m_children.end()) {
-      return iter->second;
-    }
+    if (auto iter = m_children.find(key); iter != m_children.end()) { return iter->second; }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
@@ -128,9 +124,7 @@ public:
    * error
    */
   [[nodiscard]] auto TryGet(const KeyType& key) -> ExpectedRType {
-    if (auto iter = m_children.find(key); iter != m_children.end()) {
-      return iter->second;
-    }
+    if (auto iter = m_children.find(key); iter != m_children.end()) { return iter->second; }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
@@ -159,9 +153,7 @@ public:
    * to the element that prevented the insertion) and a bool denoting whether
    * the insertion took place (true if insertion happened, false if it did not).
    */
-  auto Insert(ValueType&& value) -> std::pair<Iterator, bool> {
-    return m_children.insert(value);
-  }
+  auto Insert(ValueType&& value) -> std::pair<Iterator, bool> { return m_children.insert(value); }
 
   /**
    * @brief Insert value if the container doesn't already contain an element
@@ -221,8 +213,7 @@ public:
    * prevented the insertion.
    */
   template <typename TConvertibleToValueType>
-  auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value)
-      -> Iterator {
+  auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value) -> Iterator {
     return m_children.insert(hint, value);
   }
 
@@ -235,9 +226,7 @@ public:
    *
    * @param init_list initializer list to insert the values from
    */
-  void Insert(std::initializer_list<ValueType> init_list) {
-    m_children.insert(init_list);
-  }
+  void Insert(std::initializer_list<ValueType> init_list) { m_children.insert(init_list); }
 
   /**
    * @brief Insert a new element or assign to an existing element if found
@@ -255,8 +244,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssign(const KeyType& key, TValue&& obj)
-      -> std::pair<Iterator, bool> {
+  auto InsertOrAssign(const KeyType& key, TValue&& obj) -> std::pair<Iterator, bool> {
     return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -276,8 +264,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssign(KeyType&& key, TValue&& obj)
-      -> std::pair<Iterator, bool> {
+  auto InsertOrAssign(KeyType&& key, TValue&& obj) -> std::pair<Iterator, bool> {
     return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -308,8 +295,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj)
-      -> Iterator {
+  auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj) -> Iterator {
     return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
@@ -340,8 +326,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj)
-      -> Iterator {
+  auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj) -> Iterator {
     return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
@@ -396,8 +381,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplace(const KeyType& key, TArgs&&... args)
-      -> std::pair<Iterator, bool> {
+  auto TryEmplace(const KeyType& key, TArgs&&... args) -> std::pair<Iterator, bool> {
     return m_children.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
@@ -447,8 +431,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args)
-      -> Iterator {
+  auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args) -> Iterator {
     return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
@@ -474,8 +457,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args)
-      -> Iterator {
+  auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args) -> Iterator {
     return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
@@ -514,9 +496,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto At(const KeyType& key) -> MappedType& {
-    return m_children.at(key);
-  }
+  [[nodiscard]] auto At(const KeyType& key) -> MappedType& { return m_children.at(key); }
 
   /**
    * @brief Returns a reference to the mapped value of the element with
@@ -544,9 +524,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  auto operator[](KeyType&& key) -> MappedType& {
-    return m_children[std::move(key)];
-  }
+  auto operator[](KeyType&& key) -> MappedType& { return m_children[std::move(key)]; }
 
   /**
    * @brief Returns a reference to the value that is mapped to a key
@@ -570,25 +548,19 @@ public:
    * @param key key value of the node id to search for
    * @return true if there is such a node id, otherwise false
    */
-  [[nodiscard]] auto Contains(const KeyType& key) const -> bool {
-    return m_children.contains(key);
-  }
+  [[nodiscard]] auto Contains(const KeyType& key) const -> bool { return m_children.contains(key); }
 
   /**
    * @brief Returns the number of children in this ObjectNodeType
    * @return the number of children in this ObjectNodeType
    */
-  [[nodiscard]] auto Size() const noexcept -> SizeType {
-    return m_children.size();
-  }
+  [[nodiscard]] auto Size() const noexcept -> SizeType { return m_children.size(); }
 
   /**
    * @brief Check if this ObjectNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const noexcept -> bool {
-    return m_children.empty();
-  }
+  [[nodiscard]] auto Empty() const noexcept -> bool { return m_children.empty(); }
 
   /**
    * @brief Find a node id with key equivalent to the provided key
@@ -596,9 +568,7 @@ public:
    * @return An iterator to the requested node id. If no such node id is found,
    * past-the-end (see end()) iterator is returned.
    */
-  [[nodiscard]] auto Find(const KeyType& key) -> Iterator {
-    return m_children.find(key);
-  }
+  [[nodiscard]] auto Find(const KeyType& key) -> Iterator { return m_children.find(key); }
 
   /**
    * @brief Find a node id with key equivalent to the provided key
@@ -620,17 +590,13 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
-    return m_children.begin();
-  }
+  [[nodiscard]] auto Begin() const noexcept -> ConstIterator { return m_children.begin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
-    return m_children.cbegin();
-  }
+  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator { return m_children.cbegin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
@@ -648,9 +614,7 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
-    return CBegin();
-  }
+  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator { return CBegin(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
@@ -664,18 +628,14 @@ public:
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] auto End() const noexcept -> ConstIterator {
-    return m_children.end();
-  }
+  [[nodiscard]] auto End() const noexcept -> ConstIterator { return m_children.end(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
-    return m_children.cend();
-  }
+  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator { return m_children.cend(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
@@ -703,8 +663,7 @@ public:
    * @param other ObjectNodeType to compare against
    * @return true if the contents of the containers are equal, false otherwise.
    */
-  [[nodiscard]] auto operator==(const ObjectNodeType& other) const
-      -> bool = default;
+  [[nodiscard]] auto operator==(const ObjectNodeType& other) const -> bool = default;
 
 private:
   MapType m_children;
