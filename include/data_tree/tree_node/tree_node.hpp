@@ -715,6 +715,8 @@ private:
 };
 
 }  // namespace mguid
+
+// Get implementations of ObjectNodeType, ArrayNodeType, and ValueNodeType
 #include "data_tree/node_types/node_types.inc"
 
 namespace mguid {
