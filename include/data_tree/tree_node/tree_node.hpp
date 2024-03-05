@@ -636,9 +636,9 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<UnsafeProxy>()), TreeNode&>)
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>)
   auto Unsafe(TFunc&& func)
-      -> std::invoke_result_t<TFunc, decltype(std::declval<UnsafeProxy>()), TreeNode&>;
+      -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>()), TreeNode&>;
 
   /**
    * @brief Use the unsafe API within a lambda function
@@ -646,8 +646,9 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<UnsafeProxy>())>)
-  auto Unsafe(TFunc&& func) -> std::invoke_result_t<TFunc, decltype(std::declval<UnsafeProxy>())>;
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::UnsafeProxy>())>;
 
   /**
    * @brief Use the unsafe API within a lambda function
@@ -655,10 +656,11 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(
-        std::is_invocable_v<TFunc, decltype(std::declval<ConstUnsafeProxy>()), const TreeNode&>)
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
+                                 const TreeNode&>)
   auto ConstUnsafe(TFunc&& func) const
-      -> std::invoke_result_t<TFunc, decltype(std::declval<ConstUnsafeProxy>()), const TreeNode&>;
+      -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>()),
+                              const TreeNode&>;
 
   /**
    * @brief Use the unsafe API within a lambda function
@@ -666,9 +668,9 @@ public:
    * @param func unsafe block function
    */
   template <typename TFunc>
-    requires(std::is_invocable_v<TFunc, decltype(std::declval<ConstUnsafeProxy>())>)
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>)
   auto ConstUnsafe(TFunc&& func) const
-      -> std::invoke_result_t<TFunc, decltype(std::declval<ConstUnsafeProxy>())>;
+      -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
 private:
   /**
