@@ -233,10 +233,14 @@ class TreeNode {
         -> const UnsafeProxyType<true> {
       return UnsafeProxyType<true>{key_or_idx.Visit(
           [&](const StringKeyType& key) -> const TreeNode& {
-            return std::as_const(std::get<ObjectNodeType>(*m_node_ref.m_data_impl)).At(key);
+            return std::as_const(std::get<ObjectNodeType>(*m_node_ref.m_data_impl))
+                .ConstUnsafe(
+                    [&key](const auto&& unsafe) -> decltype(auto) { return unsafe.At(key); });
           },
           [&](const IntegerKeyType& idx) -> const TreeNode& {
-            return std::as_const(std::get<ArrayNodeType>(*m_node_ref.m_data_impl)).At(idx);
+            return std::as_const(std::get<ArrayNodeType>(*m_node_ref.m_data_impl))
+                .ConstUnsafe(
+                    [&idx](const auto&& unsafe) -> decltype(auto) { return unsafe.At(idx); });
           })};
     }
 
@@ -252,10 +256,12 @@ class TreeNode {
     [[nodiscard]] auto operator[](const KeyOrIdxType& key_or_idx) -> UnsafeProxyType<false> {
       return UnsafeProxyType<false>{key_or_idx.Visit(
           [&](const StringKeyType& key) -> const TreeNode& {
-            return std::get<ObjectNodeType>(*m_node_ref.m_data_impl).At(key);
+            return std::get<ObjectNodeType>(*m_node_ref.m_data_impl)
+                .Unsafe([&key](auto&& unsafe) -> decltype(auto) { return unsafe.At(key); });
           },
           [&](const IntegerKeyType& idx) -> const TreeNode& {
-            return std::get<ArrayNodeType>(*m_node_ref.m_data_impl).At(idx);
+            return std::get<ArrayNodeType>(*m_node_ref.m_data_impl)
+                .Unsafe([&idx](auto&& unsafe) -> decltype(auto) { return unsafe.At(idx); });
           })};
     }
 

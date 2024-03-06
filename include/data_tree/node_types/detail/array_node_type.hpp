@@ -88,6 +88,57 @@ private:
     UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
 
     /**
+     * @brief Access the specified element with bounds checking
+     * @param pos position of the element to return
+     * @throws std::out_of_range is pos >= Size()
+     * @return copy of the element at pos
+     */
+    [[nodiscard]] auto At(SizeType pos) -> ValueType& { return m_node_ref.m_underlying.at(pos); }
+
+    /**
+     * @brief Access the specified element with bounds checking
+     * @param pos position of the element to return
+     * @throws std::out_of_range is pos >= Size()
+     * @return copy of the element at pos
+     */
+    [[nodiscard]] auto At(SizeType pos) const -> const ValueType& {
+      return m_node_ref.m_underlying.at(pos);
+    }
+
+    /**
+     * @brief Access the specified element without bounds checking
+     * @param pos position of the element to return
+     * @return copy of the element at pos or Error
+     */
+    [[nodiscard]] auto operator[](SizeType pos) const -> const ValueType& {
+      return m_node_ref.m_underlying[pos];
+    }
+
+    /**
+     * @brief Get the element at the front of this ArrayNodeType
+     * @return the element at the front of this ArrayNodeType
+     */
+    [[nodiscard]] auto Front() const -> const ValueType& { return m_node_ref.m_underlying.front(); }
+
+    /**
+     * @brief Get the element at the back of this ArrayNodeType
+     * @return the element at the back of this ArrayNodeType
+     */
+    [[nodiscard]] auto Back() const -> const ValueType& { return m_node_ref.m_underlying.back(); }
+
+    /**
+     * @brief Get the element at the front of this ArrayNodeType
+     * @return the element at the front of this ArrayNodeType
+     */
+    [[nodiscard]] auto Front() -> ValueType& { return m_node_ref.m_underlying.front(); }
+
+    /**
+     * @brief Get the element at the back of this ArrayNodeType
+     * @return the element at the back of this ArrayNodeType
+     */
+    [[nodiscard]] auto Back() -> ValueType& { return m_node_ref.m_underlying.back(); }
+
+    /**
      * @brief Get a reference to the held ArrayNodeType
      * @return a reference to the held ArrayNodeType
      */
@@ -161,20 +212,6 @@ public:
   }
 
   /**
-   * @brief Access the specified element with bounds checking
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  [[nodiscard]] auto At(SizeType pos) -> ValueType& { return m_underlying.at(pos); }
-
-  /**
-   * @brief Access the specified element with bounds checking
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  [[nodiscard]] auto At(SizeType pos) const -> const ValueType& { return m_underlying.at(pos); }
-
-  /**
    * @brief Access the specified element, if the element does not exist, creates
    * all elements up to and including the new index initialized to
    * ValueNodeType{NullType}
@@ -183,15 +220,6 @@ public:
    */
   auto operator[](SizeType pos) -> ValueType& {
     if (pos >= Size()) { Resize(pos + 1, TreeNode{ValueNodeType{}}); }
-    return m_underlying[pos];
-  }
-
-  /**
-   * @brief Access the specified element without bounds checking
-   * @param pos position of the element to return
-   * @return copy of the element at pos or Error
-   */
-  [[nodiscard]] auto operator[](SizeType pos) const -> const ValueType& {
     return m_underlying[pos];
   }
 
@@ -284,30 +312,6 @@ public:
     if (Empty()) { return make_unexpected(Error{.category = Error::Category::OutOfRange}); }
     return m_underlying.back();
   }
-
-  /**
-   * @brief Get the element at the front of this ArrayNodeType
-   * @return the element at the front of this ArrayNodeType
-   */
-  [[nodiscard]] auto Front() const -> const ValueType& { return m_underlying.front(); }
-
-  /**
-   * @brief Get the element at the back of this ArrayNodeType
-   * @return the element at the back of this ArrayNodeType
-   */
-  [[nodiscard]] auto Back() const -> const ValueType& { return m_underlying.back(); }
-
-  /**
-   * @brief Get the element at the front of this ArrayNodeType
-   * @return the element at the front of this ArrayNodeType
-   */
-  [[nodiscard]] auto Front() -> ValueType& { return m_underlying.front(); }
-
-  /**
-   * @brief Get the element at the back of this ArrayNodeType
-   * @return the element at the back of this ArrayNodeType
-   */
-  [[nodiscard]] auto Back() -> ValueType& { return m_underlying.back(); }
 
   /**
    * @brief Check if this ArrayNodeType is empty

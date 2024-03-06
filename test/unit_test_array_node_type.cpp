@@ -7,7 +7,6 @@
 #include <span>
 #include <type_traits>
 #include <vector>
-#include <type_traits>
 
 #include <catch2/catch_all.hpp>
 
@@ -16,8 +15,7 @@
 TEST_CASE("Array Node Type Constructor") {
   SECTION("Default Constructor") {
     REQUIRE(std::is_nothrow_default_constructible_v<mguid::ArrayNodeType>);
-    REQUIRE(
-        std::is_nothrow_default_constructible_v<const mguid::ArrayNodeType>);
+    REQUIRE(std::is_nothrow_default_constructible_v<const mguid::ArrayNodeType>);
   }
   SECTION("Copy Constructor") {
     REQUIRE(std::is_copy_constructible_v<mguid::ArrayNodeType>);
@@ -25,28 +23,20 @@ TEST_CASE("Array Node Type Constructor") {
   }
   SECTION("Move Constructor") {
     REQUIRE(std::is_nothrow_move_constructible_v<mguid::ArrayNodeType>);
-    REQUIRE(std::is_nothrow_constructible_v<const mguid::ArrayNodeType,
-                                            mguid::ArrayNodeType&&>);
+    REQUIRE(std::is_nothrow_constructible_v<const mguid::ArrayNodeType, mguid::ArrayNodeType&&>);
   }
-  SECTION("Copy Assignment") {
-    REQUIRE(std::is_copy_assignable_v<mguid::ArrayNodeType>);
-  }
-  SECTION("Move Assignment") {
-    REQUIRE(std::is_nothrow_move_assignable_v<mguid::ArrayNodeType>);
-  }
+  SECTION("Copy Assignment") { REQUIRE(std::is_copy_assignable_v<mguid::ArrayNodeType>); }
+  SECTION("Move Assignment") { REQUIRE(std::is_nothrow_move_assignable_v<mguid::ArrayNodeType>); }
   SECTION("Initializer List Constructor") {
-    REQUIRE(std::is_constructible_v<mguid::ArrayNodeType,
-                                    std::initializer_list<mguid::TreeNode>>);
+    REQUIRE(std::is_constructible_v<mguid::ArrayNodeType, std::initializer_list<mguid::TreeNode>>);
     REQUIRE(std::is_constructible_v<const mguid::ArrayNodeType,
                                     std::initializer_list<mguid::TreeNode>>);
   }
   SECTION("Initializer List Assignment") {
-    REQUIRE(std::is_assignable_v<mguid::ArrayNodeType,
-                                 std::initializer_list<mguid::TreeNode>>);
+    REQUIRE(std::is_assignable_v<mguid::ArrayNodeType, std::initializer_list<mguid::TreeNode>>);
   }
   SECTION("Size Initialization") {
-    REQUIRE(std::is_constructible_v<mguid::ArrayNodeType,
-                                    mguid::ArrayNodeType::SizeType>);
+    REQUIRE(std::is_constructible_v<mguid::ArrayNodeType, mguid::ArrayNodeType::SizeType>);
     REQUIRE(mguid::ArrayNodeType{mguid::ArrayNodeType::SizeType{64}}.Size() ==
             mguid::ArrayNodeType::SizeType{64});
   }
@@ -107,16 +97,19 @@ TEST_CASE("Array Node Type Operator []") {
       const mguid::ArrayNodeType ant1{{}, {}, {}, {}};
       REQUIRE(ant1.Size() == 4);
 
-      const auto& result1 = ant1[0];
-      const auto& result2 = ant1[1];
-      const auto& result3 = ant1[2];
-      const auto& result4 = ant1[3];
-      REQUIRE(ant1.Size() == 4);
+      ant1.ConstUnsafe([](const auto&& unsafe, auto& safe) {
+        const auto& result1 = unsafe[0];
+        const auto& result2 = unsafe[1];
+        const auto& result3 = unsafe[2];
+        const auto& result4 = unsafe[3];
 
-      REQUIRE(result1.HasObject());
-      REQUIRE(result2.HasObject());
-      REQUIRE(result3.HasObject());
-      REQUIRE(result4.HasObject());
+        REQUIRE(safe.Size() == 4);
+
+        REQUIRE(result1.HasObject());
+        REQUIRE(result2.HasObject());
+        REQUIRE(result3.HasObject());
+        REQUIRE(result4.HasObject());
+      });
     }
   }
   SECTION("Get Non-Existent Index Index Not Empty") {
@@ -132,43 +125,45 @@ TEST_CASE("Array Node Type At") {
   SECTION("Get Non-Existent Index Empty") {
     mguid::ArrayNodeType ant1;
     REQUIRE(ant1.Empty());
-    REQUIRE_THROWS(ant1.At(0));
+    ant1.Unsafe([](auto&& unsafe) { REQUIRE_THROWS(unsafe.At(0)); });
   }
   SECTION("Get Not Empty") {
     {
       mguid::ArrayNodeType ant1{{}, {}, {}, {}};
       REQUIRE(ant1.Size() == 4);
+      ant1.ConstUnsafe([](auto&& unsafe, auto& safe) {
+        const auto& result1 = unsafe.At(0);
+        const auto& result2 = unsafe.At(1);
+        const auto& result3 = unsafe.At(2);
+        const auto& result4 = unsafe.At(3);
+        REQUIRE(safe.Size() == 4);
 
-      const auto& result1 = ant1.At(0);
-      const auto& result2 = ant1.At(1);
-      const auto& result3 = ant1.At(2);
-      const auto& result4 = ant1.At(3);
-      REQUIRE(ant1.Size() == 4);
-
-      REQUIRE(result1.HasObject());
-      REQUIRE(result2.HasObject());
-      REQUIRE(result3.HasObject());
-      REQUIRE(result4.HasObject());
+        REQUIRE(result1.HasObject());
+        REQUIRE(result2.HasObject());
+        REQUIRE(result3.HasObject());
+        REQUIRE(result4.HasObject());
+      });
     }
     {
       const mguid::ArrayNodeType ant1{{}, {}, {}, {}};
       REQUIRE(ant1.Size() == 4);
+      ant1.ConstUnsafe([](const auto&& unsafe, auto& safe) {
+        const auto& result1 = unsafe.At(0);
+        const auto& result2 = unsafe.At(1);
+        const auto& result3 = unsafe.At(2);
+        const auto& result4 = unsafe.At(3);
+        REQUIRE(safe.Size() == 4);
 
-      const auto& result1 = ant1.At(0);
-      const auto& result2 = ant1.At(1);
-      const auto& result3 = ant1.At(2);
-      const auto& result4 = ant1.At(3);
-      REQUIRE(ant1.Size() == 4);
-
-      REQUIRE(result1.HasObject());
-      REQUIRE(result2.HasObject());
-      REQUIRE(result3.HasObject());
-      REQUIRE(result4.HasObject());
+        REQUIRE(result1.HasObject());
+        REQUIRE(result2.HasObject());
+        REQUIRE(result3.HasObject());
+        REQUIRE(result4.HasObject());
+      });
     }
   }
   SECTION("Get Non-Existent Index Index Not Empty") {
     mguid::ArrayNodeType ant1{{}, {}, {}, {}};
-    REQUIRE_THROWS(ant1.At(4));
+    ant1.Unsafe([](auto&& unsafe) { REQUIRE_THROWS(unsafe.At(4)); });
   }
 }
 
@@ -187,8 +182,8 @@ TEST_CASE("Array Node Type Try Set") {
     REQUIRE(ant1.TrySet(0, std::move(test_node)).has_value());
   }
   SECTION("Set Invalid Index") {
-    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
-                              mguid::TreeNode{}, mguid::TreeNode{}};
+    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{}, mguid::TreeNode{},
+                              mguid::TreeNode{}};
     auto result = ant1.TrySet(4, mguid::TreeNode{});
     REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().category == mguid::Error::Category::OutOfRange);
@@ -280,11 +275,12 @@ TEST_CASE("Array Node Type Front") {
   SECTION("Front Has Elements") {
     {
       mguid::ArrayNodeType ant1{test_node_1, test_node_2};
-      REQUIRE(ant1.Front() == test_node_1);
+      ant1.Unsafe([test_node_1](auto&& unsafe) { REQUIRE(unsafe.Front() == test_node_1); });
     }
     {
       const mguid::ArrayNodeType ant1{test_node_1, test_node_2};
-      REQUIRE(ant1.Front() == test_node_1);
+      ant1.ConstUnsafe(
+          [test_node_1](const auto&& unsafe) { REQUIRE(unsafe.Front() == test_node_1); });
     }
   }
 }
@@ -295,11 +291,12 @@ TEST_CASE("Array Node Type Back") {
   SECTION("Back Has Elements") {
     {
       mguid::ArrayNodeType ant1{test_node_1, test_node_2};
-      REQUIRE(ant1.Back() == test_node_2);
+      ant1.Unsafe([test_node_2](auto&& unsafe) { REQUIRE(unsafe.Back() == test_node_2); });
     }
     {
       const mguid::ArrayNodeType ant1{test_node_1, test_node_2};
-      REQUIRE(ant1.Back() == test_node_2);
+      ant1.ConstUnsafe(
+          [test_node_2](const auto&& unsafe) { REQUIRE(unsafe.Back() == test_node_2); });
     }
   }
 }
@@ -321,8 +318,7 @@ TEST_CASE("Array Node Type Size") {
     REQUIRE(ant1.Size() == 0);
   }
   SECTION("Size 3") {
-    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
-                              mguid::TreeNode{}};
+    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{}, mguid::TreeNode{}};
     REQUIRE(ant1.Size() == 3);
   }
   SECTION("Size 1024") {
@@ -349,12 +345,12 @@ TEST_CASE("Array Node Type Resize With Value") {
   mguid::ArrayNodeType ant1;
   REQUIRE(ant1.Size() == 0);
   ant1.Resize(1, mguid::TreeNode{mguid::ValueNodeType{}});
-  REQUIRE(ant1.At(0).HasValue());
+  ant1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.At(0).HasValue()); });
   REQUIRE(ant1.Size() == 1);
   ant1.Resize(1024, mguid::TreeNode{mguid::ValueNodeType{}});
-  REQUIRE(ant1.At(1).HasValue());
-  REQUIRE(ant1.At(512).HasValue());
-  REQUIRE(ant1.At(1023).HasValue());
+  ant1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.At(1).HasValue()); });
+  ant1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.At(512).HasValue()); });
+  ant1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.At(1023).HasValue()); });
   REQUIRE(ant1.Size() == 1024);
   ant1.Resize(1, mguid::TreeNode{mguid::ValueNodeType{}});
   REQUIRE(ant1.Size() == 1);
@@ -383,8 +379,7 @@ TEST_CASE("Array Node Type Clear") {
     REQUIRE(ant1.Empty());
   }
   SECTION("3 Elements") {
-    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
-                              mguid::TreeNode{}};
+    mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{}, mguid::TreeNode{}};
     ant1.Clear();
     REQUIRE(ant1.Empty());
   }
@@ -651,8 +646,7 @@ TEST_CASE("Array Node Type Erase") {
       REQUIRE(ant1.Empty());
     }
     {
-      mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
-                                mguid::TreeNode{}};
+      mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{}, mguid::TreeNode{}};
       auto iter = ant1.Erase(ant1.Begin());
       REQUIRE(iter == ant1.Begin());
       REQUIRE(ant1.Size() == 2);
@@ -666,8 +660,7 @@ TEST_CASE("Array Node Type Erase") {
       REQUIRE(ant1.Empty());
     }
     {
-      mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{},
-                                mguid::TreeNode{}};
+      mguid::ArrayNodeType ant1{mguid::TreeNode{}, mguid::TreeNode{}, mguid::TreeNode{}};
       auto iter = ant1.Erase(ant1.Begin(), std::next(ant1.Begin()));
       REQUIRE(iter == ant1.Begin());
       REQUIRE(ant1.Size() == 2);

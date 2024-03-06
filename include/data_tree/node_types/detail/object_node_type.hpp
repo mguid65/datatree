@@ -88,6 +88,41 @@ private:
     UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
 
     /**
+     * @brief Returns a reference to the mapped value of the element with
+     * specified key.
+     *
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto At(const KeyType& key) -> MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
+     * @brief Returns a reference to the mapped value of the element with
+     * specified key.
+     *
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto At(const KeyType& key) const -> const MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
+     * @brief Returns a reference to the value that is mapped to a key
+     * equivalent to `key`
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto operator[](const KeyType& key) const -> const MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
      * @brief Get a reference to the held ObjectNodeType
      * @return a reference to the held ObjectNodeType
      */
@@ -529,28 +564,6 @@ public:
   auto Erase(const KeyType& key) -> SizeType { return m_children.erase(key); }
 
   /**
-   * @brief Returns a reference to the mapped value of the element with
-   * specified key.
-   *
-   * @throws std::out_of_range if key doesnt exist
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  [[nodiscard]] auto At(const KeyType& key) -> MappedType& { return m_children.at(key); }
-
-  /**
-   * @brief Returns a reference to the mapped value of the element with
-   * specified key.
-   *
-   * @throws std::out_of_range if key doesnt exist
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  [[nodiscard]] auto At(const KeyType& key) const -> const MappedType& {
-    return m_children.at(key);
-  }
-
-  /**
    * @brief Returns a reference to the value that is mapped to a key equivalent
    * to `key`, performing an insertion if such key does not already exist.
    * @param key the key of the element to find
@@ -565,22 +578,6 @@ public:
    * @return A reference to the mapped value of the requested element.
    */
   auto operator[](KeyType&& key) -> MappedType& { return m_children[std::move(key)]; }
-
-  /**
-   * @brief Returns a reference to the value that is mapped to a key
-   * equivalent to `key`
-   *
-   * NOTE_BEGIN: Not sure if this overload should be included, however, this is
-   * consistent with what ArrayNodeType does. The functionality for what
-   * ArrayNodeType does is based on what nlohmann::json does. NOTE_END
-   *
-   * @throws std::out_of_range if key doesnt exist
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  [[nodiscard]] auto operator[](const KeyType& key) const -> const MappedType& {
-    return m_children.at(key);
-  }
 
   /**
    * @brief Check if there is a key equivalent to the provided key in this
