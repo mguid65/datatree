@@ -62,6 +62,64 @@ class ValueNodeType {
     UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
 
     /**
+     * @brief Get a NullType value from this value node type
+     * @return  a NullType value
+     */
+    [[nodiscard]] auto GetNull() const -> const NullType& {
+      return std::get<NullType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a StringType value from this value node type
+     * @return  a StringType value
+     */
+    [[nodiscard]] auto GetString() const -> const StringType& {
+      return std::get<StringType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a NumberType value from this value node type
+     * @return  a NumberType value
+     */
+    [[nodiscard]] auto GetNumber() const -> const NumberType& {
+      return std::get<NumberType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a BoolType value from this value node type
+     * @return  a BoolType value
+     */
+    [[nodiscard]] auto GetBool() const -> const BoolType& {
+      return std::get<BoolType>(m_node_ref.m_variant_value);
+    }
+
+    /**
+     * @brief Get a NullType value from this value node type
+     * @return  a NullType value
+     */
+    [[nodiscard]] auto GetNull() -> NullType& {
+      return std::get<NullType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a StringType value from this value node type
+     * @return  a StringType value
+     */
+    [[nodiscard]] auto GetString() -> StringType& {
+      return std::get<StringType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a NumberType value from this value node type
+     * @return  a NumberType value
+     */
+    [[nodiscard]] auto GetNumber() -> NumberType& {
+      return std::get<NumberType>(m_node_ref.m_variant_value);
+    }
+    /**
+     * @brief Get a BoolType value from this value node type
+     * @return  a BoolType value
+     */
+    [[nodiscard]] auto GetBool() -> BoolType& {
+      return std::get<BoolType>(m_node_ref.m_variant_value);
+    }
+
+    /**
      * @brief Get a reference to the held ValueNodeType
      * @return a reference to the held ValueNodeType
      */
@@ -232,56 +290,6 @@ public:
     if (auto* val = std::get_if<BoolType>(&m_variant_value); val != nullptr) { return *val; }
     return make_unexpected(Error{.category = Error::Category::BadAccess});
   }
-
-  /**
-   * @brief Get a NullType value from this value node type
-   * @return  a NullType value
-   */
-  [[nodiscard]] auto GetNull() const -> const NullType& {
-    return std::get<NullType>(m_variant_value);
-  }
-  /**
-   * @brief Get a StringType value from this value node type
-   * @return  a StringType value
-   */
-  [[nodiscard]] auto GetString() const -> const StringType& {
-    return std::get<StringType>(m_variant_value);
-  }
-  /**
-   * @brief Get a NumberType value from this value node type
-   * @return  a NumberType value
-   */
-  [[nodiscard]] auto GetNumber() const -> const NumberType& {
-    return std::get<NumberType>(m_variant_value);
-  }
-  /**
-   * @brief Get a BoolType value from this value node type
-   * @return  a BoolType value
-   */
-  [[nodiscard]] auto GetBool() const -> const BoolType& {
-    return std::get<BoolType>(m_variant_value);
-  }
-
-  /**
-   * @brief Get a NullType value from this value node type
-   * @return  a NullType value
-   */
-  [[nodiscard]] auto GetNull() -> NullType& { return std::get<NullType>(m_variant_value); }
-  /**
-   * @brief Get a StringType value from this value node type
-   * @return  a StringType value
-   */
-  [[nodiscard]] auto GetString() -> StringType& { return std::get<StringType>(m_variant_value); }
-  /**
-   * @brief Get a NumberType value from this value node type
-   * @return  a NumberType value
-   */
-  [[nodiscard]] auto GetNumber() -> NumberType& { return std::get<NumberType>(m_variant_value); }
-  /**
-   * @brief Get a BoolType value from this value node type
-   * @return  a BoolType value
-   */
-  [[nodiscard]] auto GetBool() -> BoolType& { return std::get<BoolType>(m_variant_value); }
 
   // VERY DRY SECTION, TRUST ME
 
@@ -964,7 +972,7 @@ public:
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  auto Visit(TCallables&&... callables) {
+  decltype(auto) Visit(TCallables&&... callables) {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     return std::visit(overload_set, m_variant_value);
   }
@@ -976,7 +984,7 @@ public:
    * @return the common return type of all callables provided
    */
   template <typename... TCallables>
-  auto Visit(TCallables&&... callables) const {
+  decltype(auto) Visit(TCallables&&... callables) const {
     auto overload_set = Overload{std::forward<TCallables>(callables)...};
     return std::visit(overload_set, m_variant_value);
   }

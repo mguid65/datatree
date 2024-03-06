@@ -156,49 +156,69 @@ class TreeNode {
      *
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] auto GetNull() const -> const NullType& { return GetValue().GetNull(); }
+    [[nodiscard]] auto GetNull() const -> const NullType& {
+      return GetValue().ConstUnsafe(
+          [](const auto&& unsafe) -> decltype(auto) { return unsafe.GetNull(); });
+    }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] auto GetBool() const -> const BoolType& { return GetValue().GetBool(); }
+    [[nodiscard]] auto GetBool() const -> const BoolType& {
+      return GetValue().ConstUnsafe(
+          [](const auto&& unsafe) -> decltype(auto) { return unsafe.GetBool(); });
+    }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] auto GetNumber() const -> const NumberType& { return GetValue().GetNumber(); }
+    [[nodiscard]] auto GetNumber() const -> const NumberType& {
+      return GetValue().ConstUnsafe(
+          [](const auto&& unsafe) -> decltype(auto) { return unsafe.GetNumber(); });
+    }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] auto GetString() const -> const std::string& { return GetValue().GetString(); }
+    [[nodiscard]] auto GetString() const -> const std::string& {
+      return GetValue().ConstUnsafe(
+          [](const auto&& unsafe) -> decltype(auto) { return unsafe.GetString(); });
+    }
 
     /**
      * @brief Get Null value from this TreeNode
      * @return Null value from this TreeNode
      */
-    [[nodiscard]] auto GetNull() -> NullType& { return GetValue().GetNull(); }
+    [[nodiscard]] auto GetNull() -> NullType& {
+      return GetValue().Unsafe([](auto&& unsafe) -> decltype(auto) { return unsafe.GetNull(); });
+    }
 
     /**
      * @brief Get Bool value from this TreeNode
      * @return Bool value from this TreeNode
      */
-    [[nodiscard]] auto GetBool() -> BoolType& { return GetValue().GetBool(); }
+    [[nodiscard]] auto GetBool() -> BoolType& {
+      return GetValue().Unsafe([](auto&& unsafe) -> decltype(auto) { return unsafe.GetBool(); });
+    }
 
     /**
      * @brief Get Number value from this TreeNode
      * @return Number value from this TreeNode
      */
-    [[nodiscard]] auto GetNumber() -> NumberType& { return GetValue().GetNumber(); }
+    [[nodiscard]] auto GetNumber() -> NumberType& {
+      return GetValue().Unsafe([](auto&& unsafe) -> decltype(auto) { return unsafe.GetNumber(); });
+    }
 
     /**
      * @brief Get String value from this TreeNode
      * @return String value from this TreeNode
      */
-    [[nodiscard]] auto GetString() -> std::string& { return GetValue().GetString(); }
+    [[nodiscard]] auto GetString() -> std::string& {
+      return GetValue().Unsafe([](auto&& unsafe) -> decltype(auto) { return unsafe.GetString(); });
+    }
 
     /**
      * @brief Get a reference to the TreeNode that is mapped to the key/idx
