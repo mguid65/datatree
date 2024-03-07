@@ -624,7 +624,7 @@ public:
   /**
    * @brief Recursively visit a tree node with a visitor overload set
    *
-   * TODO: Replace with iterative version
+   * TODO: Replace with iterative version, until then the recursion limit is 512
    *
    * @tparam TCallables set of non final callable types
    * @param callables set of non final callables
@@ -635,7 +635,7 @@ public:
   /**
    * @brief Recursively visit a tree node with a visitor overload set
    *
-   * TODO: Replace with iterative version
+   * TODO: Replace with iterative version, until then the recursion limit is 512
    *
    * @tparam TCallables set of non final callable types
    * @param callables set of non final callables
