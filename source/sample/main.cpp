@@ -87,16 +87,16 @@ auto main() -> int {
   dt1.RecursiveVisit(
       [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
       [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
-      [](mguid::ValueNodeType& val) {
+      [](mguid::ValueNodeType& value_node) {
         std::cout << "Value: ";
-        val.Visit(
-            [](mguid::NumberType& num) {
-              num.Visit([](auto val) { std::cout << "Number: " << val << std::endl; });
+        value_node.Visit(
+            [](mguid::NumberType& value) {
+              value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
             },
-            [](mguid::BoolType& val) {
-              std::cout << "Bool: " << std::boolalpha << val << std::noboolalpha << std::endl;
+            [](mguid::BoolType& value) {
+              std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
             },
-            [](mguid::StringType& val) { std::cout << "String: " << val << std::endl; },
-            [](mguid::NullType& val) { std::cout << "Null: " << val << std::endl; });
+            [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
+            [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
       });
 }
