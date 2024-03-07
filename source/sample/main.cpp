@@ -57,7 +57,7 @@ auto main() -> int {
   // Value types
   dt1["first"]["second"]["number_value_signed"] = 1;
   dt1["first"]["second"]["number_value_unsigned"] = 1u;
-  dt1["first"]["second"]["number_value_double"] = 1.0;
+  dt1["first"]["second"]["number_value_double"] = 1.2345;
   dt1["first"]["second"]["bool_value_true"] = true;
   dt1["first"]["second"]["bool_value_false"] = false;
   dt1["first"]["second"]["null_value"] = mguid::Null;
@@ -83,4 +83,20 @@ auto main() -> int {
   dt2.ConstUnsafe([](const auto&& unsafe) {
     std::cout << "DT2 Num Direct Children After Erase: " << unsafe.GetObject().Size() << std::endl;
   });
+
+  dt1.RecursiveVisit(
+      [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
+      [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
+      [](mguid::ValueNodeType& val) {
+        std::cout << "Value: ";
+        val.Visit(
+            [](mguid::NumberType& num) {
+              num.Visit([](auto val) { std::cout << "Number: " << val << std::endl; });
+            },
+            [](mguid::BoolType& val) {
+              std::cout << "Bool: " << std::boolalpha << val << std::noboolalpha << std::endl;
+            },
+            [](mguid::StringType& val) { std::cout << "String: " << val << std::endl; },
+            [](mguid::NullType& val) { std::cout << "Null: " << val << std::endl; });
+      });
 }

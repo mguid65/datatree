@@ -35,6 +35,7 @@
 
 #include <concepts>
 #include <memory>
+#include <stack>
 #include <type_traits>
 #include <variant>
 
@@ -621,6 +622,24 @@ public:
   decltype(auto) Visit(TCallables&&... callables) const;
 
   /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  void RecursiveVisit(TCallables&&... callables);
+
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  template <typename... TCallables>
+  void RecursiveVisit(TCallables&&... callables) const;
+
+  /**
    * @brief Get a reference to the TreeNode that is mapped to the key equivalent
    * to `key_or_idx`
    *
@@ -719,6 +738,22 @@ public:
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
 private:
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  void RecursiveVisitInner(auto& overload_set, TreeNode& node);
+
+  /**
+   * @brief Visit a tree node with a visitor overload set
+   * @tparam TCallables set of non final callable types
+   * @param callables set of non final callables
+   * @return the common return type of all callables provided
+   */
+  void RecursiveVisitInner(auto& overload_set, const TreeNode& node) const;
+
   /**
    * @brief Based on a tag, create the corresponding node type
    *
@@ -843,6 +878,42 @@ template <typename... TCallables>
 decltype(auto) TreeNode::Visit(TCallables&&... callables) const {
   auto overload_set = Overload{std::forward<TCallables>(callables)...};
   return std::visit(overload_set, *m_data_impl);
+}
+
+void TreeNode::RecursiveVisitInner(auto& overload_set, TreeNode& node) {
+  std::visit(overload_set, *node.m_data_impl);
+  node.Visit(
+      [this, &overload_set](ObjectNodeType& obj) {
+        for (auto& kv : obj) { RecursiveVisitInner(overload_set, kv.second); }
+      },
+      [this, &overload_set](ArrayNodeType& arr) {
+        for (auto& item : arr) { RecursiveVisitInner(overload_set, item); }
+      },
+      [](ValueNodeType&) {});
+}
+
+void TreeNode::RecursiveVisitInner(auto& overload_set, const TreeNode& node) const {
+  std::visit(overload_set, *node.m_data_impl);
+  node.Visit(
+      [this, &overload_set](const ObjectNodeType& obj) {
+        for (auto& kv : obj) { RecursiveVisitInner(overload_set, kv.second); }
+      },
+      [this, &overload_set](const ArrayNodeType& arr) {
+        for (auto& item : arr) { RecursiveVisitInner(overload_set, item); }
+      },
+      [](const ValueNodeType&) {});
+}
+
+template <typename... TCallables>
+void TreeNode::RecursiveVisit(TCallables&&... callables) {
+  auto overload_set = Overload{std::forward<TCallables>(callables)...};
+  RecursiveVisitInner(overload_set, *this);
+}
+
+template <typename... TCallables>
+void TreeNode::RecursiveVisit(TCallables&&... callables) const {
+  auto overload_set = Overload{std::forward<TCallables>(callables)...};
+  RecursiveVisitInner(overload_set, *this);
 }
 
 [[nodiscard]] inline NodeType TreeNode::FromTag(NodeTypeTag tag) {
