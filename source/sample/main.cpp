@@ -16,7 +16,7 @@ auto main() -> int {
     // Allow for cache warmup
     for (std::size_t i{1}; i < 13; ++i) {
       std::cout << "..." << i + 1 << std::flush;
-      (void)func();
+      func();
     }
 
     std::cout << std::endl << "Timing With " << samples << " Samples..." << std::endl;
@@ -85,6 +85,29 @@ auto main() -> int {
   });
 
   dt1.RecursiveVisit(
+      [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
+      [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
+      [](mguid::ValueNodeType& value_node) {
+        std::cout << "Value: ";
+        value_node.Visit(
+            [](mguid::NumberType& value) {
+              value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
+            },
+            [](mguid::BoolType& value) {
+              std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
+            },
+            [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
+            [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
+      });
+
+  mguid::DataTree dt4;
+
+  std::reference_wrapper<mguid::DataTree> ref{dt4};
+  for (int i{0}; i < 256; ++i) { ref = ref.get()["key"]; }
+
+  ref.get()["key"] = mguid::ValueNodeType{};
+
+  dt4.RecursiveVisit(
       [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
       [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
       [](mguid::ValueNodeType& value_node) {
