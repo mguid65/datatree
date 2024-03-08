@@ -35,7 +35,8 @@
 
 #include <concepts>
 #include <memory>
-#include <stack>
+#include <optional>
+#include <queue>
 #include <type_traits>
 #include <variant>
 
@@ -58,6 +59,25 @@ using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
  * Value
  */
 class TreeNode {
+  template <typename TCallable>
+  struct RecursiveVisitHelper {
+    TCallable visitor;
+
+    /**
+     * @brief Inner recursive visit function
+     * @param node current node
+     * @param depth current depth
+     */
+    void Visit(TreeNode& node, std::size_t depth);
+
+    /**
+     * @brief Inner recursive visit function
+     * @param node current node
+     * @param depth current depth
+     */
+    void Visit(const TreeNode& node, std::size_t depth) const;
+  };
+
   /**
    * @brief Proxy class that provides access to unsafe TreeNode functionality
    * @tparam TConst whether we are holding a const or non-const reference
@@ -264,6 +284,35 @@ class TreeNode {
             return std::get<ArrayNodeType>(*m_node_ref.m_data_impl)
                 .Unsafe([&idx](auto&& unsafe) -> decltype(auto) { return unsafe.At(idx); });
           })};
+    }
+
+    /**
+     * @brief Recursively visit a tree node with a visitor overload set
+     *
+     * TODO: Replace with iterative version, until then the recursion limit is 512
+     *
+     * @tparam TCallables set of non final callable types
+     * @param callables set of non final callables
+     */
+    template <typename... TCallables>
+    void RecursiveVisit(TCallables&&... callables) {
+      auto visit_helper = RecursiveVisitHelper{Overload{std::forward<TCallables>(callables)...}};
+      visit_helper.Visit(m_node_ref, 0);
+    }
+
+    /**
+     * @brief Recursively visit a tree node with a visitor overload set
+     *
+     * TODO: Replace with iterative version, until then the recursion limit is 512
+     *
+     * @tparam TCallables set of non final callable types
+     * @param callables set of non final callables
+     */
+    template <typename... TCallables>
+    void RecursiveVisit(TCallables&&... callables) const {
+      const auto visit_helper =
+          RecursiveVisitHelper{Overload{std::forward<TCallables>(callables)...}};
+      visit_helper.Visit(m_node_ref, 0);
     }
 
     /**
@@ -622,28 +671,6 @@ public:
   decltype(auto) Visit(TCallables&&... callables) const;
 
   /**
-   * @brief Recursively visit a tree node with a visitor overload set
-   *
-   * TODO: Replace with iterative version, until then the recursion limit is 512
-   *
-   * @tparam TCallables set of non final callable types
-   * @param callables set of non final callables
-   */
-  template <typename... TCallables>
-  void RecursiveVisit(TCallables&&... callables);
-
-  /**
-   * @brief Recursively visit a tree node with a visitor overload set
-   *
-   * TODO: Replace with iterative version, until then the recursion limit is 512
-   *
-   * @tparam TCallables set of non final callable types
-   * @param callables set of non final callables
-   */
-  template <typename... TCallables>
-  void RecursiveVisit(TCallables&&... callables) const;
-
-  /**
    * @brief Get a reference to the TreeNode that is mapped to the key equivalent
    * to `key_or_idx`
    *
@@ -742,22 +769,6 @@ public:
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
 private:
-  /**
-   * @brief Visit a tree node with a visitor overload set
-   * @tparam TCallables set of non final callable types
-   * @param callables set of non final callables
-   * @return the common return type of all callables provided
-   */
-  void RecursiveVisitInner(auto& overload_set, TreeNode& node, std::size_t depth);
-
-  /**
-   * @brief Visit a tree node with a visitor overload set
-   * @tparam TCallables set of non final callable types
-   * @param callables set of non final callables
-   * @return the common return type of all callables provided
-   */
-  void RecursiveVisitInner(auto& overload_set, const TreeNode& node, std::size_t depth) const;
-
   /**
    * @brief Based on a tag, create the corresponding node type
    *
@@ -884,46 +895,34 @@ decltype(auto) TreeNode::Visit(TCallables&&... callables) const {
   return std::visit(overload_set, *m_data_impl);
 }
 
-void TreeNode::RecursiveVisitInner(auto& overload_set, TreeNode& node, std::size_t depth) {
-  if (depth == 512) { return; }
-  ++depth;
-  std::visit(overload_set, *node.m_data_impl);
+template <typename TCallable>
+void TreeNode::RecursiveVisitHelper<TCallable>::Visit(const TreeNode& node,
+                                                      std::size_t depth) const {
+  if (depth == 1024) { throw std::runtime_error{"Recursion depth exceeded"}; }
+  std::visit(visitor, *node.m_data_impl);
   node.Visit(
-      [this, &overload_set, depth](ObjectNodeType& obj) {
-        for (auto& kv : obj) { RecursiveVisitInner(overload_set, kv.second, depth); }
+      [this, depth](const ObjectNodeType& obj) mutable {
+        for (auto& kv : obj) { Visit(kv.second, ++depth); }
       },
-      [this, &overload_set, depth](ArrayNodeType& arr) {
-        for (auto& item : arr) { RecursiveVisitInner(overload_set, item, depth); }
-      },
-      [](ValueNodeType&) {});
-}
-
-void TreeNode::RecursiveVisitInner(auto& overload_set, const TreeNode& node,
-                                   std::size_t depth) const {
-  if (depth == 512) { return; }
-  ++depth;
-
-  std::visit(overload_set, *node.m_data_impl);
-  node.Visit(
-      [this, &overload_set, depth](const ObjectNodeType& obj) {
-        for (auto& kv : obj) { RecursiveVisitInner(overload_set, kv.second, depth); }
-      },
-      [this, &overload_set, depth](const ArrayNodeType& arr) {
-        for (auto& item : arr) { RecursiveVisitInner(overload_set, item, depth); }
+      [this, depth](const ArrayNodeType& arr) mutable {
+        for (auto& item : arr) { Visit(item, ++depth); }
       },
       [](const ValueNodeType&) {});
 }
 
-template <typename... TCallables>
-void TreeNode::RecursiveVisit(TCallables&&... callables) {
-  auto overload_set = Overload{std::forward<TCallables>(callables)...};
-  RecursiveVisitInner(overload_set, *this, 0);
-}
-
-template <typename... TCallables>
-void TreeNode::RecursiveVisit(TCallables&&... callables) const {
-  auto overload_set = Overload{std::forward<TCallables>(callables)...};
-  RecursiveVisitInner(overload_set, *this, 0);
+template <typename TCallable>
+void TreeNode::RecursiveVisitHelper<TCallable>::Visit(TreeNode& node, std::size_t depth) {
+  std::queue<std::reference_wrapper<TreeNode>> to_visit;
+  if (depth == 1024) { throw std::runtime_error{"Recursion depth exceeded"}; }
+  std::visit(visitor, *node.m_data_impl);
+  node.Visit(
+      [this, depth](ObjectNodeType& obj) mutable {
+        for (auto& kv : obj) { Visit(kv.second, ++depth); }
+      },
+      [this, depth](ArrayNodeType& arr) mutable {
+        for (auto& item : arr) { Visit(item, ++depth); }
+      },
+      [](ValueNodeType&) {});
 }
 
 [[nodiscard]] inline NodeType TreeNode::FromTag(NodeTypeTag tag) {

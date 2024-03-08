@@ -84,21 +84,23 @@ auto main() -> int {
     std::cout << "DT2 Num Direct Children After Erase: " << unsafe.GetObject().Size() << std::endl;
   });
 
-  dt1.RecursiveVisit(
-      [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
-      [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
-      [](mguid::ValueNodeType& value_node) {
-        std::cout << "Value: ";
-        value_node.Visit(
-            [](mguid::NumberType& value) {
-              value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
-            },
-            [](mguid::BoolType& value) {
-              std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
-            },
-            [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
-            [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
-      });
+  dt1.Unsafe([](auto&& unsafe) {
+    unsafe.RecursiveVisit(
+        [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
+        [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
+        [](mguid::ValueNodeType& value_node) {
+          std::cout << "Value: ";
+          value_node.Visit(
+              [](mguid::NumberType& value) {
+                value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
+              },
+              [](mguid::BoolType& value) {
+                std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
+              },
+              [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
+              [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
+        });
+  });
 
   mguid::DataTree dt4;
 
@@ -107,19 +109,21 @@ auto main() -> int {
 
   ref.get()["key"] = mguid::ValueNodeType{};
 
-  dt4.RecursiveVisit(
-      [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
-      [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
-      [](mguid::ValueNodeType& value_node) {
-        std::cout << "Value: ";
-        value_node.Visit(
-            [](mguid::NumberType& value) {
-              value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
-            },
-            [](mguid::BoolType& value) {
-              std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
-            },
-            [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
-            [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
-      });
+  dt4.Unsafe([](auto&& unsafe) {
+    unsafe.RecursiveVisit(
+        [](mguid::ObjectNodeType&) { std::cout << "Object:" << std::endl; },
+        [](mguid::ArrayNodeType&) { std::cout << "Array:" << std::endl; },
+        [](mguid::ValueNodeType& value_node) {
+          std::cout << "Value: ";
+          value_node.Visit(
+              [](mguid::NumberType& value) {
+                value.Visit([](auto number) { std::cout << "Number: " << number << std::endl; });
+              },
+              [](mguid::BoolType& value) {
+                std::cout << "Bool: " << std::boolalpha << value << std::noboolalpha << std::endl;
+              },
+              [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
+              [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
+        });
+  });
 }
