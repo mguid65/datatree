@@ -39,6 +39,7 @@
 #include <queue>
 #include <type_traits>
 #include <variant>
+#include <ranges>
 
 #include "data_tree/common/common.hpp"
 #include "data_tree/error/error_type.hpp"
@@ -555,8 +556,10 @@ public:
    * @param key_or_idx path to check
    * @return true if the path exists, otherwise false
    */
-  //  [[nodiscard]] inline auto Exists(const RangeOf<KeyOrIdxType> auto& ids) const noexcept ->
-  //  bool;
+  template <typename TRange>
+    requires std::ranges::range<TRange> &&
+             std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
+  [[nodiscard]] inline auto Exists(const TRange& ids) const noexcept -> bool;
 
   /**
    * @brief Try to get the requested type from this TreeNode
@@ -1125,17 +1128,20 @@ auto TreeNode::Exists(const Path<NLength>& path) const noexcept -> bool {
   }(path.Items(), std::make_index_sequence<NLength>{});
 }
 
-// auto TreeNode::Exists(const RangeOf<KeyOrIdxType> auto& ids) const noexcept -> bool {
-//   std::reference_wrapper ref = *this;
-//   for (const auto& item : ids) {
-//     if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
-//       ref = maybe_next.value();
-//     } else {
-//       return false;
-//     }
-//   }
-//   return true;
-// }
+template <typename TRange>
+  requires std::ranges::range<TRange> &&
+           std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
+auto TreeNode::Exists(const TRange& ids) const noexcept -> bool {
+  std::reference_wrapper ref = *this;
+  for (const auto& item : ids) {
+    if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
+      ref = maybe_next.value();
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
 
 inline auto TreeNode::TryGetObject() const -> RefExpected<const ObjectNodeType, Error> {
   return TryGet<ObjectNodeType>();
