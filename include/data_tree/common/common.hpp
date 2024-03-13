@@ -38,6 +38,7 @@
 #include <string>
 #include <type_traits>
 #include <variant>
+#include <array>
 
 #include <tl/expected.hpp>
 
