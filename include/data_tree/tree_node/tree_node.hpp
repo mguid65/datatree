@@ -528,6 +528,37 @@ public:
   [[nodiscard]] inline auto HasString() const noexcept -> bool;
 
   /**
+   * @brief Try to get the child corresponding to id from this
+   * @param id id of child to find
+   * @return child node or error
+   */
+  [[nodiscard]] inline auto TryGet(const KeyOrIdxType& id) -> RefExpected<TreeNode, Error>;
+
+  /**
+   * @brief Try to get the child corresponding to id from this
+   * @param id id of child to find
+   * @return child node or error
+   */
+  [[nodiscard]] inline auto TryGet(const KeyOrIdxType& id) const
+      -> RefExpected<const TreeNode, Error>;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  template <std::size_t NLength>
+  [[nodiscard]] inline auto Exists(const Path<NLength>& path) const noexcept -> bool;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  //  [[nodiscard]] inline auto Exists(const RangeOf<KeyOrIdxType> auto& ids) const noexcept ->
+  //  bool;
+
+  /**
    * @brief Try to get the requested type from this TreeNode
    * @tparam TRequestedType the type requested
    * @return The requested type if it is the type being held, otherwise Error
@@ -1049,6 +1080,63 @@ inline auto TreeNode::HasString() const noexcept -> bool {
          ConstUnsafe([](const auto&& unsafe) { return unsafe.GetValue().HasString(); });
 }
 
+auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, Error> {
+  if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
+    const auto& key = *key_ptr;
+    if (auto obj = TryGetObject(); obj.has_value()) { return obj.value()[key]; }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  } else {
+    const auto& idx = std::get<IntegerKeyType>(key_or_idx);
+    if (auto arr = TryGetArray(); arr.has_value()) { return arr.value()[idx]; }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  }
+}
+
+auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const -> RefExpected<const TreeNode, Error> {
+  if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
+    const auto& key = *key_ptr;
+    if (const auto obj = TryGetObject(); obj.has_value()) {
+      return obj.value().ConstUnsafe(
+          [&key](const auto& unsafe) -> decltype(auto) { return unsafe[key]; });
+    }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  } else {
+    const auto& idx = std::get<IntegerKeyType>(key_or_idx);
+    if (const auto arr = TryGetArray(); arr.has_value()) {
+      return arr.value().ConstUnsafe(
+          [&idx](const auto& unsafe) -> decltype(auto) { return unsafe[idx]; });
+    }
+    return make_unexpected(Error{.category = Error::Category::KeyError});
+  }
+}
+
+template <std::size_t NLength>
+auto TreeNode::Exists(const Path<NLength>& path) const noexcept -> bool {
+  std::reference_wrapper ref = *this;
+  return [&ref]<std::size_t... NIdxs>(const auto& container_inner, std::index_sequence<NIdxs...>) {
+    return ([&ref](const auto& item) {
+      if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
+        ref = maybe_next.value();
+        return true;
+      }
+      return false;
+    }(container_inner[NIdxs]) &&
+            ...);
+  }(path.Items(), std::make_index_sequence<NLength>{});
+}
+
+// auto TreeNode::Exists(const RangeOf<KeyOrIdxType> auto& ids) const noexcept -> bool {
+//   std::reference_wrapper ref = *this;
+//   for (const auto& item : ids) {
+//     if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
+//       ref = maybe_next.value();
+//     } else {
+//       return false;
+//     }
+//   }
+//   return true;
+// }
+
 inline auto TreeNode::TryGetObject() const -> RefExpected<const ObjectNodeType, Error> {
   return TryGet<ObjectNodeType>();
 }
@@ -1116,31 +1204,31 @@ inline auto TreeNode::TryGetString() -> RefExpected<StringType, Error> {
 inline void TreeNode::Reset(NodeTypeTag tag) { *m_data_impl = FromTag(tag); }
 
 inline auto TreeNode::operator[](const KeyOrIdxType& key_or_idx) -> TreeNode& {
-  return key_or_idx.Visit(
-      [&](const StringKeyType& key) -> TreeNode& {
-        if (!HasObject()) { *m_data_impl = ObjectNodeType{}; }
-        return std::get<ObjectNodeType>(*m_data_impl)[key];
-      },
-      [&](const IntegerKeyType& idx) -> TreeNode& {
-        if (!HasArray()) { *m_data_impl = ArrayNodeType{}; }
-        return std::get<ArrayNodeType>(*m_data_impl)[idx];
-      });
+  if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
+    const auto& key = *key_ptr;
+    if (!HasObject()) { *m_data_impl = ObjectNodeType{}; }
+    return std::get<ObjectNodeType>(*m_data_impl)[key];
+  } else {
+    const auto& idx = std::get<IntegerKeyType>(key_or_idx);
+    if (!HasArray()) { *m_data_impl = ArrayNodeType{}; }
+    return std::get<ArrayNodeType>(*m_data_impl)[idx];
+  }
 }
 
 inline bool TreeNode::Erase(const KeyOrIdxType& key_or_idx) {
-  return key_or_idx.Visit(
-      [&](const StringKeyType& key) -> bool {
-        if (!HasObject()) { return false; }
-        auto& obj = std::get<ObjectNodeType>(*m_data_impl);
-        return static_cast<bool>(obj.Erase(key));
-      },
-      [&](const IntegerKeyType& idx) -> bool {
-        if (!HasArray()) { return false; }
-        auto& arr = std::get<ArrayNodeType>(*m_data_impl);
-        if (idx >= arr.Size()) { return false; }
-        arr.Erase(std::next(arr.Begin(), static_cast<ArrayNodeType::DifferenceType>(idx)));
-        return true;
-      });
+  if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
+    const auto& key = *key_ptr;
+    if (!HasObject()) { return false; }
+    auto& obj = std::get<ObjectNodeType>(*m_data_impl);
+    return static_cast<bool>(obj.Erase(key));
+  } else {
+    const auto& idx = std::get<IntegerKeyType>(key_or_idx);
+    if (!HasArray()) { return false; }
+    auto& arr = std::get<ArrayNodeType>(*m_data_impl);
+    if (idx >= arr.Size()) { return false; }
+    arr.Erase(std::next(arr.Begin(), static_cast<ArrayNodeType::DifferenceType>(idx)));
+    return true;
+  }
 }
 
 inline bool TreeNode::operator==(const TreeNode& other) const noexcept {
