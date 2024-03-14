@@ -1115,16 +1115,12 @@ auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const -> RefExpected<const
 
 template <std::size_t NLength>
 auto TreeNode::Exists(const Path<NLength>& path) const noexcept -> bool {
-  std::reference_wrapper ref = *this;
-  return [&ref]<std::size_t... NIdxs>(const auto& container_inner, std::index_sequence<NIdxs...>) {
+  return [this]<std::size_t... NIdxs>(const auto& container_inner, std::index_sequence<NIdxs...>) {
+    RefExpected<const TreeNode, Error> ref{*this};
     return ([&ref](const auto& item) {
-      if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
-        ref = maybe_next.value();
-        return true;
-      }
-      return false;
-    }(container_inner[NIdxs]) &&
-            ...);
+      ref = ref->TryGet(item);
+      return ref.has_value();
+    }(container_inner[NIdxs]) && ...);
   }(path.Items(), std::make_index_sequence<NLength>{});
 }
 
