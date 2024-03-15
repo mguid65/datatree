@@ -936,9 +936,9 @@ TreeNode& TreeNode::operator=(TValueType&& value) {
 
 template <ValidValueNodeTypeValueType TRequestedType>
 auto TreeNode::Has() const noexcept -> bool {
-  return HasValue() && ConstUnsafe([](const auto&& unsafe){
-    return unsafe.GetValue().template Has<TRequestedType>();
-  });
+  return HasValue() && ConstUnsafe([](const auto&& unsafe) {
+           return unsafe.GetValue().template Has<TRequestedType>();
+         });
 }
 
 template <typename TRequestedType>
@@ -1122,45 +1122,40 @@ inline auto TreeNode::HasArray() const noexcept -> bool { return Has<ArrayNodeTy
 
 inline auto TreeNode::HasValue() const noexcept -> bool { return Has<ValueNodeType>(); }
 
-inline auto TreeNode::HasNull() const noexcept -> bool {
-  return Has<NullType>();
-}
+inline auto TreeNode::HasNull() const noexcept -> bool { return Has<NullType>(); }
 
-inline auto TreeNode::HasBool() const noexcept -> bool {
-  return Has<BoolType>();
-}
+inline auto TreeNode::HasBool() const noexcept -> bool { return Has<BoolType>(); }
 
-inline auto TreeNode::HasNumber() const noexcept -> bool {
-  return Has<NumberType>();
-}
+inline auto TreeNode::HasNumber() const noexcept -> bool { return Has<NumberType>(); }
 
-inline auto TreeNode::HasString() const noexcept -> bool {
-  return Has<StringType>();
-}
+inline auto TreeNode::HasString() const noexcept -> bool { return Has<StringType>(); }
 
 inline auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, Error> {
   if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
     const auto& key = *key_ptr;
-    if (auto obj = TryGetObject(); obj.has_value()) { return obj.value()[key]; }
+    if (auto obj = TryGetObject(); obj.has_value() && obj->Contains(key)) {
+      return obj.value()[key];
+    }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   } else {
     const auto& idx = std::get<IntegerKeyType>(key_or_idx);
-    if (auto arr = TryGetArray(); arr.has_value()) { return arr.value()[idx]; }
+    if (auto arr = TryGetArray(); arr.has_value() && arr->Size() > idx) { return arr.value()[idx]; }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 }
 
-inline auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const -> RefExpected<const TreeNode, Error> {
+inline auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const
+    -> RefExpected<const TreeNode, Error> {
   if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
     const auto& key = *key_ptr;
-    if (const auto obj = TryGetObject(); obj.has_value()) {
+    if (const auto obj = TryGetObject(); obj.has_value() && obj->Contains(key)) {
       return obj.value().ConstUnsafe(
           [&key](const auto& unsafe) -> decltype(auto) { return unsafe[key]; });
     }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   } else {
     const auto& idx = std::get<IntegerKeyType>(key_or_idx);
-    if (const auto arr = TryGetArray(); arr.has_value()) {
+    if (const auto arr = TryGetArray(); arr.has_value() && arr->Size() > idx) {
       return arr.value().ConstUnsafe(
           [&idx](const auto& unsafe) -> decltype(auto) { return unsafe[idx]; });
     }

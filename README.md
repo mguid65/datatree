@@ -1,6 +1,6 @@
 # DataTree
 
-DataTree library just for fun
+C++20 DataTree library just for fun
 
 You might look at this and say "that looks like JSON"...
 
@@ -133,7 +133,8 @@ dt3.ConstUnsafe([](const auto&& unsafe, const auto& safe) {
 - [x] Array node type
 - [x] Tree Node
 - [x] Data tree
-- [ ] Data tree visitor and recursive visitor
+- [x] Data tree visitor and recursive visitor
+- [ ] Monadic operations on TreeNode
 - [ ] Serialization/Deserialization
 
 ### Experimental
