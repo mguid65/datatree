@@ -1138,7 +1138,7 @@ inline auto TreeNode::HasString() const noexcept -> bool {
   return Has<StringType>();
 }
 
-auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, Error> {
+inline auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, Error> {
   if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
     const auto& key = *key_ptr;
     if (auto obj = TryGetObject(); obj.has_value()) { return obj.value()[key]; }
@@ -1150,7 +1150,7 @@ auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, E
   }
 }
 
-auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const -> RefExpected<const TreeNode, Error> {
+inline auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) const -> RefExpected<const TreeNode, Error> {
   if (const auto* key_ptr = std::get_if<StringKeyType>(&key_or_idx); key_ptr != nullptr) {
     const auto& key = *key_ptr;
     if (const auto obj = TryGetObject(); obj.has_value()) {
