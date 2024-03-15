@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(data_tree VERSION 0.0.2 LANGUAGES CXX C)
+project(data_tree LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
