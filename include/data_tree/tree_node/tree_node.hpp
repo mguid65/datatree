@@ -37,9 +37,9 @@
 #include <memory>
 #include <optional>
 #include <queue>
+#include <ranges>
 #include <type_traits>
 #include <variant>
-#include <ranges>
 
 #include "data_tree/common/common.hpp"
 #include "data_tree/error/error_type.hpp"
@@ -482,7 +482,16 @@ public:
    * @tparam TRequestedType the type requested
    * @return The requested type if it is the type being held, otherwise Error
    */
+  template <ValidValueNodeTypeValueType TRequestedType>
+  [[nodiscard]] auto Has() const noexcept -> bool;
+
+  /**
+   * @brief Try to get the requested type from this TreeNode
+   * @tparam TRequestedType the type requested
+   * @return The requested type if it is the type being held, otherwise Error
+   */
   template <typename TRequestedType>
+    requires(!ValidValueNodeTypeValueType<TRequestedType>)
   [[nodiscard]] auto Has() const noexcept -> bool;
 
   /**
@@ -560,6 +569,46 @@ public:
     requires std::ranges::range<TRange> &&
              std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
   [[nodiscard]] inline auto Exists(const TRange& ids) const noexcept -> bool;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree and is a ValueNodeType
+   * and has the proper value type
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  template <ValidValueNodeTypeValueType TValueType, std::size_t NLength>
+  [[nodiscard]] inline auto ContainsType(const Path<NLength>& path) const noexcept -> bool;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  template <ValidValueNodeTypeValueType TValueType, typename TRange>
+    requires std::ranges::range<TRange> &&
+             std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
+  [[nodiscard]] inline auto ContainsType(const TRange& ids) const noexcept -> bool;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree and is a ValueNodeType
+   * and has the proper value type
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  template <typename TNodeType, std::size_t NLength>
+    requires(!ValidValueNodeTypeValueType<TNodeType>)
+  [[nodiscard]] inline auto ContainsNodeType(const Path<NLength>& path) const noexcept -> bool;
+
+  /**
+   * @brief Determine if the provided path exists in this data tree
+   * @param key_or_idx path to check
+   * @return true if the path exists, otherwise false
+   */
+  template <typename TNodeType, typename TRange>
+    requires std::ranges::range<TRange> &&
+             std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType> &&
+             (!ValidValueNodeTypeValueType<TNodeType>)
+  [[nodiscard]] inline auto ContainsNodeType(const TRange& ids) const noexcept -> bool;
 
   /**
    * @brief Try to get the requested type from this TreeNode
@@ -885,7 +934,15 @@ TreeNode& TreeNode::operator=(TValueType&& value) {
   return *this;
 }
 
+template <ValidValueNodeTypeValueType TRequestedType>
+auto TreeNode::Has() const noexcept -> bool {
+  return HasValue() && ConstUnsafe([](const auto&& unsafe){
+    return unsafe.GetValue().template Has<TRequestedType>();
+  });
+}
+
 template <typename TRequestedType>
+  requires(!ValidValueNodeTypeValueType<TRequestedType>)
 auto TreeNode::Has() const noexcept -> bool {
   return std::holds_alternative<TRequestedType>(*m_data_impl);
 }
@@ -1066,21 +1123,19 @@ inline auto TreeNode::HasArray() const noexcept -> bool { return Has<ArrayNodeTy
 inline auto TreeNode::HasValue() const noexcept -> bool { return Has<ValueNodeType>(); }
 
 inline auto TreeNode::HasNull() const noexcept -> bool {
-  return HasValue() && ConstUnsafe([](const auto&& unsafe) { return unsafe.GetValue().HasNull(); });
+  return Has<NullType>();
 }
 
 inline auto TreeNode::HasBool() const noexcept -> bool {
-  return HasValue() && ConstUnsafe([](const auto&& unsafe) { return unsafe.GetValue().HasBool(); });
+  return Has<BoolType>();
 }
 
 inline auto TreeNode::HasNumber() const noexcept -> bool {
-  return HasValue() &&
-         ConstUnsafe([](const auto&& unsafe) { return unsafe.GetValue().HasNumber(); });
+  return Has<NumberType>();
 }
 
 inline auto TreeNode::HasString() const noexcept -> bool {
-  return HasValue() &&
-         ConstUnsafe([](const auto&& unsafe) { return unsafe.GetValue().HasString(); });
+  return Has<StringType>();
 }
 
 auto TreeNode::TryGet(const KeyOrIdxType& key_or_idx) -> RefExpected<TreeNode, Error> {
@@ -1120,7 +1175,8 @@ auto TreeNode::Exists(const Path<NLength>& path) const noexcept -> bool {
     return ([&ref](const auto& item) {
       ref = ref->TryGet(item);
       return ref.has_value();
-    }(container_inner[NIdxs]) && ...);
+    }(container_inner[NIdxs]) &&
+            ...);
   }(path.Items(), std::make_index_sequence<NLength>{});
 }
 
@@ -1128,15 +1184,64 @@ template <typename TRange>
   requires std::ranges::range<TRange> &&
            std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
 auto TreeNode::Exists(const TRange& ids) const noexcept -> bool {
-  std::reference_wrapper ref = *this;
+  RefExpected<const TreeNode, Error> ref{*this};
   for (const auto& item : ids) {
-    if (auto maybe_next = ref.get().TryGet(item); maybe_next.has_value()) {
-      ref = maybe_next.value();
-    } else {
-      return false;
-    }
+    ref = ref->TryGet(item);
+    if (!ref.has_value()) { return false; }
   }
   return true;
+}
+
+template <ValidValueNodeTypeValueType TValueType, std::size_t NLength>
+auto TreeNode::ContainsType(const Path<NLength>& path) const noexcept -> bool {
+  return [this]<std::size_t... NIdxs>(const auto& container_inner, std::index_sequence<NIdxs...>) {
+    RefExpected<const TreeNode, Error> ref{*this};
+    return ([&ref](const auto& item) {
+             ref = ref->TryGet(item);
+             return ref.has_value();
+           }(container_inner[NIdxs]) &&
+            ...) &&
+           ref->Has<TValueType>();
+  }(path.Items(), std::make_index_sequence<NLength>{});
+}
+
+template <ValidValueNodeTypeValueType TValueType, typename TRange>
+  requires std::ranges::range<TRange> &&
+           std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType>
+auto TreeNode::ContainsType(const TRange& ids) const noexcept -> bool {
+  RefExpected<const TreeNode, Error> ref{*this};
+  for (const auto& item : ids) {
+    ref = ref->TryGet(item);
+    if (!ref.has_value()) { return false; }
+  }
+  return ref->Has<TValueType>();
+}
+
+template <typename TNodeType, std::size_t NLength>
+  requires(!ValidValueNodeTypeValueType<TNodeType>)
+auto TreeNode::ContainsNodeType(const Path<NLength>& path) const noexcept -> bool {
+  return [this]<std::size_t... NIdxs>(const auto& container_inner, std::index_sequence<NIdxs...>) {
+    RefExpected<const TreeNode, Error> ref{*this};
+    return ([&ref](const auto& item) {
+             ref = ref->TryGet(item);
+             return ref.has_value();
+           }(container_inner[NIdxs]) &&
+            ...) &&
+           ref->Has<TNodeType>();
+  }(path.Items(), std::make_index_sequence<NLength>{});
+}
+
+template <typename TNodeType, typename TRange>
+  requires std::ranges::range<TRange> &&
+           std::convertible_to<std::ranges::range_value_t<TRange>, KeyOrIdxType> &&
+           (!ValidValueNodeTypeValueType<TNodeType>)
+auto TreeNode::ContainsNodeType(const TRange& ids) const noexcept -> bool {
+  RefExpected<const TreeNode, Error> ref{*this};
+  for (const auto& item : ids) {
+    ref = ref->TryGet(item);
+    if (!ref.has_value()) { return false; }
+  }
+  return ref->Has<TNodeType>();
 }
 
 inline auto TreeNode::TryGetObject() const -> RefExpected<const ObjectNodeType, Error> {

@@ -91,7 +91,7 @@ using VariantValueType = std::variant<NullType, BoolType, NumberType, StringType
  * @brief A type satisfies this concept if it satisfies one of the value node
  * value type concepts
  *
- * What a name
+ * This is named like this because I think its funny
  *
  * @tparam TType type to constrain
  */

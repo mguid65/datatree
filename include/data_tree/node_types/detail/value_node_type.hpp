@@ -193,12 +193,22 @@ public:
   }
 
   /**
+   * @brief Is this valid node type holding the requested type
+   * @tparam TValueType requested type to check for
+   * @return true if this value node type holding the requested type, otherwise false
+   */
+  template <ValidValueNodeTypeValueType TValueType>
+  [[nodiscard]] constexpr auto Has() const noexcept -> bool {
+    return std::holds_alternative<TValueType>(m_variant_value);
+  }
+
+  /**
    * @brief Is this value node type holding a NullType value
    * @return true if this value node type holding a NullType value, otherwise
    * false
    */
   [[nodiscard]] constexpr auto HasNull() const noexcept -> bool {
-    return std::holds_alternative<NullType>(m_variant_value);
+    return Has<NullType>();
   }
   /**
    * @brief Is this value node type holding a StringType value
@@ -206,7 +216,7 @@ public:
    * false
    */
   [[nodiscard]] constexpr auto HasString() const noexcept -> bool {
-    return std::holds_alternative<StringType>(m_variant_value);
+    return Has<StringType>();
   }
   /**
    * @brief Is this value node type holding a NumberType value
@@ -214,7 +224,7 @@ public:
    * false
    */
   [[nodiscard]] constexpr auto HasNumber() const noexcept -> bool {
-    return std::holds_alternative<NumberType>(m_variant_value);
+    return Has<NumberType>();
   }
   /**
    * @brief Is this value node type holding a BoolType value
@@ -222,7 +232,7 @@ public:
    * false
    */
   [[nodiscard]] constexpr auto HasBool() const noexcept -> bool {
-    return std::holds_alternative<BoolType>(m_variant_value);
+    return Has<BoolType>();
   }
 
   /**
