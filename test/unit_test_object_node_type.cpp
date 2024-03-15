@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/tree_node.hpp>
+#include "data_tree/tree_node/tree_node.hpp"
 
 using TestMapType = std::unordered_map<std::string, mguid::TreeNode>;
 
@@ -107,22 +107,21 @@ TEST_CASE("Object Node Type Get") {
 TEST_CASE("Object Node Type At") {
   SECTION("Key Exists") {
     mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
-    REQUIRE(ont1.At("key").HasObject());
+    ont1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.At("key").HasObject()); });
   }
   SECTION("Key Exists Const") {
     const mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
-    REQUIRE(ont1.At("key").HasObject());
+    ont1.ConstUnsafe([](const auto&& unsafe) { REQUIRE(unsafe.At("key").HasObject()); });
   }
   SECTION("Key Doesn't Exist") {
     mguid::ObjectNodeType ont1;
-    REQUIRE_THROWS(ont1.At("key"));
+    ont1.Unsafe([](auto&& unsafe) { REQUIRE_THROWS(unsafe.At("key")); });
   }
   SECTION("Key Doesn't Exist Const") {
     const mguid::ObjectNodeType ont1;
-    REQUIRE_THROWS(ont1.At("key"));
+    ont1.ConstUnsafe([](const auto&& unsafe) { REQUIRE_THROWS(unsafe.At("key")); });
   }
 }
-
 
 TEST_CASE("Object Node Type Operator []") {
   SECTION("Key Exists") {
@@ -133,9 +132,11 @@ TEST_CASE("Object Node Type Operator []") {
   }
   SECTION("Key Exists Const") {
     const mguid::ObjectNodeType ont1{{"key", mguid::TreeNode{}}};
-    REQUIRE(ont1["key"].HasObject());
-    const std::string key{"key"};
-    REQUIRE(ont1[key].HasObject());
+    ont1.ConstUnsafe([](const auto&& unsafe){
+      REQUIRE(unsafe["key"].HasObject());
+      const std::string key{"key"};
+      REQUIRE(unsafe[key].HasObject());
+    });
   }
   SECTION("Key Doesn't Exist") {
     mguid::ObjectNodeType ont1;
@@ -162,7 +163,6 @@ TEST_CASE("Object Node Type Operator []") {
   }
 }
 
-
 TEST_CASE("Object Node Type Clear") {
   SECTION("Already Empty") {
     mguid::ObjectNodeType ont1;
@@ -180,9 +180,7 @@ TEST_CASE("Object Node Type Clear") {
   }
   SECTION("Many Elements") {
     mguid::ObjectNodeType ont1;
-    for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont1.Emplace(std::to_string(i), mguid::TreeNode{}); }
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1024);
     ont1.Clear();
@@ -400,8 +398,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto iter =
-        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
+    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
@@ -412,8 +409,7 @@ TEST_CASE("Object Node Insert Or Assign Hint") {
     auto node = mguid::TreeNode{mguid::ValueNodeType{1}};
     auto expected = mguid::TreeNode{mguid::ValueNodeType{1}};
     const std::string key{"key"};
-    auto iter =
-        ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
+    auto iter = ont1.InsertOrAssignHint(ont1.Begin(), key, std::move(node));
     REQUIRE(iter != ont1.End());
     REQUIRE_FALSE(ont1.Empty());
     REQUIRE(ont1.Size() == 1);
@@ -664,17 +660,13 @@ TEST_CASE("Object Node Type Find") {
   }
   SECTION("Find Element Exists Many Element In Map") {
     mguid::ObjectNodeType ont1;
-    for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont1.Emplace(std::to_string(i), mguid::TreeNode{}); }
     auto iter = ont1.Find("512");
     REQUIRE(iter != ont1.End());
   }
   SECTION("Find Element Does Not Exist Many Element In Map") {
     mguid::ObjectNodeType ont1;
-    for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont1.Emplace(std::to_string(i), mguid::TreeNode{}); }
     auto iter = ont1.Find("1025");
     REQUIRE(iter == ont1.End());
   }
@@ -695,18 +687,14 @@ TEST_CASE("Object Node Type Find") {
   }
   SECTION("Find Element Exists Many Element In Map Const") {
     mguid::ObjectNodeType ont_init;
-    for (auto i{0}; i < 1024; ++i) {
-      ont_init.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont_init.Emplace(std::to_string(i), mguid::TreeNode{}); }
     const mguid::ObjectNodeType ont1{ont_init};
     auto iter = ont1.Find("512");
     REQUIRE(iter != ont1.End());
   }
   SECTION("Find Element Does Not Exist Many Element In Map Const") {
     mguid::ObjectNodeType ont_init;
-    for (auto i{0}; i < 1024; ++i) {
-      ont_init.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont_init.Emplace(std::to_string(i), mguid::TreeNode{}); }
     const mguid::ObjectNodeType ont1{ont_init};
     auto iter = ont1.Find("1025");
     REQUIRE(iter == ont1.End());
@@ -781,12 +769,8 @@ TEST_CASE("Object Node Type Equality Comparison") {
   SECTION("Compare Not Equal Many Elements") {
     mguid::ObjectNodeType ont1;
     mguid::ObjectNodeType ont2;
-    for (auto i{0}; i < 1024; ++i) {
-      ont1.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
-    for (auto i{1024}; i < 2048; ++i) {
-      ont2.Emplace(std::to_string(i), mguid::TreeNode{});
-    }
+    for (auto i{0}; i < 1024; ++i) { ont1.Emplace(std::to_string(i), mguid::TreeNode{}); }
+    for (auto i{1024}; i < 2048; ++i) { ont2.Emplace(std::to_string(i), mguid::TreeNode{}); }
     REQUIRE(ont1 != ont2);
   }
 }

@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/tree_node.hpp>
+#include "data_tree/tree_node/tree_node.hpp"
 
 TEST_CASE("Tree Node Construction/Assignment") {
   SECTION("Default Constructor") {
@@ -750,151 +750,199 @@ TEST_CASE("Tree Node Get Value Type") {
   SECTION("Constructed With Null") {
     {
       mguid::TreeNode tn1{mguid::NullType{}};
-      REQUIRE(tn1.GetNull() == mguid::NullType{});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNull() == mguid::NullType{});
+      });
     }
     {
       const mguid::TreeNode tn1{mguid::NullType{}};
-      REQUIRE(tn1.GetNull() == mguid::NullType{});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNull() == mguid::NullType{});
+      });
     }
   }
   SECTION("Constructed With Integer") {
     {
       mguid::TreeNode tn1{std::int8_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::int8_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::int16_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::int16_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::int32_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::int32_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::int64_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::int64_t{1}};
-      REQUIRE(tn1.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetInt().value() == mguid::IntegerType{1});
+      });
     }
   }
   SECTION("Constructed With Unsigned Integer") {
     {
       mguid::TreeNode tn1{std::uint8_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::uint8_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::uint16_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::uint16_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::uint32_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::uint32_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       mguid::TreeNode tn1{std::uint64_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{std::uint64_t{1}};
-      REQUIRE(tn1.GetNumber().GetUInt().value() ==
-              mguid::UnsignedIntegerType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetUInt().value() ==
+                mguid::UnsignedIntegerType{1});
+      });
     }
   }
   SECTION("Constructed With Float") {
     {
       mguid::TreeNode tn1{float{1}};
-      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{float{1}};
-      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      });
     }
     {
       mguid::TreeNode tn1{double{1}};
-      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      tn1.Unsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      });
     }
     {
       const mguid::TreeNode tn1{double{1}};
-      REQUIRE(tn1.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      tn1.ConstUnsafe([](const auto&& unsafe) {
+        REQUIRE(unsafe.GetNumber().GetDouble().value() == mguid::DoubleType{1});
+      });
     }
   }
   SECTION("Constructed With Bool") {
     {
       mguid::TreeNode tn1{true};
-      REQUIRE(tn1.GetBool());
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetBool()); });
     }
     {
       const mguid::TreeNode tn1{true};
-      REQUIRE(tn1.GetBool());
+      tn1.ConstUnsafe([](const auto&& unsafe) { REQUIRE(unsafe.GetBool()); });
     }
     {
       mguid::TreeNode tn1{false};
-      REQUIRE_FALSE(tn1.GetBool());
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE_FALSE(unsafe.GetBool()); });
     }
     {
       const mguid::TreeNode tn1{false};
-      REQUIRE_FALSE(tn1.GetBool());
+      tn1.ConstUnsafe(
+          [](const auto&& unsafe) { REQUIRE_FALSE(unsafe.GetBool()); });
     }
   }
   SECTION("Constructed With String") {
     {
       mguid::TreeNode tn1{std::string{"test"}};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
     {
       const mguid::TreeNode tn1{std::string{"test"}};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.ConstUnsafe(
+          [](const auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
     {
       mguid::TreeNode tn1{"test"};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
     {
       const mguid::TreeNode tn1{"test"};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.ConstUnsafe(
+          [](const auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
     {
       char test[] = "test";
       mguid::TreeNode tn1{test};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
     {
       char test[] = "test";
       const mguid::TreeNode tn1{test};
-      REQUIRE(tn1.GetString() == "test");
+      tn1.ConstUnsafe(
+          [](const auto&& unsafe) { REQUIRE(unsafe.GetString() == "test"); });
     }
   }
 }
@@ -902,33 +950,45 @@ TEST_CASE("Tree Node Get Value Type") {
 TEST_CASE("Tree Node Get Type") {
   SECTION("Get Object") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
-    REQUIRE(tn1.GetObject() == mguid::ObjectNodeType());
-    REQUIRE(tn1.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+    tn1.Unsafe([](mguid::TreeNode::UnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetObject() == mguid::ObjectNodeType());
+      REQUIRE(unsafe.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+    });
   }
   SECTION("Get Object Const") {
     const mguid::TreeNode tn1{mguid::NodeTypeTag::Object};
-    REQUIRE(tn1.GetObject() == mguid::ObjectNodeType());
-    REQUIRE(tn1.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+    tn1.ConstUnsafe([](mguid::TreeNode::ConstUnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetObject() == mguid::ObjectNodeType());
+      REQUIRE(unsafe.Get<mguid::ObjectNodeType>() == mguid::ObjectNodeType());
+    });
   }
   SECTION("Get Array") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
-    REQUIRE(tn1.GetArray() == mguid::ArrayNodeType());
-    REQUIRE(tn1.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+    tn1.Unsafe([](mguid::TreeNode::UnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetArray() == mguid::ArrayNodeType());
+      REQUIRE(unsafe.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+    });
   }
   SECTION("Get Array Const") {
     const mguid::TreeNode tn1{mguid::NodeTypeTag::Array};
-    REQUIRE(tn1.GetArray() == mguid::ArrayNodeType());
-    REQUIRE(tn1.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+    tn1.ConstUnsafe([](mguid::TreeNode::ConstUnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetArray() == mguid::ArrayNodeType());
+      REQUIRE(unsafe.Get<mguid::ArrayNodeType>() == mguid::ArrayNodeType());
+    });
   }
   SECTION("Get Value") {
     mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.GetValue() == mguid::ValueNodeType());
-    REQUIRE(tn1.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
+    tn1.Unsafe([](mguid::TreeNode::UnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetValue() == mguid::ValueNodeType());
+      REQUIRE(unsafe.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
+    });
   }
   SECTION("Get Value Const") {
     const mguid::TreeNode tn1{mguid::NodeTypeTag::Value};
-    REQUIRE(tn1.GetValue() == mguid::ValueNodeType());
-    REQUIRE(tn1.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
+    tn1.ConstUnsafe([](mguid::TreeNode::ConstUnsafeProxy&& unsafe) {
+      REQUIRE(unsafe.GetValue() == mguid::ValueNodeType());
+      REQUIRE(unsafe.Get<mguid::ValueNodeType>() == mguid::ValueNodeType());
+    });
   }
 }
 
@@ -1182,38 +1242,46 @@ TEST_CASE("Tree Node Operator []") {
     REQUIRE(ont1[key].HasObject());
   }
   SECTION("Key Exists Const") {
-    const mguid::TreeNode ont1{mguid::ObjectNodeType{{"key", mguid::TreeNode{}}}};
-    REQUIRE(ont1["key"].HasObject());
-    const std::string key{"key"};
-    REQUIRE(ont1[key].HasObject());
+    const mguid::TreeNode ont1{
+        mguid::ObjectNodeType{{"key", mguid::TreeNode{}}}};
+    ont1.ConstUnsafe([](auto&& unsafe) {
+      REQUIRE(unsafe["key"].Safe().HasObject());
+      const std::string key{"key"};
+      REQUIRE(unsafe[key].Safe().HasObject());
+    });
   }
   SECTION("Key Doesn't Exist") {
     mguid::TreeNode ont1;
-    REQUIRE(ont1.GetObject().Empty());
-    REQUIRE(ont1["key1"].HasObject());
-    REQUIRE(ont1.GetObject().Size() == 1);
-    const std::string key2{"key2"};
-    REQUIRE(ont1[key2].HasObject());
-    REQUIRE(ont1.GetObject().Size() == 2);
+    ont1.Unsafe([](auto&& unsafe, auto& safe) {
+      REQUIRE(unsafe.GetObject().Empty());
+      REQUIRE(safe["key1"].HasObject());
+      REQUIRE(unsafe.GetObject().Size() == 1);
+      const std::string key2{"key2"};
+      REQUIRE(safe[key2].HasObject());
+      REQUIRE(unsafe.GetObject().Size() == 2);
+    });
   }
   SECTION("Get Non-Existent Index Empty") {
-    mguid::TreeNode ant1{mguid::ArrayNodeType{}};
-    REQUIRE(ant1.GetArray().Empty());
-    const auto& result = ant1.GetArray()[0];
-    REQUIRE(ant1.GetArray().Size() == 1);
-    REQUIRE(result.HasValue());
+    mguid::TreeNode ont1{mguid::ArrayNodeType{}};
+    ont1.Unsafe([](auto&& unsafe, auto& safe) {
+      REQUIRE(unsafe.GetArray().Empty());
+      const auto& result = safe[0];
+      REQUIRE(unsafe.GetArray().Size() == 1);
+      REQUIRE(result.HasValue());
+    });
   }
   SECTION("Get Not Empty") {
     {
-      mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
+      mguid::TreeNode tn1{mguid::ArrayNodeType{{}, {}, {}, {}}};
 
-      REQUIRE(ant1.GetArray().Size() == 4);
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 4); });
 
-      const auto& result1 = ant1[0];
-      const auto& result2 = ant1[1];
-      const auto& result3 = ant1[2];
-      const auto& result4 = ant1[3];
-      REQUIRE(ant1.GetArray().Size() == 4);
+      const auto& result1 = tn1[0];
+      const auto& result2 = tn1[1];
+      const auto& result3 = tn1[2];
+      const auto& result4 = tn1[3];
+
+      tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 4); });
 
       REQUIRE(result1.HasObject());
       REQUIRE(result2.HasObject());
@@ -1221,26 +1289,30 @@ TEST_CASE("Tree Node Operator []") {
       REQUIRE(result4.HasObject());
     }
     {
-      const mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
-      REQUIRE(ant1.GetArray().Size() == 4);
+      const mguid::TreeNode tn1{mguid::ArrayNodeType{{}, {}, {}, {}}};
 
-      const auto& result1 = ant1[0];
-      const auto& result2 = ant1[1];
-      const auto& result3 = ant1[2];
-      const auto& result4 = ant1[3];
-      REQUIRE(ant1.GetArray().Size() == 4);
+      tn1.ConstUnsafe([](auto&& unsafe) {
+        REQUIRE(unsafe.GetArray().Size() == 4);
 
-      REQUIRE(result1.HasObject());
-      REQUIRE(result2.HasObject());
-      REQUIRE(result3.HasObject());
-      REQUIRE(result4.HasObject());
+        const auto& result1 = unsafe[0];
+        const auto& result2 = unsafe[1];
+        const auto& result3 = unsafe[2];
+        const auto& result4 = unsafe[3];
+
+        REQUIRE(unsafe.GetArray().Size() == 4);
+
+        REQUIRE(result1.Safe().HasObject());
+        REQUIRE(result2.Safe().HasObject());
+        REQUIRE(result3.Safe().HasObject());
+        REQUIRE(result4.Safe().HasObject());
+      });
     }
   }
   SECTION("Get Non-Existent Index Index Not Empty") {
-    mguid::TreeNode ant1{mguid::ArrayNodeType{{}, {}, {}, {}}};
-    REQUIRE(ant1.GetArray().Size() == 4);
-    const auto& result = ant1[4];
-    REQUIRE(ant1.GetArray().Size() == 5);
+    mguid::TreeNode tn1{mguid::ArrayNodeType{{}, {}, {}, {}}};
+    tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 4); });
+    const auto& result = tn1[4];
+    tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 5); });
     REQUIRE(result.HasValue());
   }
 }
@@ -1332,15 +1404,15 @@ TEST_CASE("Tree Node Erase") {
   tn1["object"]["third"];
   tn1["array"][9];
 
-  REQUIRE(tn1.GetObject().Size() == 2);
+  tn1.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetObject().Size() == 2); });
 
   auto& obj = tn1["object"];
-  REQUIRE(obj.GetObject().Size() == 3);
+  obj.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetObject().Size() == 3); });
   obj.Erase("second");
-  REQUIRE(obj.GetObject().Size() == 2);
+  obj.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetObject().Size() == 2); });
 
   auto& arr = tn1["array"];
-  REQUIRE(arr.GetArray().Size() == 10);
+  arr.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 10); });
   arr.Erase(5);
-  REQUIRE(arr.GetArray().Size() == 9);
+  arr.Unsafe([](auto&& unsafe) { REQUIRE(unsafe.GetArray().Size() == 9); });
 }

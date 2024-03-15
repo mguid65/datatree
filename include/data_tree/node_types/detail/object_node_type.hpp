@@ -1,10 +1,33 @@
 /**
- * Copyright (c) 2024 Matthew Guidry
- * Distributed under the MIT License (http://opensource.org/licenses/MIT)
- *
  * @brief Declarations for object node type
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
+ *
+ * @cond IGNORE_LICENSE
+ *
+ * MIT License
+ *
+ * Copyright (c) 2024 Matthew Guidry
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @endcond
  */
 
 #ifndef DATATREE_OBJECT_NODE_TYPE_HPP
@@ -23,8 +46,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "datatree/common.hpp"
-#include "datatree/error/error_type.hpp"
+#include "data_tree/common/common.hpp"
+#include "data_tree/error/error_type.hpp"
 
 namespace mguid {
 
@@ -48,6 +71,81 @@ public:
   using ExpectedRType = RefExpected<MappedType, Error>;
   using ConstExpectedRType = RefExpected<const MappedType, Error>;
 
+private:
+  /**
+   * @brief Proxy class that provides access to unsafe ObjectNodeType functionality
+   * @tparam TConst whether we are holding a const or non-const reference
+   */
+  template <bool TConst = false>
+  class UnsafeProxyType {
+  public:
+    /**
+     * @brief Delete Move/Copy Constructors/Assignment Operators
+     */
+    UnsafeProxyType(const UnsafeProxyType&) = delete;
+    UnsafeProxyType& operator=(const UnsafeProxyType&) = delete;
+    UnsafeProxyType(UnsafeProxyType&&) = delete;
+    UnsafeProxyType& operator=(UnsafeProxyType&&) = delete;
+
+    /**
+     * @brief Returns a reference to the mapped value of the element with
+     * specified key.
+     *
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto At(const KeyType& key) -> MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
+     * @brief Returns a reference to the mapped value of the element with
+     * specified key.
+     *
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto At(const KeyType& key) const -> const MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
+     * @brief Returns a reference to the value that is mapped to a key
+     * equivalent to `key`
+     * @throws std::out_of_range if key doesnt exist
+     * @param key the key of the element to find
+     * @return A reference to the mapped value of the requested element.
+     */
+    [[nodiscard]] auto operator[](const KeyType& key) const -> const MappedType& {
+      return m_node_ref.m_children.at(key);
+    }
+
+    /**
+     * @brief Get a reference to the held ObjectNodeType
+     * @return a reference to the held ObjectNodeType
+     */
+    [[nodiscard]] auto Safe() -> ObjectNodeType& { return m_node_ref; }
+
+    /**
+     * @brief Get a reference to the held ObjectNodeType
+     * @return a reference to the held ObjectNodeType
+     */
+    [[nodiscard]] auto Safe() const -> const ObjectNodeType& { return m_node_ref; }
+
+  private:
+    explicit UnsafeProxyType(std::conditional_t<TConst, const ObjectNodeType&, ObjectNodeType&> ref)
+        : m_node_ref{ref} {}
+
+    friend ObjectNodeType;
+    std::conditional_t<TConst, const ObjectNodeType&, ObjectNodeType&> m_node_ref;
+  };
+
+public:
+  using ConstUnsafeProxy = const UnsafeProxyType<true>;
+  using UnsafeProxy = UnsafeProxyType<false>;
+
   /**
    * @brief Default construct an ObjectNodeType
    */
@@ -65,8 +163,7 @@ public:
    * @brief Construct an ObjectNodeType from an initializer list of ValueType
    * @param init_list an initializer list of ValueType
    */
-  ObjectNodeType(std::initializer_list<ValueType> init_list)
-      : m_children{init_list} {}
+  ObjectNodeType(std::initializer_list<ValueType> init_list) : m_children{init_list} {}
 
   /**
    * @brief Assign an initializer list of ValueType to this
@@ -82,8 +179,7 @@ public:
    * @brief Construct an ObjectNodeType from an existing map
    * @param init_mapping an initial mapping to initialize this with
    */
-  explicit ObjectNodeType(MapType init_mapping)
-      : m_children{std::move(init_mapping)} {}
+  explicit ObjectNodeType(MapType init_mapping) : m_children{std::move(init_mapping)} {}
 
   /**
    * @brief Try to get a copy of the node id with the specified key
@@ -92,9 +188,7 @@ public:
    * error
    */
   [[nodiscard]] auto TryGet(const KeyType& key) const -> ConstExpectedRType {
-    if (auto iter = m_children.find(key); iter != m_children.end()) {
-      return iter->second;
-    }
+    if (auto iter = m_children.find(key); iter != m_children.end()) { return iter->second; }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
@@ -105,9 +199,7 @@ public:
    * error
    */
   [[nodiscard]] auto TryGet(const KeyType& key) -> ExpectedRType {
-    if (auto iter = m_children.find(key); iter != m_children.end()) {
-      return iter->second;
-    }
+    if (auto iter = m_children.find(key); iter != m_children.end()) { return iter->second; }
     return make_unexpected(Error{.category = Error::Category::KeyError});
   }
 
@@ -136,9 +228,7 @@ public:
    * to the element that prevented the insertion) and a bool denoting whether
    * the insertion took place (true if insertion happened, false if it did not).
    */
-  auto Insert(ValueType&& value) -> std::pair<Iterator, bool> {
-    return m_children.insert(value);
-  }
+  auto Insert(ValueType&& value) -> std::pair<Iterator, bool> { return m_children.insert(value); }
 
   /**
    * @brief Insert value if the container doesn't already contain an element
@@ -198,8 +288,7 @@ public:
    * prevented the insertion.
    */
   template <typename TConvertibleToValueType>
-  auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value)
-      -> Iterator {
+  auto InsertHint(ConstIterator hint, TConvertibleToValueType&& value) -> Iterator {
     return m_children.insert(hint, value);
   }
 
@@ -212,9 +301,7 @@ public:
    *
    * @param init_list initializer list to insert the values from
    */
-  void Insert(std::initializer_list<ValueType> init_list) {
-    m_children.insert(init_list);
-  }
+  void Insert(std::initializer_list<ValueType> init_list) { m_children.insert(init_list); }
 
   /**
    * @brief Insert a new element or assign to an existing element if found
@@ -232,8 +319,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssign(const KeyType& key, TValue&& obj)
-      -> std::pair<Iterator, bool> {
+  auto InsertOrAssign(const KeyType& key, TValue&& obj) -> std::pair<Iterator, bool> {
     return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -253,8 +339,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssign(KeyType&& key, TValue&& obj)
-      -> std::pair<Iterator, bool> {
+  auto InsertOrAssign(KeyType&& key, TValue&& obj) -> std::pair<Iterator, bool> {
     return m_children.insert_or_assign(key, std::forward<TValue>(obj));
   }
 
@@ -285,8 +370,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj)
-      -> Iterator {
+  auto InsertOrAssignHint(ConstIterator hint, const KeyType& key, TValue&& obj) -> Iterator {
     return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
@@ -317,8 +401,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename TValue>
-  auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj)
-      -> Iterator {
+  auto InsertOrAssignHint(ConstIterator hint, KeyType&& key, TValue&& obj) -> Iterator {
     return m_children.insert_or_assign(hint, key, std::forward<TValue>(obj));
   }
 
@@ -373,8 +456,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplace(const KeyType& key, TArgs&&... args)
-      -> std::pair<Iterator, bool> {
+  auto TryEmplace(const KeyType& key, TArgs&&... args) -> std::pair<Iterator, bool> {
     return m_children.try_emplace(key, std::forward<TArgs>(args)...);
   }
 
@@ -424,8 +506,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args)
-      -> Iterator {
+  auto TryEmplaceHint(ConstIterator hint, const KeyType& key, TArgs&&... args) -> Iterator {
     return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
@@ -451,8 +532,7 @@ public:
    * element that was inserted or updated.
    */
   template <typename... TArgs>
-  auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args)
-      -> Iterator {
+  auto TryEmplaceHint(ConstIterator hint, KeyType&& key, TArgs&&... args) -> Iterator {
     return m_children.try_emplace(hint, key, std::forward<TArgs>(args)...);
   }
 
@@ -484,28 +564,12 @@ public:
   auto Erase(const KeyType& key) -> SizeType { return m_children.erase(key); }
 
   /**
-   * @brief Returns a reference to the mapped value of the element with
-   * specified key.
-   *
-   * @throws std::out_of_range if key doesnt exist
+   * @brief Returns a reference to the value that is mapped to a key equivalent
+   * to `key`, performing an insertion if such key does not already exist.
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  [[nodiscard]] auto At(const KeyType& key) -> MappedType& {
-    return m_children.at(key);
-  }
-
-  /**
-   * @brief Returns a reference to the mapped value of the element with
-   * specified key.
-   *
-   * @throws std::out_of_range if key doesnt exist
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  [[nodiscard]] auto At(const KeyType& key) const -> const MappedType& {
-    return m_children.at(key);
-  }
+  auto operator[](const KeyType& key) -> MappedType& { return m_children[key]; }
 
   /**
    * @brief Returns a reference to the value that is mapped to a key equivalent
@@ -513,35 +577,7 @@ public:
    * @param key the key of the element to find
    * @return A reference to the mapped value of the requested element.
    */
-  auto operator[](const KeyType& key) -> MappedType& {
-    return m_children[key];
-  }
-
-  /**
-   * @brief Returns a reference to the value that is mapped to a key equivalent
-   * to `key`, performing an insertion if such key does not already exist.
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  auto operator[](KeyType&& key) -> MappedType& {
-    return m_children[std::move(key)];
-  }
-
-  /**
-   * @brief Returns a reference to the value that is mapped to a key
-   * equivalent to `key`
-   *
-   * NOTE_BEGIN: Not sure if this overload should be included, however, this is
-   * consistent with what ArrayNodeType does. The functionality for what
-   * ArrayNodeType does is based on what nlohmann::json does. NOTE_END
-   *
-   * @throws std::out_of_range if key doesnt exist
-   * @param key the key of the element to find
-   * @return A reference to the mapped value of the requested element.
-   */
-  [[nodiscard]] auto operator[](const KeyType& key) const -> const MappedType& {
-    return m_children.at(key);
-  }
+  auto operator[](KeyType&& key) -> MappedType& { return m_children[std::move(key)]; }
 
   /**
    * @brief Check if there is a key equivalent to the provided key in this
@@ -549,25 +585,19 @@ public:
    * @param key key value of the node id to search for
    * @return true if there is such a node id, otherwise false
    */
-  [[nodiscard]] auto Contains(const KeyType& key) const -> bool {
-    return m_children.contains(key);
-  }
+  [[nodiscard]] auto Contains(const KeyType& key) const -> bool { return m_children.contains(key); }
 
   /**
    * @brief Returns the number of children in this ObjectNodeType
    * @return the number of children in this ObjectNodeType
    */
-  [[nodiscard]] auto Size() const noexcept -> SizeType {
-    return m_children.size();
-  }
+  [[nodiscard]] auto Size() const noexcept -> SizeType { return m_children.size(); }
 
   /**
    * @brief Check if this ObjectNodeType is empty
    * @return true if empty, otherwise false
    */
-  [[nodiscard]] auto Empty() const noexcept -> bool {
-    return m_children.empty();
-  }
+  [[nodiscard]] auto Empty() const noexcept -> bool { return m_children.empty(); }
 
   /**
    * @brief Find a node id with key equivalent to the provided key
@@ -575,9 +605,7 @@ public:
    * @return An iterator to the requested node id. If no such node id is found,
    * past-the-end (see end()) iterator is returned.
    */
-  [[nodiscard]] auto Find(const KeyType& key) -> Iterator {
-    return m_children.find(key);
-  }
+  [[nodiscard]] auto Find(const KeyType& key) -> Iterator { return m_children.find(key); }
 
   /**
    * @brief Find a node id with key equivalent to the provided key
@@ -599,17 +627,13 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto Begin() const noexcept -> ConstIterator {
-    return m_children.begin();
-  }
+  [[nodiscard]] auto Begin() const noexcept -> ConstIterator { return m_children.begin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator {
-    return m_children.cbegin();
-  }
+  [[nodiscard]] auto CBegin() const noexcept -> ConstIterator { return m_children.cbegin(); }
 
   /**
    * @brief Get an iterator to the first element of the underlying map.
@@ -627,9 +651,7 @@ public:
    * @brief Get an iterator to the first element of the underlying map.
    * @return Iterator to the first element.
    */
-  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator {
-    return CBegin();
-  }
+  [[nodiscard]] auto cbegin() const noexcept -> ConstIterator { return CBegin(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
@@ -643,18 +665,14 @@ public:
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] auto End() const noexcept -> ConstIterator {
-    return m_children.end();
-  }
+  [[nodiscard]] auto End() const noexcept -> ConstIterator { return m_children.end(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
    * unordered_map.
    * @return Iterator to the element following the last element.
    */
-  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator {
-    return m_children.cend();
-  }
+  [[nodiscard]] auto CEnd() const noexcept -> ConstIterator { return m_children.cend(); }
 
   /**
    * @brief Get an iterator to the element following the last element of the
@@ -682,8 +700,91 @@ public:
    * @param other ObjectNodeType to compare against
    * @return true if the contents of the containers are equal, false otherwise.
    */
-  [[nodiscard]] auto operator==(const ObjectNodeType& other) const
-      -> bool = default;
+  [[nodiscard]] auto operator==(const ObjectNodeType& other) const -> bool = default;
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()),
+                            ObjectNodeType&> &&
+        !std::is_same_v<
+            std::decay_t<std::invoke_result_t<
+                TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()), ObjectNodeType&>>,
+            ObjectNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>()),
+                              ObjectNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::UnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The UnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())>>,
+                             ObjectNodeType::UnsafeProxy>)
+  auto Unsafe(TFunc&& func)
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::UnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::UnsafeProxy{*this});
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                                 const ObjectNodeType&> &&
+             !std::is_same_v<std::decay_t<std::invoke_result_t<
+                                 TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                                 const ObjectNodeType&>>,
+                             ObjectNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>()),
+                              const ObjectNodeType&> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::ConstUnsafeProxy{*this}, *this);
+  }
+
+  /**
+   * @brief Use the unsafe API within a lambda function
+   *
+   * The ConstUnsafeProxy cannot be returned from the lambda function
+   *
+   * @tparam TFunc type of function
+   * @param func unsafe block function
+   * @return value returned by provided lambda function
+   */
+  template <typename TFunc>
+    requires(
+        std::is_invocable_v<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())> &&
+        !std::is_same_v<std::decay_t<std::invoke_result_t<
+                            TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())>>,
+                        ObjectNodeType::ConstUnsafeProxy>)
+  auto ConstUnsafe(TFunc&& func) const
+      -> std::invoke_result_t<TFunc, decltype(std::declval<ObjectNodeType::ConstUnsafeProxy>())> {
+    return std::invoke(std::forward<TFunc>(func), ObjectNodeType::ConstUnsafeProxy{*this});
+  }
 
 private:
   MapType m_children;

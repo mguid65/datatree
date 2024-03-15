@@ -1,10 +1,33 @@
 /**
- * Copyright (c) 2024 Matthew Guidry
- * Distributed under the MIT License (http://opensource.org/licenses/MIT)
- *
  * @brief Common utilities
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
+ *
+ * @cond IGNORE_LICENSE
+ *
+ * MIT License
+ *
+ * Copyright (c) 2024 Matthew Guidry
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @endcond
  */
 
 #ifndef DATATREE_COMMON_HPP
@@ -13,7 +36,9 @@
 #include <algorithm>
 #include <cstdint>
 #include <string>
+#include <type_traits>
 #include <variant>
+#include <array>
 
 #include <tl/expected.hpp>
 
@@ -25,8 +50,7 @@ namespace mguid {
  * @param tab_width width of indentation in pretty printed output
  * @return pretty formatted json
  */
-[[nodiscard]] inline std::string PrettifyJson(const std::string& json,
-                                              std::size_t tab_width = 2) {
+[[nodiscard]] inline std::string PrettifyJson(const std::string& json, std::size_t tab_width = 2) {
   std::size_t indent{0};
   std::string result;
 
@@ -94,8 +118,7 @@ using tl::make_unexpected;
  * @tparam TErrorType error type
  */
 template <typename TExpectedType, typename TErrorType>
-struct RefExpected
-    : private expected<std::reference_wrapper<TExpectedType>, TErrorType> {
+struct RefExpected : private expected<std::reference_wrapper<TExpectedType>, TErrorType> {
   using BaseType = expected<std::reference_wrapper<TExpectedType>, TErrorType>;
   using ValueType = TExpectedType;
 
@@ -120,9 +143,7 @@ struct RefExpected
    *
    * @return const reference to ValueType
    */
-  [[nodiscard]] constexpr const ValueType& value() const& {
-    return this->BaseType::value().get();
-  }
+  [[nodiscard]] constexpr const ValueType& value() const& { return this->BaseType::value().get(); }
 
   /**
    * @brief Get value from this
@@ -151,9 +172,7 @@ struct RefExpected
    *
    * @return pointer to ValueType
    */
-  [[nodiscard]] ValueType* operator->() {
-    return &(this->BaseType::value().get());
-  }
+  [[nodiscard]] ValueType* operator->() { return &(this->BaseType::value().get()); }
 
   /**
    * @brief Get const reference to value from this
@@ -173,9 +192,7 @@ struct RefExpected
    *
    * @return reference to ValueType
    */
-  [[nodiscard]] ValueType& operator*() & {
-    return this->BaseType::value().get();
-  }
+  [[nodiscard]] ValueType& operator*() & { return this->BaseType::value().get(); }
 };
 
 using StringKeyType = std::string;
@@ -252,9 +269,7 @@ namespace key_literals {
  * @param idx an index
  * @return a KeyType created from an index
  */
-inline KeyOrIdxType operator""_k(unsigned long long idx) {
-  return KeyOrIdxType{idx};
-}
+inline KeyOrIdxType operator""_k(unsigned long long idx) { return KeyOrIdxType{idx}; }
 
 /**
  * @brief Helper for string literal KeyType UDL
@@ -295,9 +310,8 @@ private:
   using rhs_chain_type = typename PickFirstConvertible<TType, TOther...>::type;
 
 public:
-  using type =
-      typename std::conditional<std::is_convertible<TType, TFirst>::value,
-                                TFirst, rhs_chain_type>::type;
+  using type = typename std::conditional<std::is_convertible<TType, TFirst>::value, TFirst,
+                                         rhs_chain_type>::type;
 };
 
 /**
@@ -307,8 +321,7 @@ public:
  */
 template <typename TType, typename TFirst>
 struct PickFirstConvertible<TType, TFirst> {
-  using type = std::conditional<std::is_convertible<TType, TFirst>::value,
-                                TFirst, void>::type;
+  using type = std::conditional<std::is_convertible<TType, TFirst>::value, TFirst, void>::type;
 };
 
 /**
@@ -324,16 +337,15 @@ struct Path {
    */
   template <typename... TArgs>
   Path(TArgs&&... path_items)
-      : items{{static_cast<typename PickFirstConvertible<
-            TArgs, StringKeyType, IntegerKeyType>::type>(path_items)...}} {}
+      : items{
+            {static_cast<typename PickFirstConvertible<TArgs, StringKeyType, IntegerKeyType>::type>(
+                path_items)...}} {}
 
   /**
    * @brief Get array of KeyType path items
    * @return array of KeyType path items
    */
-  [[nodiscard]] const std::array<KeyOrIdxType, NLength>& Items() const {
-    return items;
-  }
+  [[nodiscard]] const std::array<KeyOrIdxType, NLength>& Items() const { return items; }
 
 private:
   std::array<KeyOrIdxType, NLength> items;
@@ -360,10 +372,8 @@ concept IntegerIndexable = requires(TContainer container, std::size_t idx) {
 template <std::size_t NCount, IntegerIndexable TContainer, typename TFunc>
   requires std::invocable<TFunc, decltype(std::declval<TContainer>()[0])>
 constexpr void For(TContainer&& container, TFunc&& func) noexcept(
-    std::is_nothrow_invocable_v<TFunc,
-                                decltype(std::declval<TContainer>()[0])>) {
-  auto ForImpl = []<std::size_t... NIdxs>(TContainer&& container_inner,
-                                          TFunc&& func_inner,
+    std::is_nothrow_invocable_v<TFunc, decltype(std::declval<TContainer>()[0])>) {
+  auto ForImpl = []<std::size_t... NIdxs>(TContainer&& container_inner, TFunc&& func_inner,
                                           std::index_sequence<NIdxs...>) {
     (std::invoke(func_inner, container_inner[NIdxs]), ...);
   };
@@ -381,13 +391,10 @@ constexpr void For(TContainer&& container, TFunc&& func) noexcept(
 template <std::size_t NLength>
 std::ostream& operator<<(std::ostream& os, const Path<NLength>& path) {
   For<NLength>(path.Items(), [&os](auto&& arg) {
-    std::visit(Overload{[&os](const StringKeyType& key_or_idx) {
-                          os << "[\"" << key_or_idx << "\"]";
-                        },
-                        [&os](const IntegerKeyType& key_or_idx) {
-                          os << "[" << key_or_idx << "]";
-                        }},
-               KeyOrIdxType{arg});
+    std::visit(
+        Overload{[&os](const StringKeyType& key_or_idx) { os << "[\"" << key_or_idx << "\"]"; },
+                 [&os](const IntegerKeyType& key_or_idx) { os << "[" << key_or_idx << "]"; }},
+        KeyOrIdxType{arg});
   });
   return os;
 }
@@ -416,15 +423,6 @@ Path(TArgs...) -> Path<sizeof...(TArgs)>;
   __builtin_unreachable();
 #endif
 }
-
-/**
- * @brief Check if something is a range of TValueType
- * @tparam TRange some range
- * @tparam TValueType range value type
- */
-template <typename TValueType, typename TRange>
-concept RangeOf = std::ranges::range<TRange> &&
-                  std::same_as<std::ranges::range_value_t<TRange>, TValueType>;
 
 }  // namespace mguid
 

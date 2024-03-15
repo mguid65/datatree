@@ -53,6 +53,71 @@ dt1["first"]["second"]["array"].Erase(2);
 // Set path to another tree
 mguid::DataTree dt2;
 dt2["some_key"] = dt1;
+
+// Unsafe API
+const mguid::DataTree dt3 = dt1;
+
+// Unsafe
+
+//              Unsafe API
+//                   |    
+//                   V     
+dt1.Unsafe([](auto&& unsafe) {
+  // The UnsafeProxy operator[] returns another UnsafeProxy
+  auto& second_unsafe_proxy = unsafe["first"]["second"];
+  auto& obj1 = unsafe.GetObject();
+  auto& obj2 = unsafe.Get<mguid::ObjectNodeType>();
+  
+  // Access the safe API with the Safe function
+  auto& safe = unsafe["first"]["second"].Safe();
+});
+
+// ConstUnsafe
+
+//                         Unsafe API
+//                              |    
+//                              V            
+dt3.ConstUnsafe([](const auto&& unsafe) {
+  // The UnsafeProxy operator[] returns another UnsafeProxy
+  const auto& second_unsafe_proxy = unsafe["first"]["second"];
+  const auto& obj1 = unsafe.GetObject();
+  const auto& obj2 = unsafe.Get<mguid::ObjectNodeType>();
+  
+  // Access the safe API with the Safe function
+  const auto& safe = unsafe["first"]["second"].Safe();
+});
+
+// Provide a second reference parameter to get a reference to the safe API
+
+// Unsafe
+
+//              Unsafe API  Reference to dt1
+//                   |             |
+//                   V             V        
+dt1.Unsafe([](auto&& unsafe, auto& safe) {
+  // The UnsafeProxy operator[] returns another UnsafeProxy
+  auto& second_unsafe_proxy = unsafe["first"]["second"];
+  auto& obj1 = unsafe.GetObject();
+  auto& obj2 = unsafe.Get<mguid::ObjectNodeType>();
+  
+  // Access the safe API with the Safe function
+  auto result = safe.TryGetObject();
+});
+
+// Const Unsafe
+
+//                         Unsafe API        Reference to dt3
+//                              |                   |
+//                              V                   V             
+dt3.ConstUnsafe([](const auto&& unsafe, const auto& safe) {
+  // The UnsafeProxy operator[] returns another UnsafeProxy
+  const auto& second_unsafe_proxy = unsafe["first"]["second"];
+  const auto& obj1 = unsafe.GetObject();
+  const auto& obj2 = unsafe.Get<mguid::ObjectNodeType>();
+  
+  // Access the safe API with the Safe function
+  const auto result = safe.TryGetObject();
+});
 ```
 
 ### TODO

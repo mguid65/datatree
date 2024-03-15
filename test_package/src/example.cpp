@@ -4,47 +4,48 @@
  * @date 2024-02-21
  */
 
-#include <chrono>
 #include <iostream>
 
-#include "datatree/data_tree.hpp"
+#include "data_tree/data_tree.hpp"
 
 auto main() -> int {
-  static constexpr auto time_it = [](auto name, auto func,
-                                     std::size_t samples = 1) {
-    std::cout << "Timing " << name << std::endl;
-    std::chrono::nanoseconds time_span{0};
-    // Allow for cache warmup
-    for (std::size_t i{0}; i < 12; ++i) {
-      std::cout << "Warmup Run #" << i << std::endl;
-      (void)func();
-    }
+  mguid::DataTree dt1;
 
-    std::cout << "Timing With " << samples << " Samples..." << std::endl;
-    for (std::size_t i{0}; i < samples; ++i) {
-      auto t1 = std::chrono::steady_clock::now();
-      func();
-      auto t2 = std::chrono::steady_clock::now();
+  // Node types
+  dt1["first"]["second"]["array"] = mguid::ArrayNodeType{};
+  dt1["first"]["second"]["object"] = mguid::ObjectNodeType{};
+  dt1["first"]["second"]["value"] = mguid::ValueNodeType{};
 
-      auto duration =
-          std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
-      time_span += duration;
-    }
+  // Value types
+  dt1["first"]["second"]["number_value_signed"] = 1;
+  dt1["first"]["second"]["number_value_unsigned"] = 1u;
+  dt1["first"]["second"]["number_value_double"] = 1.0;
+  dt1["first"]["second"]["bool_value_true"] = true;
+  dt1["first"]["second"]["bool_value_false"] = false;
+  dt1["first"]["second"]["null_value"] = mguid::Null;
+  dt1["first"]["second"]["string_literal_value"] = "Hello, World!";
+  dt1["first"]["second"]["string_value"] = std::string("42");
 
-    std::cout << "Avg Time: " << (time_span / samples).count() << "ns"
+  dt1.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT1 Num Direct Children: " << unsafe.GetObject().Size()
               << std::endl;
-  };
+    std::cout << R"(DT1["first"]["second"] Num Direct Children: )"
+              << unsafe["first"]["second"].GetObject().Size() << std::endl;
+  });
 
-  time_it(
-      "Data Tree",
-      []() {
-        mguid::DataTree dt;
+  // Set path to another tree
+  mguid::DataTree dt2;
+  dt2["some_key"] = dt1;
 
-        dt["first"]["second"]["third"] = mguid::ArrayNodeType{};
+  dt2.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT2 Num Direct Children: " << unsafe.GetObject().Size()
+              << std::endl;
+  });
 
-        for (std::size_t i{0}; i < 2048; ++i) {
-          dt["first"]["second"]["third"][i] = i;
-        }
-      },
-      48);
+  dt2.Erase("some_key");
+
+  dt2.ConstUnsafe([](const auto&& unsafe) {
+    std::cout << "DT2 Num Direct Children After Erase: "
+              << unsafe.GetObject().Size() << std::endl;
+  });
 }

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(datatree REQUIRED CONFIG)
+find_package(data_tree REQUIRED CONFIG)
 
 add_executable(example src/example.cpp)
-target_link_libraries(example PRIVATE datatree::datatree)
+target_link_libraries(example PRIVATE data_tree::data_tree)

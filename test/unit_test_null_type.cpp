@@ -11,7 +11,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <datatree/node_types/detail/null_type.hpp>
+#include "data_tree/node_types/detail/value_types/null_type.hpp"
 
 TEST_CASE("Null Type Traits") {
   SECTION("Trivially Default Constructible") {
