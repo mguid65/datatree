@@ -35,6 +35,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <ostream>
 #include <string>
 #include <type_traits>
 #include <variant>

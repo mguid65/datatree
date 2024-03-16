@@ -7,7 +7,7 @@ from conan.tools.build import can_run
 
 class DataTreeConan(ConanFile):
     name = 'data_tree'
-    version = '0.0.3'
+    version = '0.0.4'
 
     license = 'MIT'
     author = 'Matthew Guidry'
