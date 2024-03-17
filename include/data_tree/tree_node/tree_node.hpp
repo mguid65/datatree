@@ -405,33 +405,6 @@ public:
   explicit inline TreeNode(ValueNodeType&& node_data);
 
   /**
-   * @brief Construct a TreeNode from an init list of key/TreeNode pairs
-   * @param init_list an init list of key/TreeNode pairs
-   */
-  explicit inline TreeNode(std::initializer_list<std::pair<const std::string, TreeNode>> init_list);
-
-  /**
-   * @brief Assign an init list of key/TreeNode pairs to this
-   * @param init_list an init list of key/TreeNode pairs to this
-   * @return reference to this TreeNode
-   */
-  inline TreeNode& operator=(
-      std::initializer_list<std::pair<const std::string, TreeNode>> init_list);
-
-  /**
-   * @brief Construct a TreeNode from an init list of TreeNodes
-   * @param init_list an init list of TreeNodes
-   */
-  explicit inline TreeNode(std::initializer_list<TreeNode> init_list);
-
-  /**
-   * @brief Assign an init list of TreeNodes to this
-   * @param init_list an init list of TreeNodes to this
-   * @return reference to this TreeNode
-   */
-  inline TreeNode& operator=(std::initializer_list<TreeNode> init_list);
-
-  /**
    * @brief Construct from a value that satisfies ValidValueNodeTypeValueType
    * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
    * @param value value to use to construct inner value node
@@ -1103,23 +1076,6 @@ inline TreeNode::TreeNode(const ValueNodeType& node_data)
 
 inline TreeNode::TreeNode(ValueNodeType&& node_data)
     : m_data_impl{std::make_unique<NodeType>(node_data)} {}
-
-inline TreeNode::TreeNode(std::initializer_list<std::pair<const std::string, TreeNode>> init_list)
-    : m_data_impl{std::make_unique<NodeType>(ObjectNodeType{init_list})} {}
-
-inline TreeNode& TreeNode::operator=(
-    std::initializer_list<std::pair<const std::string, TreeNode>> init_list) {
-  *m_data_impl = ObjectNodeType{init_list};
-  return *this;
-}
-
-inline TreeNode::TreeNode(std::initializer_list<TreeNode> init_list)
-    : m_data_impl{std::make_unique<NodeType>(ArrayNodeType{init_list})} {}
-
-inline TreeNode& TreeNode::operator=(std::initializer_list<TreeNode> init_list) {
-  *m_data_impl = ArrayNodeType{init_list};
-  return *this;
-}
 
 inline TreeNode& TreeNode::operator=(const ObjectNodeType& node_data) {
   *m_data_impl = node_data;
