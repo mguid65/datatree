@@ -851,6 +851,7 @@ public:
   auto ConstUnsafe(TFunc&& func) const
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
+
 private:
   /**
    * @brief Based on a tag, create the corresponding node type

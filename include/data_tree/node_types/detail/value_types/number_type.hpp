@@ -36,6 +36,8 @@
 #include <compare>
 #include <concepts>
 #include <cstdint>
+#include <cmath>
+#include <functional>
 #include <utility>
 
 #include "data_tree/common/common.hpp"
@@ -324,6 +326,90 @@ public:
         //  reinterpret_cast<mguid::NumberType*>(&bytes);
         return false;
     }
+  }
+
+  /**
+   * @brief Negate the held value
+   * @return A new NumberType with the negated value
+   */
+  [[nodiscard]] NumberType operator-() const {
+    return Visit([](const auto val) { return NumberType{std::negate<void>{}(val)}; });
+  }
+
+  /**
+   * @brief Promote the held value
+   * @return A new NumberType with the promoted value
+   */
+  [[nodiscard]] NumberType operator+() const {
+    return Visit([](const auto val) { return NumberType{+val}; });
+  }
+
+  /**
+   * @brief Add this NumberType to another NumberType
+   * @return A new NumberType with the result of the plus operation
+   */
+  [[nodiscard]] NumberType operator+(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit([lhs](const auto rhs) { return NumberType{std::plus<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Subtract a NumberType from this NumberType
+   * @return A new NumberType with the result of the minus operation
+   */
+  [[nodiscard]] NumberType operator-(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::minus<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Multiply this NumberType with another NumberType
+   * @return A new NumberType with the result of the multiplication operation
+   */
+  [[nodiscard]] NumberType operator*(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::multiplies<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Divide this NumberType by another NumberType
+   * @return A new NumberType with the result of the division operation
+   */
+  [[nodiscard]] NumberType operator/(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::divides<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Modulo this NumberType by another NumberType
+   * @return A new NumberType with the result of the modulus operation
+   */
+  [[nodiscard]] NumberType operator%(const NumberType& other) const {
+    return Visit(
+        [&other](const mguid::DoubleType lhs) {
+          return other.Visit([lhs](const auto rhs) { return NumberType{std::fmod(lhs, rhs)}; });
+        },
+        [&other](const auto lhs) {
+          return other.Visit(
+              [lhs](const mguid::DoubleType rhs) { return NumberType{std::fmod(lhs, rhs)}; },
+              [lhs](const auto rhs) { return NumberType{std::modulus<void>{}(lhs, rhs)}; });
+        });
+  }
+
+  /**
+   * @brief Stream insertion operator overload
+   * @return reference to ostream
+   */
+  friend std::ostream& operator<<(std::ostream& os, const NumberType& nt) {
+    nt.Visit([&os](const auto val) { os << val; });
+    return os;
   }
 
 private:
