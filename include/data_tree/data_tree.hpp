@@ -74,15 +74,17 @@ inline mguid::DataTree operator""_DT(const char* value) {
   mguid::UnsignedIntegerType parsed_uint{0};
   mguid::DoubleType parsed_double{0.0};
 
-  if (auto result = std::from_chars(sv_value.begin(), sv_value.end(), parsed_int);
+  if (auto result = std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_int);
       result.ec == std::errc()) {
     return mguid::DataTree{mguid::ValueNodeType{parsed_int}};
   }
-  if (auto result = std::from_chars(sv_value.begin(), sv_value.end(), parsed_uint);
+  if (auto result =
+          std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_uint);
       result.ec == std::errc()) {
     return mguid::DataTree{mguid::ValueNodeType{parsed_uint}};
   }
-  if (auto result = std::from_chars(sv_value.begin(), sv_value.end(), parsed_double);
+  if (auto result =
+          std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_double);
       result.ec == std::errc()) {
     return mguid::DataTree{mguid::ValueNodeType{parsed_double}};
   }
