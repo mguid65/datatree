@@ -110,7 +110,7 @@ auto main() -> int {
   mguid::DataTree dt4;
 
   std::reference_wrapper<mguid::DataTree> ref{dt4};
-  for (int i{0}; i < 256; ++i) { ref = ref.get()["key"]; }
+  for (int i{0}; i < 64; ++i) { ref = ref.get()["key"]; }
 
   ref.get()["key"] = mguid::ValueNodeType{};
 
@@ -131,4 +131,12 @@ auto main() -> int {
               [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
         });
   });
+
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3.5}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3u}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5.0} % mguid::NumberType{3.0}} << std::endl;
+
+  std::cout << mguid::TrueValueTree << std::endl;
+  std::cout << dt1 << std::endl;
 }

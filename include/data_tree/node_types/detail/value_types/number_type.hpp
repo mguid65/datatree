@@ -33,13 +33,28 @@
 #ifndef DATATREE_NUMBER_TYPE_HPP
 #define DATATREE_NUMBER_TYPE_HPP
 
+#include <cmath>
 #include <compare>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <utility>
+#include <ostream>
 
 #include "data_tree/common/common.hpp"
 #include "data_tree/error/error_type.hpp"
+
+#ifdef _MSC_VER
+#define BEGIN_SUPPRESS_C4146 \
+_Pragma("warning(push, 0)")  \
+_Pragma("warning(disable : 4146)")
+
+#define END_SUPPRESS_C4146 \
+_Pragma("warning(pop)")
+#else
+#define BEGIN_SUPPRESS_C4146
+#define END_SUPPRESS_C4146
+#endif
 
 namespace mguid {
 
@@ -326,6 +341,96 @@ public:
     }
   }
 
+  /**
+   * @brief Negate the held value
+   * @return A new NumberType with the negated value
+   */
+  [[nodiscard]] NumberType operator-() const {
+    return Visit(
+        [](const UnsignedIntegerType val) {
+          BEGIN_SUPPRESS_C4146
+          return NumberType{std::negate<void>{}(val)};
+          END_SUPPRESS_C4146
+        },
+        [](const auto val) { return NumberType{std::negate<void>{}(val)}; });
+  }
+
+  /**
+   * @brief Promote the held value
+   * @return A new NumberType with the promoted value
+   */
+  [[nodiscard]] NumberType operator+() const {
+    return Visit([](const auto val) { return NumberType{+val}; });
+  }
+
+  /**
+   * @brief Add this NumberType to another NumberType
+   * @return A new NumberType with the result of the plus operation
+   */
+  [[nodiscard]] NumberType operator+(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit([lhs](const auto rhs) { return NumberType{std::plus<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Subtract a NumberType from this NumberType
+   * @return A new NumberType with the result of the minus operation
+   */
+  [[nodiscard]] NumberType operator-(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::minus<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Multiply this NumberType with another NumberType
+   * @return A new NumberType with the result of the multiplication operation
+   */
+  [[nodiscard]] NumberType operator*(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::multiplies<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Divide this NumberType by another NumberType
+   * @return A new NumberType with the result of the division operation
+   */
+  [[nodiscard]] NumberType operator/(const NumberType& other) const {
+    return Visit([&other](const auto lhs) {
+      return other.Visit(
+          [lhs](const auto rhs) { return NumberType{std::divides<void>{}(lhs, rhs)}; });
+    });
+  }
+
+  /**
+   * @brief Modulo this NumberType by another NumberType
+   * @return A new NumberType with the result of the modulus operation
+   */
+  [[nodiscard]] NumberType operator%(const NumberType& other) const {
+    return Visit(
+        [&other](const mguid::DoubleType lhs) {
+          return other.Visit([lhs](const auto rhs) { return NumberType{std::fmod(lhs, rhs)}; });
+        },
+        [&other](const auto lhs) {
+          return other.Visit(
+              [lhs](const mguid::DoubleType rhs) { return NumberType{std::fmod(lhs, rhs)}; },
+              [lhs](const auto rhs) { return NumberType{std::modulus<void>{}(lhs, rhs)}; });
+        });
+  }
+
+  /**
+   * @brief Stream insertion operator overload
+   * @return reference to ostream
+   */
+  friend std::ostream& operator<<(std::ostream& os, const NumberType& nt) {
+    nt.Visit([&os](const auto val) { os << val; });
+    return os;
+  }
+
 private:
   union {
     IntegerType i_value{0};
@@ -336,5 +441,13 @@ private:
 };
 
 }  // namespace mguid
+
+#ifdef BEGIN_SUPPRESS_C4146
+#undef BEGIN_SUPPRESS_C4146
+#endif
+
+#ifdef END_SUPPRESS_C4146
+#undef END_SUPPRESS_C4146
+#endif
 
 #endif  // DATATREE_NUMBER_TYPE_HPP

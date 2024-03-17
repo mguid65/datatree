@@ -413,6 +413,28 @@ public:
   explicit TreeNode(TValueType&& value);
 
   /**
+   * @brief Assign a value that satisfies ValidValueNodeTypeValueType to this
+   *
+   * If this TreeNode is not a ValueNodeType, reset it to ValueNodeType then
+   * assign the value
+   *
+   * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
+   * @param value value to assign
+   * @return reference to this TreeNode
+   */
+  template <ValidValueNodeTypeValueType TValueType>
+  TreeNode& operator=(TValueType&& value);
+
+  /**
+   * @brief Construct a TreeNode with the proper alternative given the tag
+   *
+   * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
+   *
+   * @tparam tag tag corresponding with one of the node types
+   */
+  explicit inline TreeNode(NodeTypeTag tag);
+
+  /**
    * @brief Copy assign a TreeNode from an ObjectNodeType
    * @param node_data an ObjectNodeType
    * @return reference to this TreeNode
@@ -448,28 +470,6 @@ public:
    * @return reference to this TreeNode
    */
   inline TreeNode& operator=(ValueNodeType&& node_data);
-
-  /**
-   * @brief Assign a value that satisfies ValidValueNodeTypeValueType to this
-   *
-   * If this TreeNode is not a ValueNodeType, reset it to ValueNodeType then
-   * assign the value
-   *
-   * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
-   * @param value value to assign
-   * @return reference to this TreeNode
-   */
-  template <ValidValueNodeTypeValueType TValueType>
-  TreeNode& operator=(TValueType&& value);
-
-  /**
-   * @brief Construct a TreeNode with the proper alternative given the tag
-   *
-   * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
-   *
-   * @tparam tag tag corresponding with one of the node types
-   */
-  explicit inline TreeNode(NodeTypeTag tag);
 
   /**
    * @brief Get type tag for this tree node
@@ -850,6 +850,13 @@ public:
                              TreeNode::ConstUnsafeProxy>)
   auto ConstUnsafe(TFunc&& func) const
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
+
+  /**
+   * @brief This is only to assist with negating a ValueNodeType with a NumberType
+   * Does nothing if the type is incorrect
+   * @return A TreeNode with a negated value or copy of this
+   */
+  [[nodiscard]] inline TreeNode operator-() const;
 
 private:
   /**
@@ -1335,6 +1342,14 @@ inline bool TreeNode::Erase(const KeyOrIdxType& key_or_idx) {
 
 inline bool TreeNode::operator==(const TreeNode& other) const noexcept {
   return *m_data_impl == *other.m_data_impl;
+}
+
+[[nodiscard]] inline TreeNode TreeNode::operator-() const {
+  if (HasNumber()) {
+    return ConstUnsafe(
+        [](const auto&& unsafe) { return TreeNode{ValueNodeType{-unsafe.GetNumber()}}; });
+  }
+  return *this;
 }
 
 inline TreeNode::~TreeNode() = default;
