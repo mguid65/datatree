@@ -413,6 +413,28 @@ public:
   explicit TreeNode(TValueType&& value);
 
   /**
+   * @brief Assign a value that satisfies ValidValueNodeTypeValueType to this
+   *
+   * If this TreeNode is not a ValueNodeType, reset it to ValueNodeType then
+   * assign the value
+   *
+   * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
+   * @param value value to assign
+   * @return reference to this TreeNode
+   */
+  template <ValidValueNodeTypeValueType TValueType>
+  TreeNode& operator=(TValueType&& value);
+
+  /**
+   * @brief Construct a TreeNode with the proper alternative given the tag
+   *
+   * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
+   *
+   * @tparam tag tag corresponding with one of the node types
+   */
+  explicit inline TreeNode(NodeTypeTag tag);
+
+  /**
    * @brief Copy assign a TreeNode from an ObjectNodeType
    * @param node_data an ObjectNodeType
    * @return reference to this TreeNode
@@ -448,28 +470,6 @@ public:
    * @return reference to this TreeNode
    */
   inline TreeNode& operator=(ValueNodeType&& node_data);
-
-  /**
-   * @brief Assign a value that satisfies ValidValueNodeTypeValueType to this
-   *
-   * If this TreeNode is not a ValueNodeType, reset it to ValueNodeType then
-   * assign the value
-   *
-   * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
-   * @param value value to assign
-   * @return reference to this TreeNode
-   */
-  template <ValidValueNodeTypeValueType TValueType>
-  TreeNode& operator=(TValueType&& value);
-
-  /**
-   * @brief Construct a TreeNode with the proper alternative given the tag
-   *
-   * NodeTypeTag::Object, NodeTypeTag::Array, or NodeTypeTag::Value
-   *
-   * @tparam tag tag corresponding with one of the node types
-   */
-  explicit inline TreeNode(NodeTypeTag tag);
 
   /**
    * @brief Get type tag for this tree node

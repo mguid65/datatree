@@ -33,15 +33,27 @@
 #ifndef DATATREE_NUMBER_TYPE_HPP
 #define DATATREE_NUMBER_TYPE_HPP
 
+#include <cmath>
 #include <compare>
 #include <concepts>
 #include <cstdint>
-#include <cmath>
 #include <functional>
 #include <utility>
 
 #include "data_tree/common/common.hpp"
 #include "data_tree/error/error_type.hpp"
+
+#ifdef _MSC_VER
+#define BEGIN_SUPPRESS_C4146 \
+_Pragma("warning(push, 0)")  \
+_Pragma("warning(disable : 4146)")
+
+#define END_SUPPRESS_C4146 \
+_Pragma("warning(pop)")
+#else
+#define BEGIN_SUPPRESS_C4146
+#define END_SUPPRESS_C4146
+#endif
 
 namespace mguid {
 
@@ -333,7 +345,13 @@ public:
    * @return A new NumberType with the negated value
    */
   [[nodiscard]] NumberType operator-() const {
-    return Visit([](const auto val) { return NumberType{std::negate<void>{}(val)}; });
+    return Visit(
+        [](const UnsignedIntegerType val) {
+          BEGIN_SUPPRESS_C4146
+          return NumberType{std::negate<void>{}(val)};
+          END_SUPPRESS_C4146
+        },
+        [](const auto val) { return NumberType{std::negate<void>{}(val)}; });
   }
 
   /**
@@ -422,5 +440,13 @@ private:
 };
 
 }  // namespace mguid
+
+#ifdef BEGIN_SUPPRESS_C4146
+#undef BEGIN_SUPPRESS_C4146
+#endif
+
+#ifdef END_SUPPRESS_C4146
+#undef END_SUPPRESS_C4146
+#endif
 
 #endif  // DATATREE_NUMBER_TYPE_HPP
