@@ -851,7 +851,12 @@ public:
   auto ConstUnsafe(TFunc&& func) const
       -> std::invoke_result_t<TFunc, decltype(std::declval<TreeNode::ConstUnsafeProxy>())>;
 
-
+  /**
+   * @brief This is only to assist with negating a ValueNodeType with a NumberType
+   * Does nothing if the type is incorrect
+   * @return A TreeNode with a negated value or copy of this
+   */
+  [[nodiscard]] inline TreeNode operator-() const;
 private:
   /**
    * @brief Based on a tag, create the corresponding node type
@@ -1336,6 +1341,15 @@ inline bool TreeNode::Erase(const KeyOrIdxType& key_or_idx) {
 
 inline bool TreeNode::operator==(const TreeNode& other) const noexcept {
   return *m_data_impl == *other.m_data_impl;
+}
+
+[[nodiscard]] inline TreeNode TreeNode::operator-() const {
+  if (HasNumber()) {
+    return ConstUnsafe([](const auto&& unsafe){
+      return TreeNode{ValueNodeType{-unsafe.GetNumber()}};
+    });
+  }
+  return *this;
 }
 
 inline TreeNode::~TreeNode() = default;

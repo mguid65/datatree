@@ -39,6 +39,7 @@
 #include <cstdint>
 #include <functional>
 #include <utility>
+#include <ostream>
 
 #include "data_tree/common/common.hpp"
 #include "data_tree/error/error_type.hpp"

@@ -132,12 +132,11 @@ auto main() -> int {
         });
   });
 
-  std::cout << *mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3}}.TryGetNumber()
-            << std::endl;
-  std::cout << *mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3.5}}.TryGetNumber()
-            << std::endl;
-  std::cout << *mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3u}}.TryGetNumber()
-            << std::endl;
-  std::cout << *mguid::DataTree{mguid::NumberType{5.0} % mguid::NumberType{3.0}}.TryGetNumber()
-            << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3.5}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3u}} << std::endl;
+  std::cout << mguid::DataTree{mguid::NumberType{5.0} % mguid::NumberType{3.0}} << std::endl;
+
+  std::cout << mguid::TrueValueTree << std::endl;
+  std::cout << dt1 << std::endl;
 }
