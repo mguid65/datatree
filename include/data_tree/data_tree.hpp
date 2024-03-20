@@ -60,35 +60,30 @@ static const auto FalseValueTree = DataTree{ValueNodeType{false}};
 namespace literals {
 
 /**
- * @brief UDL operator to create a value typed DataTree from a number
- *
- * Terminates if unable to create DataTree
- *
+ * @brief UDL operator to create a value typed DataTree from an int64
  * @param value some string representation of a number
  * @return a DataTree created from the parsed value
  */
-inline mguid::DataTree operator""_DT(const char* value) {
-  std::string_view sv_value{value};
+inline mguid::DataTree operator""_DT_I64(unsigned long long int val) {
+  return mguid::DataTree{mguid::ValueNodeType{static_cast<IntegerType>(val)}};
+}
 
-  mguid::IntegerType parsed_int{0};
-  mguid::UnsignedIntegerType parsed_uint{0};
-  mguid::DoubleType parsed_double{0.0};
+/**
+ * @brief UDL operator to create a value typed DataTree from an int64
+ * @param value some string representation of a number
+ * @return a DataTree created from the parsed value
+ */
+inline mguid::DataTree operator""_DT_U64(unsigned long long int val) {
+  return mguid::DataTree{mguid::ValueNodeType{static_cast<UnsignedIntegerType>(val)}};
+}
 
-  if (auto result = std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_int);
-      result.ec == std::errc()) {
-    return mguid::DataTree{mguid::ValueNodeType{parsed_int}};
-  }
-  if (auto result =
-          std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_uint);
-      result.ec == std::errc()) {
-    return mguid::DataTree{mguid::ValueNodeType{parsed_uint}};
-  }
-  if (auto result =
-          std::from_chars(sv_value.data(), sv_value.data() + sv_value.size(), parsed_double);
-      result.ec == std::errc()) {
-    return mguid::DataTree{mguid::ValueNodeType{parsed_double}};
-  }
-  std::terminate();
+/**
+ * @brief UDL operator to create a value typed DataTree from an int64
+ * @param value some string representation of a number
+ * @return a DataTree created from the parsed value
+ */
+inline mguid::DataTree operator""_DT_F64(long double val) {
+  return mguid::DataTree{mguid::ValueNodeType{static_cast<DoubleType>(val)}};
 }
 
 /**
@@ -97,7 +92,7 @@ inline mguid::DataTree operator""_DT(const char* value) {
  * @param sz string size
  * @return a DataTree created with the string value
  */
-mguid::DataTree operator""_DT(const char* value, std::size_t sz) {
+mguid::DataTree operator""_DT_STR(const char* value, std::size_t sz) {
   return mguid::DataTree(mguid::ValueNodeType{mguid::StringType{value, sz}});
 }
 

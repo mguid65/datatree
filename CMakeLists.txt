@@ -11,7 +11,7 @@ include(cmake/utilities.cmake)
 enable_warnings()
 
 option(COVERAGE "Enable code coverage flags")
-option(SANITIZER "Enable sanitizer flags")
+option(SANITIZE "Enable sanitizer flags")
 
 if (COVERAGE)
     enable_coverage()
