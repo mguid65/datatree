@@ -10,8 +10,11 @@ include(cmake/utilities.cmake)
 
 enable_warnings()
 
-option(COVERAGE "Enable code coverage flags")
-option(SANITIZE "Enable sanitizer flags")
+option(COVERAGE "Enable code coverage flags" Off)
+option(SANITIZE "Enable sanitizer flags" Off)
+
+option(DATA_TREE_BUILD_SAMPLE "Enable building of sample" On)
+option(DATA_TREE_BUILD_TESTS "Enable building of tests" On)
 
 if (COVERAGE)
     enable_coverage()
@@ -43,23 +46,29 @@ target_sources(data_tree INTERFACE ${DATA_TREE_HEADERS})
 target_link_libraries(data_tree INTERFACE tl::expected)
 set_target_properties(data_tree PROPERTIES LINKER_LANGUAGE CXX)
 
-include(CTest)
 
 install(DIRECTORY include/ DESTINATION include)
 install(TARGETS data_tree DESTINATION lib)
 
-add_executable(sample)
-target_sources(sample PRIVATE source/sample/main.cpp)
-target_link_libraries(sample PRIVATE data_tree)
+if (DATA_TREE_BUILD_SAMPLE)
+    add_executable(sample)
+    target_sources(sample PRIVATE source/sample/main.cpp)
+    target_link_libraries(sample PRIVATE data_tree)
+endif ()
 
-enable_testing()
+if (DATA_TREE_BUILD_TESTS)
+    include(CTest)
+    enable_testing()
 
-add_test(NAME sample
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND sample)
+    if (DATA_TREE_BUILD_SAMPLE)
+        add_test(NAME sample
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMAND sample)
+    endif ()
 
-find_package(Catch2 COMPONENTS Catch2WithMain)
+    find_package(Catch2 COMPONENTS Catch2WithMain)
 
-if (Catch2_FOUND)
-    add_subdirectory(test)
+    if (Catch2_FOUND)
+        add_subdirectory(test)
+    endif ()
 endif ()
