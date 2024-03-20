@@ -62,7 +62,7 @@ concept SatisfiesBoolType = std::same_as<std::remove_cvref_t<TType>, bool>;
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept SatisfiesStringType = !std::same_as<std::remove_cvref_t<TType>, nullptr_t> &&
+concept SatisfiesStringType = !std::same_as<std::remove_cvref_t<TType>, std::nullptr_t> &&
                               std::convertible_to<std::remove_cvref_t<TType>, std::string>;
 
 /**
