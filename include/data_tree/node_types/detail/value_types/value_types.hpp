@@ -37,8 +37,8 @@
 #include <type_traits>
 #include <variant>
 
-#include "null_type.hpp"
-#include "number_type.hpp"
+#include "data_tree/node_types/detail/value_types/null_type.hpp"
+#include "data_tree/node_types/detail/value_types/number_type.hpp"
 
 namespace mguid {
 
@@ -62,7 +62,7 @@ concept SatisfiesBoolType = std::same_as<std::remove_cvref_t<TType>, bool>;
  * @tparam TType type to constrain
  */
 template <typename TType>
-concept SatisfiesStringType = !std::same_as<std::remove_cvref_t<TType>, nullptr_t> &&
+concept SatisfiesStringType = !std::same_as<std::remove_cvref_t<TType>, std::nullptr_t> &&
                               std::convertible_to<std::remove_cvref_t<TType>, std::string>;
 
 /**

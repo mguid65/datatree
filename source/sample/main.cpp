@@ -139,4 +139,13 @@ auto main() -> int {
 
   std::cout << mguid::TrueValueTree << std::endl;
   std::cout << dt1 << std::endl;
+
+  using namespace mguid::literals;
+
+  std::cout << "F64: " << 42.0_DT_F64 << std::endl;
+  std::cout << "Negated F64: " << -42.0_DT_F64 << std::endl;
+  std::cout << "I64: " << 42_DT_I64 << std::endl;
+  std::cout << "Negated I64: " << -42_DT_I64 << std::endl;
+  std::cout << "U64: " << 42_DT_U64 << std::endl;
+  std::cout << "Negated U64: " << -42_DT_U64 << std::endl;
 }
