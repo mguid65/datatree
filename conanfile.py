@@ -7,9 +7,9 @@ from conan.tools.build import can_run
 
 class DataTreeConan(ConanFile):
     name = 'data_tree'
-    version = '0.0.6'
+    version = '0.0.7'
 
-    license = 'MIT'
+    license = 'BSL 1.0'
     author = 'Matthew Guidry'
     url = 'https://github.com/mguid65/datatree'
     description = 'N-ary tree of primitive data types'

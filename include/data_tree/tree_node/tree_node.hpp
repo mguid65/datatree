@@ -2,32 +2,6 @@
  * @brief Declarations for TreeNode
  * @author Matthew Guidry (github: mguid65)
  * @date 2024-02-05
- *
- * @cond IGNORE_LICENSE
- *
- * MIT License
- *
- * Copyright (c) 2024 Matthew Guidry
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- * @endcond
  */
 
 #ifndef DATATREE_TREE_NODE_HPP
@@ -50,10 +24,11 @@ namespace mguid {
 class ObjectNodeType;
 class ArrayNodeType;
 class ValueNodeType;
+class GenericNodeType;
 
-enum class NodeTypeTag : std::uint8_t { Object, Array, Value };
+enum class NodeTypeTag : std::uint8_t { Object, Array, Value, Generic };
 
-using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType>;
+using NodeType = std::variant<ObjectNodeType, ArrayNodeType, ValueNodeType, GenericNodeType>;
 
 /**
  * @brief Represents a node in the data tree that can be an Object, Array, or
@@ -170,6 +145,12 @@ class TreeNode {
      * @return reference to ValueNodeType
      */
     [[nodiscard]] auto GetValue() -> ValueNodeType& { return Get<ValueNodeType>(); }
+
+    [[nodiscard]] auto GetGeneric() const -> const GenericNodeType& {
+      return Get<GenericNodeType>();
+    }
+
+    [[nodiscard]] auto GetGeneric() -> GenericNodeType& { return Get<GenericNodeType>(); }
 
     /**
      * @brief Get Null value from this TreeNode
@@ -404,6 +385,9 @@ public:
    */
   explicit inline TreeNode(ValueNodeType&& node_data);
 
+  explicit inline TreeNode(const GenericNodeType& node_data);
+  explicit inline TreeNode(GenericNodeType&& node_data);
+
   /**
    * @brief Construct from a value that satisfies ValidValueNodeTypeValueType
    * @tparam TValueType type of value that satisfies ValidValueNodeTypeValueType
@@ -470,6 +454,8 @@ public:
    * @return reference to this TreeNode
    */
   inline TreeNode& operator=(ValueNodeType&& node_data);
+  inline TreeNode& operator=(const GenericNodeType& node_data);
+  inline TreeNode& operator=(GenericNodeType&& node_data);
 
   /**
    * @brief Get type tag for this tree node
@@ -511,6 +497,8 @@ public:
    * @return true if holding an ValueNodeType, otherwise false
    */
   [[nodiscard]] inline auto HasValue() const noexcept -> bool;
+
+  [[nodiscard]] inline auto HasGeneric() const noexcept -> bool;
 
   /**
    * @brief Check if this TreeNode is holding a ValueNodeType and if it is Null
@@ -643,6 +631,7 @@ public:
    * @return ValueNodeType if holding an ValueNodeType, otherwise Error
    */
   [[nodiscard]] inline auto TryGetValue() const -> RefExpected<const ValueNodeType, Error>;
+  [[nodiscard]] inline auto TryGetGeneric() const -> RefExpected<const GenericNodeType, Error>;
 
   /**
    * @brief Try to get an ObjectNodeType from this node
@@ -661,6 +650,7 @@ public:
    * @return ValueNodeType if holding an ValueNodeType, otherwise Error
    */
   [[nodiscard]] inline auto TryGetValue() -> RefExpected<ValueNodeType, Error>;
+  [[nodiscard]] inline auto TryGetGeneric() -> RefExpected<GenericNodeType, Error>;
 
   /**
    * @brief Try to get NullType value from this TreeNode
@@ -725,7 +715,7 @@ public:
    * @tparam TTag tag corresponding with one of the node types
    */
   template <NodeTypeTag TTag = NodeTypeTag::Object>
-    requires(static_cast<std::uint8_t>(TTag) < 3)
+    requires(static_cast<std::uint8_t>(TTag) < 4)
   void Reset();
 
   /**
@@ -976,7 +966,7 @@ void TreeNode::Set(TNodeType&& node_data) {
 }
 
 template <NodeTypeTag TTag>
-  requires(static_cast<std::uint8_t>(TTag) < 3)
+  requires(static_cast<std::uint8_t>(TTag) < 4)
 void TreeNode::Reset() {
   *m_data_impl = FromTagTemplate<TTag>();
 }
@@ -1005,7 +995,10 @@ void TreeNode::RecursiveVisitHelper<TCallable>::Visit(const TreeNode& node,
       [this, depth](const ArrayNodeType& arr) mutable {
         for (auto& item : arr) { Visit(item, ++depth); }
       },
-      [](const ValueNodeType&) {});
+      [](const ValueNodeType&) {},
+      [this, depth](const GenericNodeType& gen) mutable {
+        for (auto& kv : gen) { Visit(kv.second, ++depth); }
+      });
 }
 
 template <typename TCallable>
@@ -1020,7 +1013,10 @@ void TreeNode::RecursiveVisitHelper<TCallable>::Visit(TreeNode& node, std::size_
       [this, depth](ArrayNodeType& arr) mutable {
         for (auto& item : arr) { Visit(item, ++depth); }
       },
-      [](ValueNodeType&) {});
+      [](ValueNodeType&) {},
+      [this, depth](GenericNodeType& gen) mutable {
+        for (auto& kv : gen) { Visit(kv.second, ++depth); }
+      });
 }
 
 [[nodiscard]] inline NodeType TreeNode::FromTag(NodeTypeTag tag) {
@@ -1029,6 +1025,8 @@ void TreeNode::RecursiveVisitHelper<TCallable>::Visit(TreeNode& node, std::size_
       return {ArrayNodeType{}};
     case NodeTypeTag::Value:
       return {ValueNodeType{}};
+    case NodeTypeTag::Generic:
+      return {GenericNodeType{}};
     default:
       return {ObjectNodeType{}};
   }
@@ -1040,6 +1038,8 @@ template <NodeTypeTag TTag>
     return ArrayNodeType{};
   } else if constexpr (TTag == NodeTypeTag::Value) {
     return ValueNodeType{};
+  } else if constexpr (TTag == NodeTypeTag::Generic) {
+    return GenericNodeType{};
   } else {
     return ObjectNodeType{};
   }
@@ -1077,6 +1077,12 @@ inline TreeNode::TreeNode(const ValueNodeType& node_data)
 inline TreeNode::TreeNode(ValueNodeType&& node_data)
     : m_data_impl{std::make_unique<NodeType>(node_data)} {}
 
+inline TreeNode::TreeNode(const GenericNodeType& node_data)
+    : m_data_impl{std::make_unique<NodeType>(node_data)} {}
+
+inline TreeNode::TreeNode(GenericNodeType&& node_data)
+    : m_data_impl{std::make_unique<NodeType>(node_data)} {}
+
 inline TreeNode& TreeNode::operator=(const ObjectNodeType& node_data) {
   *m_data_impl = node_data;
   return *this;
@@ -1107,6 +1113,16 @@ inline TreeNode& TreeNode::operator=(ValueNodeType&& node_data) {
   return *this;
 }
 
+inline TreeNode& TreeNode::operator=(const GenericNodeType& node_data) {
+  *m_data_impl = node_data;
+  return *this;
+}
+
+inline TreeNode& TreeNode::operator=(GenericNodeType&& node_data) {
+  *m_data_impl = node_data;
+  return *this;
+}
+
 inline TreeNode::TreeNode(NodeTypeTag tag)
     : m_data_impl{std::make_unique<NodeType>(FromTag(tag))} {}
 
@@ -1118,6 +1134,8 @@ inline NodeTypeTag TreeNode::Tag() const noexcept {
       return NodeTypeTag::Array;
     case 2:
       return NodeTypeTag::Value;
+    case 3:
+      return NodeTypeTag::Generic;
     default:
       Unreachable();
   }
@@ -1128,6 +1146,8 @@ inline auto TreeNode::HasObject() const noexcept -> bool { return Has<ObjectNode
 inline auto TreeNode::HasArray() const noexcept -> bool { return Has<ArrayNodeType>(); }
 
 inline auto TreeNode::HasValue() const noexcept -> bool { return Has<ValueNodeType>(); }
+
+inline auto TreeNode::HasGeneric() const noexcept -> bool { return Has<GenericNodeType>(); }
 
 inline auto TreeNode::HasNull() const noexcept -> bool { return Has<NullType>(); }
 
@@ -1258,6 +1278,10 @@ inline auto TreeNode::TryGetValue() const -> RefExpected<const ValueNodeType, Er
   return TryGet<ValueNodeType>();
 }
 
+inline auto TreeNode::TryGetGeneric() const -> RefExpected<const GenericNodeType, Error> {
+  return TryGet<GenericNodeType>();
+}
+
 inline auto TreeNode::TryGetObject() -> RefExpected<ObjectNodeType, Error> {
   return TryGet<ObjectNodeType>();
 }
@@ -1268,6 +1292,10 @@ inline auto TreeNode::TryGetArray() -> RefExpected<ArrayNodeType, Error> {
 
 inline auto TreeNode::TryGetValue() -> RefExpected<ValueNodeType, Error> {
   return TryGet<ValueNodeType>();
+}
+
+inline auto TreeNode::TryGetGeneric() -> RefExpected<GenericNodeType, Error> {
+  return TryGet<GenericNodeType>();
 }
 
 inline auto TreeNode::TryGetNull() const -> RefExpected<const NullType, Error> {

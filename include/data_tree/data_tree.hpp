@@ -2,32 +2,6 @@
  * @brief Declarations for datatree
  * @author Matthew Guidry(github: mguid65)
  * @date 2024-02-04
- *
- * @cond IGNORE_LICENSE
- *
- * MIT License
- *
- * Copyright (c) 2024 Matthew Guidry
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- * @endcond
  */
 
 #ifndef DATATREE_DATATREE_HPP
@@ -41,6 +15,22 @@
 
 namespace mguid {
 
+/**
+ * @brief Main DataTree type alias for TreeNode
+ *
+ * DataTree (TreeNode) can hold one of four node types:
+ * 1. ObjectNodeType   - For user-facing associative arrays/dictionaries
+ * 2. ArrayNodeType    - For ordered collections/arrays
+ * 3. ValueNodeType    - For primitive values (null, bool, numbers, strings)
+ * 4. GenericNodeType  - For special internal types (functions, file handles, etc.)
+ *
+ * Usage patterns:
+ * - Use ObjectNodeType for creating JSON-like structures and user data
+ * - Use ArrayNodeType for ordered lists of elements
+ * - Use ValueNodeType for primitive data
+ * - Use GenericNodeType for host-managed special types that shouldn't be
+ *   exposed to user code (functions, file handles, system resources)
+ */
 using DataTree = TreeNode;
 
 /*
@@ -92,7 +82,7 @@ inline mguid::DataTree operator""_DT_F64(long double val) {
  * @param sz string size
  * @return a DataTree created with the string value
  */
-mguid::DataTree operator""_DT_STR(const char* value, std::size_t sz) {
+inline mguid::DataTree operator""_DT_STR(const char* value, std::size_t sz) {
   return mguid::DataTree(mguid::ValueNodeType{mguid::StringType{value, sz}});
 }
 
@@ -145,6 +135,9 @@ inline std::ostream& operator<<(std::ostream& os, const DataTree& dt) {
             },
             [&os](const mguid::StringType& value) { os << '"' << value << '"'; },
             [&os](const auto& value) { os << value; });
+      },
+      [&os](const mguid::GenericNodeType&) {
+        os << "<generic>";
       });
   return os;
 }
