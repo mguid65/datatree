@@ -104,7 +104,8 @@ auto main() -> int {
               },
               [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
               [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
-        });
+        },
+        [](mguid::GenericNodeType&) { std::cout << "Generic:" << std::endl; });
   });
 
   mguid::DataTree dt4;
@@ -129,7 +130,9 @@ auto main() -> int {
               },
               [](mguid::StringType& value) { std::cout << "String: " << value << std::endl; },
               [](mguid::NullType& value) { std::cout << "Null: " << value << std::endl; });
-        });
+        },
+        [](mguid::GenericNodeType&) { std::cout << "Generic:" << std::endl; })
+      ;);
   });
 
   std::cout << mguid::DataTree{mguid::NumberType{5} % mguid::NumberType{3}} << std::endl;
